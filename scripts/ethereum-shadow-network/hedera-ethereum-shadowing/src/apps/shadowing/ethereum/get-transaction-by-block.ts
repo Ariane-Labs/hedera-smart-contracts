@@ -13,7 +13,6 @@ export async function getTransactionByBlock(
 ) {
 	try {
 		for (; startFromBlock < numberOfBlocks; startFromBlock++) {
-
 			// We reset hedera local node after hitting 100000
 			if (startFromBlock % 100000 === 0 && startFromBlock !== 0) {
 				await resetHederaLocalNode();
@@ -39,7 +38,7 @@ export async function getTransactionByBlock(
 				console.log(`transaction in block ${startFromBlock} found...`);
 				console.log('preceding iterate through transfers...');
 				for (const transaction of transactions) {
-					if (transaction && transaction.hash) {
+					if (transaction?.hash) {
 						console.log(`transaction found ${transaction.hash}`);
 						//Create hedera transaction with function createEthereumTransaction that uses Hashgraph SDK EthereumTransaction
 						await createEthereumTransaction(
