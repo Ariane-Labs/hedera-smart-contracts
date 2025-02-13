@@ -44,9 +44,10 @@ abstract class RotatedFileLogger<T, L extends string = string> {
 		const transports = levels.map(
 			(level) =>
 				new DailyRotateFile({
-					datePattern: 'YYYY-MM-DD-HH:mm',
+					datePattern: 'YYYY-MM-DD-HH',
 					dirname: `${dirname}/${level}`,
-					filename: `%DATE%-${level}-${filename}.${extension}`,
+					filename: `%DATE%-${level}-${filename}`,
+					extension: `.${extension}`,
 					maxSize,
 					format,
 					level,
