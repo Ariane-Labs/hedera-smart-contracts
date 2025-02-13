@@ -77,7 +77,7 @@ abstract class RotatedFileLogger<T, L extends string = string> {
  * @argument dirname - The directory where the log files will be stored.
  * @argument filename - The name of the log files.
  */
-class CsvLogger extends RotatedFileLogger<any[], 'info'> {
+export class CsvLogger extends RotatedFileLogger<any[], 'info'> {
 	constructor(
 		readonly dirname: string,
 		readonly filename: string,
@@ -112,53 +112,3 @@ class CsvLogger extends RotatedFileLogger<any[], 'info'> {
 		super.log('info', message);
 	}
 }
-
-export const TRANSACTION_CHECKER_LOGGER = new CsvLogger(
-	'logs/transaction-checker',
-	'transaction-checker',
-	{
-		header: [
-			'transactionId',
-			'type',
-			'blockNumber',
-			'addressTo',
-			'txTimestamp',
-			'currentTimestamp',
-			'hederaTransactionHash',
-			'ethereumTransactionHash',
-			'status',
-		],
-	}
-);
-
-export const CONTRACT_DETAILS_LOGGER = new CsvLogger(
-	'logs/all-contracts-details',
-	'all-contracts-details',
-	{
-		header: [
-			'blockNumber',
-			'ethereumTransactionHash',
-			'timestamp',
-			'contractAddress',
-			'searchedSlot',
-			'hederaValue',
-			'ethereumValue',
-		],
-	}
-);
-
-export const STATE_ROOT_COMPARE_ERRORS_LOGGER = new CsvLogger(
-	'logs/state-root-compare-errors',
-	'state-root-compare-errors',
-	{
-		header: [
-			'blockNumber',
-			'ethereumTransactionHash',
-			'timestamp',
-			'contractAddress',
-			'searchedSlot',
-			'hederaValue',
-			'ethereumValue',
-		],
-	}
-);

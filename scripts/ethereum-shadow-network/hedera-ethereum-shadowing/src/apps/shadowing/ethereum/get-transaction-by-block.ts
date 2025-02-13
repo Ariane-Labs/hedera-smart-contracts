@@ -5,7 +5,8 @@ import { createEthereumTransaction } from '@/apps/shadowing/ethereum/create-ethe
 import { getAccount } from '@/api/hedera-mirror-node/get-account';
 import { sendHbarToAlias } from '@/apps/shadowing/transfers/send-hbar-to-alias';
 import { resetHederaLocalNode } from '@/utils/helpers/reset-hedera-local-node';
-import { writeLogFile } from '@/utils/helpers/write-log-file';
+import { BlockStat } from '@/utils/block-stat';
+import { calculateFee } from '@/utils/helpers/calculate-fee';
 
 export async function getTransactionByBlock(
 	startFromBlock: number,
@@ -16,7 +17,6 @@ export async function getTransactionByBlock(
 ) {
 	try {
 		for (; startFromBlock < numberOfBlocks; startFromBlock++) {
-
 			// We reset hedera local node after hitting 100000
 			if (startFromBlock % 100000 === 0 && startFromBlock !== 0) {
 				await resetHederaLocalNode();
@@ -37,6 +37,13 @@ export async function getTransactionByBlock(
 				transactions,
 				nodeAccountId
 			);
+
+			const blockStats = {
+				gasUsed: 0,
+				txFees: 0,
+			};
+
+			const start = new Date().getTime();
 
 			if (transactions.length > 0) {
 				console.log(`transaction in block ${startFromBlock} found...`);
@@ -61,10 +68,10 @@ export async function getTransactionByBlock(
 						);
 					}
 
-					if (transaction && transaction.hash) {
+					if (transaction?.hash) {
 						console.log(`transaction found ${transaction.hash}`);
 						//Create hedera transaction with function createEthereumTransaction that uses Hashgraph SDK EthereumTransaction
-						const hederaTransaction = await createEthereumTransaction(
+						await createEthereumTransaction(
 							{
 								txHash: transaction.hash,
 								gas: 21000,
@@ -75,9 +82,24 @@ export async function getTransactionByBlock(
 							transaction.to,
 							startFromBlock
 						);
+
+						// Add gas used and transaction fees to blockStats
+						const fee = calculateFee(transaction.gas, transaction.gasPrice);
+						blockStats.gasUsed += Number(transaction.gas);
+						blockStats.txFees += fee;
 					}
 				}
 			}
+
+			const end = new Date().getTime();
+
+			BlockStat.addBlockLog({
+				blockNumber: startFromBlock,
+				timePerBlock: end - start,
+				gasUsed: blockStats.gasUsed,
+				txFees: blockStats.txFees,
+				txCount: transactions.length,
+			});
 		}
 	} catch (error) {
 		console.log(error);
