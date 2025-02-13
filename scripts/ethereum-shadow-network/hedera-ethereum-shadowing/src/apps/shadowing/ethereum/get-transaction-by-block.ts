@@ -85,7 +85,7 @@ export async function getTransactionByBlock(
 
 						// Add gas used and transaction fees to blockStats
 						const fee = calculateFee(transaction.gas, transaction.gasPrice);
-						blockStats.gasUsed += transaction.gas;
+						blockStats.gasUsed += Number(transaction.gas);
 						blockStats.txFees += fee;
 					}
 				}
