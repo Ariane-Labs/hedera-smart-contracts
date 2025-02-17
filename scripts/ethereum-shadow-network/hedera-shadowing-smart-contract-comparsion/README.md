@@ -76,8 +76,8 @@ To run this project install the [Hedera local node](https://github.com/hiero-led
 
 4. The original Hedera local node `network_node` service has issues with creating transactions on the `CHAIN_ID` 11155111. To fix that, paste both images into `docker-compose.yml` and replace the service images with:
 
-   - `havaged` service: `us-docker.pkg.dev/swirlds-registry/local-node/network-node-haveged:0.54.0-shadowing-wip-new-changes-0.54.0-alpha.5.x06fa4a3`
-   - `network-node` service: `us-docker.pkg.dev/swirlds-registry/local-node/main-network-node:0.54.0-shadowing-wip-new-changes-0.54.0-alpha.5.x06fa4a3`
+   - `haveged` service: `us-docker.pkg.dev/swirlds-registry/local-node/network-node-haveged:0.54.0-shadowing-wip-new-changes-0.54.0-alhpa.5.x30ca434`
+   - `network-node` service: `us-docker.pkg.dev/swirlds-registry/local-node/main-network-node:0.54.0-shadowing-wip-new-changes-0.54.0-alhpa.5.x30ca434`
 
    To prevent any stability issues, in the same file:
 
