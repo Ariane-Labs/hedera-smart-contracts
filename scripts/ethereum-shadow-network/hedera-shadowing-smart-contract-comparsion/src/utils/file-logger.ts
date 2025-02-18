@@ -152,7 +152,6 @@ export const CONTRACT_DETAILS_LOGGER = new CsvLogger(
 			'hederaValue',
 			'ethereumValue',
 		],
-		maxSize: 256,
 	}
 );
 
