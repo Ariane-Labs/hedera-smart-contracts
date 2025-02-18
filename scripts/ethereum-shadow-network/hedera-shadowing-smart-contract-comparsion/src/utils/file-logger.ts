@@ -1,9 +1,6 @@
 import path from 'path';
 import * as fs from 'fs';
 import * as winston from 'winston';
-import DailyRotateFile, {
-	DailyRotateFileTransportOptions,
-} from 'winston-daily-rotate-file';
 
 /**
  * An abstract class for creating a rotated file logger using Winston.
@@ -15,21 +12,31 @@ import DailyRotateFile, {
 abstract class RotatedFileLogger<T, L extends string = string> {
 	private readonly logger: winston.Logger;
 
+	/**
+	 * Creates an instance of RotatedFileLogger.
+	 *
+	 * @param dirname - The directory name where log files will be stored.
+	 * @param filename - The base name of the log files.
+	 * @param extension - The file extension for the log files.
+	 * @param format - The format of the log messages.
+	 * @param levels - The log levels to be used.
+	 * @param maxSize - The maximum size of each log file in bytes. Defaults to 10MB.
+	 */
 	constructor(
 		dirname: string,
 		filename: string,
 		extension: string,
 		format: winston.Logform.Format,
 		levels: L[],
-		maxSize: DailyRotateFileTransportOptions['maxSize'] = '10m'
+		maxSize: number = 1024 * 1024 * 10
 	) {
 		this.logger = this.createLogger(
 			dirname,
 			filename,
 			extension,
 			format,
-			maxSize,
-			levels
+			levels,
+			maxSize
 		);
 	}
 
@@ -38,18 +45,20 @@ abstract class RotatedFileLogger<T, L extends string = string> {
 		filename: string,
 		extension: string,
 		format: winston.Logform.Format,
-		maxSize: DailyRotateFileTransportOptions['maxSize'],
-		levels: L[]
+		levels: L[],
+		maxsize: number
 	) {
 		const transports = levels.map(
 			(level) =>
-				new DailyRotateFile({
-					datePattern: 'YYYY-MM-DD-HH:mm',
-					dirname: `${dirname}/${level}`,
-					filename: `%DATE%-${level}-${filename}.${extension}`,
-					maxSize,
-					format,
-					level,
+				new winston.transports.File({
+					filename: path.join(
+						dirname,
+						`${new Date().toISOString().split('T')[0]}-${filename}-${level}.${extension}`
+					),
+					format: format,
+					level: level,
+					lazy: false,
+					maxsize,
 				})
 		);
 
@@ -82,7 +91,7 @@ class CsvLogger extends RotatedFileLogger<any[], 'info'> {
 		readonly filename: string,
 		readonly options: {
 			header?: string[];
-			maxSize?: DailyRotateFileTransportOptions['maxSize'];
+			maxSize?: number;
 		} = {}
 	) {
 		super(
@@ -143,6 +152,7 @@ export const CONTRACT_DETAILS_LOGGER = new CsvLogger(
 			'hederaValue',
 			'ethereumValue',
 		],
+		maxSize: 256,
 	}
 );
 
