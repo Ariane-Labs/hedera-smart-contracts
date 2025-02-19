@@ -7,7 +7,6 @@ import { compareSmartContractRootState } from '@/apps/smart-contract-comparison/
 import { transactionStatusAccuracyChecker } from '@/apps/smart-contract-comparison/hedera/transaction-status-accuracy-checker';
 
 (async () => {
-	let iteration = 0;
 
 	// Start listening for the shadowing api requests from evm_shadowing api
 	websocketConnection();
@@ -31,7 +30,6 @@ import { transactionStatusAccuracyChecker } from '@/apps/smart-contract-comparis
 		while (eventQueue.length > 0) {
 			const contractData = eventQueue.shift();
 			if (contractData) {
-				iteration++;
 				// log transaction data
 				await transactionStatusAccuracyChecker(contractData);
 				// function for detecting and comparing smart contract slots between Hedera and Sepolia

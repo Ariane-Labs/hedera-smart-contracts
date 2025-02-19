@@ -55,13 +55,14 @@ export async function compareContractRootStates(accountId: AccountId, client: Cl
     for (const transaction of transactions) {
         const response = await createEthereumTransaction(
             {
+                addressFrom: 'from',
+                addressTo: 'to',
                 txHash: transaction,
                 gas: 21000,
             },
             accountId,
             client,
             nodeAccountId,
-            'transaction.to',
             0
         );
 

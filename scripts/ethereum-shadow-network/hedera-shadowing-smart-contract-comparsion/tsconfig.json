@@ -8,6 +8,7 @@
     "allowImportingTsExtensions": false,
     "strict": true,
     "typeRoots": ["./node_modules/@types"],
+    "types": ["node"],
     "skipLibCheck": true,
     "baseUrl": ".",
     "paths": {

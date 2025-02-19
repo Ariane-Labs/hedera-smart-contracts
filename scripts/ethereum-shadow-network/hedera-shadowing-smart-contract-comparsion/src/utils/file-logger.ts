@@ -39,12 +39,12 @@ abstract class RotatedFileLogger<T, L extends string = string> {
 		extension: string,
 		format: winston.Logform.Format,
 		maxSize: DailyRotateFileTransportOptions['maxSize'],
-		levels: L[]
+		levels: L[],
 	) {
 		const transports = levels.map(
 			(level) =>
 				new DailyRotateFile({
-					datePattern: 'YYYY-MM-DD-HH:mm',
+					datePattern: 'YYYY-MM-DD-HH',
 					dirname: `${dirname}/${level}`,
 					filename: `%DATE%-${level}-${filename}.${extension}`,
 					maxSize,
@@ -120,12 +120,15 @@ export const TRANSACTION_CHECKER_LOGGER = new CsvLogger(
 			'transactionId',
 			'type',
 			'blockNumber',
+			'addressFrom',
 			'addressTo',
 			'txTimestamp',
 			'currentTimestamp',
 			'hederaTransactionHash',
 			'ethereumTransactionHash',
 			'status',
+			'ethereumStatus',
+			'fromAccountBalance'
 		],
 	}
 );

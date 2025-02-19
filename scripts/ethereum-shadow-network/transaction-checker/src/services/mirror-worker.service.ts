@@ -12,12 +12,17 @@ export function mirrorWorker(id: number) {
         console.log(`Mirror Worker ${id} processing transaction ${payload.transactionId}`);
         try {
           const status = await checkTransactionOnMirrorNode(payload);
-          console.log(`Status of transaction ${payload.transactionId} is: ${status}`);
 
-          await sendAndLogToFile(payload, status, null);
+          await sendAndLogToFile(payload,
+            {
+              status: status.toString(),
+              fromAccountBalance: '-'
+            },
+            null
+          );
         } catch (error) {
           console.error(`Mirror Worker ${id} failed to get the status of transaction ${payload.transactionId}: ${error}`);
-          await sendAndLogToFile(payload, '', `Error getting status from node, transaction failed or not executed (mirror node): ${error}`);
+          await sendAndLogToFile(payload, { status: 'error', fromAccountBalance: '-'}, `Error getting status from node, transaction failed or not executed (mirror node): ${error}`);
           // TODO: Implement error handling to prevent payload loss when Mirror Node is unavailable.
         }
       }
