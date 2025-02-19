@@ -1,14 +1,14 @@
 #!/bin/bash
 set -e
 
-NODE_VERSION=$1
 
-if [ -z "$NODE_VERSION" ]; then
-  echo "⚠️ Error: Please provide NODE_VERSION argument."
-  exit 1
-fi
 
-cd "$HOME/.nvm/versions/node/v$NODE_VERSION/lib/node_modules/@hashgraph/hedera-local"
+NODE_VERSION=$(node -v)
+
+echo "Installing Hedera Local v2.34.0 for node $NODE_VERSION"
+npm install -g @hashgraph/hedera-local@2.34.0
+
+cd "$HOME/.nvm/versions/node/$NODE_VERSION/lib/node_modules/@hashgraph/hedera-local"
 
 SED_CMD="sed -i.bak -E"
 
