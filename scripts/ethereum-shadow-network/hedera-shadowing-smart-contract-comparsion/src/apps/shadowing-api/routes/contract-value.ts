@@ -10,6 +10,7 @@ const contractValueRouter = (wss: WebSocketServer) => {
 			transactionId: req.body.transactionId,
 			type: req.body.type,
 			blockNumber: req.body.blockNumber,
+			addressFrom: req.body.addressFrom,
 			addressTo: req.body.addressTo,
 			txTimestamp: req.body.txTimestamp,
 			timestamp: req.body.timestamp,
@@ -17,6 +18,7 @@ const contractValueRouter = (wss: WebSocketServer) => {
 			hederaTransactionHash: req.body.hederaTransactionHash,
 			ethereumTransactionHash: req.body.ethereumTransactionHash,
 			status: req.body.status,
+			fromAccountBalance: req.body.fromAccountBalance,
 		};
 
 		wss.clients.forEach((client) => {

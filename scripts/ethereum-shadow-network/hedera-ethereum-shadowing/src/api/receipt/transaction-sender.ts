@@ -1,11 +1,11 @@
 import { TransactionId } from '@hashgraph/sdk';
 import { axiosReceiptApi } from '../config';
-import { AxiosError, isAxiosError } from 'axios';
 import { TransactionType } from '@/utils/types';
 import { errorHandler } from '@/utils/helpers/api/error-handler';
 
 interface TransactionReceiptPayload {
 	transactionId: TransactionId;
+	addressFrom: string;
 	evmAddress: string;
 	currentBlock: number;
 	transactionType: TransactionType;
@@ -23,6 +23,7 @@ export async function sendTransactionInfoToReceiptApi(
 			ethereumTransactionHash: transactionReceiptApi.ethereumTransactionHash,
 			hederaTransactionHash: transactionReceiptApi.hederaTransactionHash,
 			blockNumber: transactionReceiptApi.currentBlock,
+			addressFrom: transactionReceiptApi.addressFrom,
 			addressTo: transactionReceiptApi.evmAddress,
 			type: transactionReceiptApi.transactionType,
 			txTimestamp: transactionReceiptApi.txTimestamp,

@@ -24,7 +24,6 @@ export async function createEthereumTransaction(
 	accountId: AccountId,
 	client: Client,
 	nodeAccountId: AccountId,
-	accountTo: string,
 	currentBlock: number
 ): Promise<any> {
 	try {
@@ -56,7 +55,8 @@ export async function createEthereumTransaction(
 			hederaTransactionHash: txResponse.toJSON().transactionHash,
 			transactionType: 'TRANSFER_TRANSACTION',
 			currentBlock: currentBlock,
-			evmAddress: accountTo,
+			addressFrom: transactionData.addressFrom,
+			evmAddress: transactionData.addressTo,
 			txTimestamp: transactionTimestamp,
 		});
 		return txResponse.toJSON();
@@ -75,7 +75,6 @@ export async function createEthereumTransaction(
 				accountId,
 				client,
 				nodeAccountId,
-				accountTo,
 				currentBlock
 			);
 		}
@@ -100,7 +99,6 @@ export async function createEthereumTransaction(
 				accountId,
 				client,
 				nodeAccountId,
-				accountTo,
 				currentBlock
 			);
 		} else if (

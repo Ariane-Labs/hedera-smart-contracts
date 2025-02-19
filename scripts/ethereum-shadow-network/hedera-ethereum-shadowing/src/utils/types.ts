@@ -13,6 +13,8 @@ export interface StateData {
 }
 
 export interface TransactionData {
+	addressFrom: string;
+	addressTo: string;
 	txHash: string;
 	gas: number;
 }

@@ -6,6 +6,7 @@ export interface StateData {
 }
 
 export interface ContractType {
+	addressFrom: string;
 	addressTo: string;
 	blockNumber: number;
 	currentTimestamp: string;
@@ -18,6 +19,8 @@ export interface ContractType {
 
 export interface TransactionStatusResponse extends ContractType {
 	status: string;
+	ethereumStatus: string;
+	fromAccountBalance: string
 }
 
 interface HederaTransfers {
@@ -44,7 +47,7 @@ interface HederaTransaction {
 	token_transfers: [];
 	transaction_hash: string;
 	transaction_id: string;
-	transafers: HederaTransfers[];
+	transfers: HederaTransfers[];
 	valid_duration_seconds: string;
 	valid_start_timestamp: string;
 }
