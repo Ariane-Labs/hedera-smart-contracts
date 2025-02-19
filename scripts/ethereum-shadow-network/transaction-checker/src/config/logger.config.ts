@@ -5,10 +5,11 @@ import {TransactionPayload} from "../models/transaction-payload.model";
 import {sendToShadowingSmartContractComaparisonApi} from "../utils/shadowing-client.util";
 import {env} from "./environment-variables.config";
 
-export async function sendAndLogToFile(payload: TransactionPayload, status: string, error: string | null) {
+export async function sendAndLogToFile(payload: TransactionPayload, newData: { status: string, fromAccountBalance: string }, error: string | null) {
   const transactionStatus: TransactionStatus = {
     ...payload,
-    status: status,
+    status: newData.status,
+    fromAccountBalance: newData.fromAccountBalance,
     error: error || undefined,
   };
 

@@ -129,12 +129,15 @@ export const TRANSACTION_CHECKER_LOGGER = new CsvLogger(
 			'transactionId',
 			'type',
 			'blockNumber',
+			'addressFrom',
 			'addressTo',
 			'txTimestamp',
 			'currentTimestamp',
 			'hederaTransactionHash',
 			'ethereumTransactionHash',
 			'status',
+			'ethereumStatus',
+			'fromAccountBalance',
 		],
 	}
 );

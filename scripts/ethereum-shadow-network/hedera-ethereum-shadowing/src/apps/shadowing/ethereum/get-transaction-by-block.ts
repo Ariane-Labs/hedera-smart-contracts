@@ -2,10 +2,7 @@ import { getBlockByNumber } from '@/api/erigon/get-block-by-number';
 import { AccountId, Client } from '@hashgraph/sdk';
 import { sendBlockReward } from '@/apps/shadowing/transfers/send-block-reward';
 import { createEthereumTransaction } from '@/apps/shadowing/ethereum/create-ethereum-transaction';
-import { getAccount } from '@/api/hedera-mirror-node/get-account';
-import { sendHbarToAlias } from '@/apps/shadowing/transfers/send-hbar-to-alias';
 import { resetHederaLocalNode } from '@/utils/helpers/reset-hedera-local-node';
-import { writeLogFile } from '@/utils/helpers/write-log-file';
 
 export async function getTransactionByBlock(
 	startFromBlock: number,
@@ -42,37 +39,19 @@ export async function getTransactionByBlock(
 				console.log(`transaction in block ${startFromBlock} found...`);
 				console.log('preceding iterate through transfers...');
 				for (const transaction of transactions) {
-					const isAccountCreated = await getAccount(transaction.to);
-
-					//Checks if transaction.to is not a smart contract creation and is account exist in hedera mirror node
-					if (!isAccountCreated && transaction.to !== null) {
-						console.log(
-							'account not found, created new account and sending 1 hbar...'
-						);
-
-						// Create a hedera account.
-						await sendHbarToAlias(
-							accountId,
-							transaction.to,
-							1,
-							client,
-							startFromBlock,
-							nodeAccountId
-						);
-					}
-
 					if (transaction && transaction.hash) {
 						console.log(`transaction found ${transaction.hash}`);
 						//Create hedera transaction with function createEthereumTransaction that uses Hashgraph SDK EthereumTransaction
-						const hederaTransaction = await createEthereumTransaction(
+						await createEthereumTransaction(
 							{
+								addressFrom: transaction.from,
+								addressTo: transaction.to,
 								txHash: transaction.hash,
 								gas: 21000,
 							},
 							accountId,
 							client,
 							nodeAccountId,
-							transaction.to,
 							startFromBlock
 						);
 					}
