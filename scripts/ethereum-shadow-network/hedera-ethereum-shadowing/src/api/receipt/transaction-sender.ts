@@ -12,6 +12,8 @@ interface TransactionReceiptPayload {
 	txTimestamp?: string;
 	ethereumTransactionHash: string | null;
 	hederaTransactionHash: string | Uint8Array;
+	ethGas: number;
+	ethGasPrice: number;
 }
 
 export async function sendTransactionInfoToReceiptApi(
@@ -28,6 +30,8 @@ export async function sendTransactionInfoToReceiptApi(
 			type: transactionReceiptApi.transactionType,
 			txTimestamp: transactionReceiptApi.txTimestamp,
 			currentTimestamp: new Date().toISOString(),
+			ethGas: transactionReceiptApi.ethGas,
+			ethGasPrice: transactionReceiptApi.ethGasPrice,
 		});
 
 		if (response.data === 'OK') {

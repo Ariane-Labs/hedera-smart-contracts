@@ -58,6 +58,8 @@ export async function createEthereumTransaction(
 			addressFrom: transactionData.addressFrom,
 			evmAddress: transactionData.addressTo,
 			txTimestamp: transactionTimestamp,
+			ethGas: transactionData.ethGas,
+			ethGasPrice: transactionData.ethGasPrice,
 		});
 	} catch (error: any) {
 		// Sometimes we would catch DUPLICATE_TRANSACTION error that was thrown when Transaction ID was duplicated.

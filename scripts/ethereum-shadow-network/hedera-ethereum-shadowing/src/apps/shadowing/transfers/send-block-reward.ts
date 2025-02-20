@@ -5,12 +5,13 @@ import { sendTinyBarToAlias } from '@/apps/shadowing/transfers/send-tiny-bar-to-
 import { calculateFee } from '@/utils/helpers/calculate-fee';
 import { BigNumber } from '@ethersproject/bignumber';
 import { convertHexIntoDecimal } from '@/utils/helpers/convert-hex-into-decimal';
+import { ErigonTransactionLog } from '../types';
 
 export async function sendBlockReward(
 	accountId: AccountId,
 	client: Client,
 	currentBlock: string,
-	transactions: any[],
+	transactions: ErigonTransactionLog[],
 	nodeAccountId: AccountId
 ) {
 	const convertedCurrentBlock = convertHexIntoDecimal(currentBlock);

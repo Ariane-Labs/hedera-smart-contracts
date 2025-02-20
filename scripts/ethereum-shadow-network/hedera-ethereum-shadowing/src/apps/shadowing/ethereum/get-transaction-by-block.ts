@@ -3,6 +3,7 @@ import { AccountId, Client } from '@hashgraph/sdk';
 import { sendBlockReward } from '@/apps/shadowing/transfers/send-block-reward';
 import { createEthereumTransaction } from '@/apps/shadowing/ethereum/create-ethereum-transaction';
 import { resetHederaLocalNode } from '@/utils/helpers/reset-hedera-local-node';
+import { ErigonTransactionLog } from '../types';
 
 export async function getTransactionByBlock(
 	startFromBlock: number,
@@ -22,7 +23,7 @@ export async function getTransactionByBlock(
 
 			// Retrieve all block information with RPC API call to Erigon https://www.quicknode.com/docs/ethereum/eth_getBlockByNumber
 			let block = await getBlockByNumber(startFromBlock.toString(16));
-			const transactions = block.transactions;
+			const transactions: ErigonTransactionLog[] = block.transactions;
 			// Sends block reward for the current miner, and uncles.
 			// We need to send block reward for the account to match current balance in block
 			// Proceed with this method to learn more
@@ -47,6 +48,8 @@ export async function getTransactionByBlock(
 								addressTo: transaction.to,
 								txHash: transaction.hash,
 								gas: 21000,
+								ethGas: parseInt(transaction.gas),
+								ethGasPrice: parseInt(transaction.gasPrice),
 							},
 							accountId,
 							client,
