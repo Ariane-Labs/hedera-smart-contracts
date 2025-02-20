@@ -33,7 +33,7 @@ export function hederaWorker(id: number) {
             blockNumber: transaction.blockNumber,
             txTime: new Date(transaction.txTimestamp).getTime() - consensusTimestamp.toDate().getTime(),
             ethTxFee: fee,
-            HederaTxFee: transactionFee.toTinybars().toNumber(),
+            hederaTxFee: transactionFee.toTinybars().toNumber(),
           });
 
         } catch (error) {

@@ -11,7 +11,7 @@ interface TransactionParams {
 	blockNumber: number;
 	txTime: number;
 	ethTxFee: number;
-	HederaTxFee: number;
+	hederaTxFee: number;
 }
 
 interface CurrentBlock {
@@ -79,7 +79,7 @@ export class BlockStat {
 	 * @param params The transaction parameters to initialize the block.
 	 */
 	private static initCurrentBlock(params: TransactionParams): void {
-		const { blockNumber, txTime, ethTxFee, HederaTxFee } = params;
+		const { blockNumber, txTime, ethTxFee, hederaTxFee: HederaTxFee } = params;
 		this.currentBlock = {
 			blockNumber,
 			blockTime: txTime,
@@ -95,7 +95,7 @@ export class BlockStat {
 	 * @param params Object containing blockNumber, txTime, ethTxFee, and HederaTxFee.
 	 */
 	public static addTransaction(params: TransactionParams): void {
-		const { blockNumber, txTime, ethTxFee, HederaTxFee } = params;
+		const { blockNumber, txTime, ethTxFee, hederaTxFee: HederaTxFee } = params;
 
 		if (!this.currentBlock) {
 			this.initCurrentBlock(params);

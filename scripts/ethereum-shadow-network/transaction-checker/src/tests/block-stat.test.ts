@@ -30,12 +30,12 @@ describe('BlockStat', () => {
 	});
 
 	test('aggregates transactions for the same block and logs when a new block is detected', () => {
-		BlockStat.addTransaction({ blockNumber: 1, txTime: 100, ethTxFee: 10, HederaTxFee: 5 });
-		BlockStat.addTransaction({ blockNumber: 1, txTime: 200, ethTxFee: 20, HederaTxFee: 10 });
+		BlockStat.addTransaction({ blockNumber: 1, txTime: 100, ethTxFee: 10, hederaTxFee: 5 });
+		BlockStat.addTransaction({ blockNumber: 1, txTime: 200, ethTxFee: 20, hederaTxFee: 10 });
 
 		expect(csvLoggerMock.info).not.toHaveBeenCalled();
 
-		BlockStat.addTransaction({ blockNumber: 2, txTime: 150, ethTxFee: 15, HederaTxFee: 7 });
+		BlockStat.addTransaction({ blockNumber: 2, txTime: 150, ethTxFee: 15, hederaTxFee: 7 });
 
 		expect(csvLoggerMock.info).toHaveBeenCalledTimes(1);
 		expect(csvLoggerMock.info).toHaveBeenCalledWith([
@@ -59,11 +59,11 @@ describe('BlockStat', () => {
 	});
 
 	test('handles a single transaction and finalizes when a new block arrives', () => {
-		BlockStat.addTransaction({ blockNumber: 5, txTime: 120, ethTxFee: 12, HederaTxFee: 6 });
+		BlockStat.addTransaction({ blockNumber: 5, txTime: 120, ethTxFee: 12, hederaTxFee: 6 });
 
 		expect(csvLoggerMock.info).not.toHaveBeenCalled();
 
-		BlockStat.addTransaction({ blockNumber: 6, txTime: 130, ethTxFee: 13, HederaTxFee: 7 });
+		BlockStat.addTransaction({ blockNumber: 6, txTime: 130, ethTxFee: 13, hederaTxFee: 7 });
 
 		expect(csvLoggerMock.info).toHaveBeenCalledTimes(1);
 		expect(csvLoggerMock.info).toHaveBeenCalledWith([
@@ -87,12 +87,12 @@ describe('BlockStat', () => {
 	});
 
 	test('aggregates two transactions in one block and then one in the next', () => {
-		BlockStat.addTransaction({ blockNumber: 10, txTime: 50, ethTxFee: 5, HederaTxFee: 2 });
-		BlockStat.addTransaction({ blockNumber: 10, txTime: 70, ethTxFee: 7, HederaTxFee: 3 });
+		BlockStat.addTransaction({ blockNumber: 10, txTime: 50, ethTxFee: 5, hederaTxFee: 2 });
+		BlockStat.addTransaction({ blockNumber: 10, txTime: 70, ethTxFee: 7, hederaTxFee: 3 });
 
 		expect(csvLoggerMock.info).not.toHaveBeenCalled();
 
-		BlockStat.addTransaction({ blockNumber: 11, txTime: 60, ethTxFee: 6, HederaTxFee: 3 });
+		BlockStat.addTransaction({ blockNumber: 11, txTime: 60, ethTxFee: 6, hederaTxFee: 3 });
 
 		expect(csvLoggerMock.info).toHaveBeenCalledTimes(1);
 		expect(csvLoggerMock.info).toHaveBeenCalledWith([
@@ -117,10 +117,10 @@ describe('BlockStat', () => {
 	});
 
     test('correctly calculates average block time and total values with transactions in separate blocks', () => {
-		BlockStat.addTransaction({ blockNumber: 1, txTime: 100, ethTxFee: 10, HederaTxFee: 5 });
-		BlockStat.addTransaction({ blockNumber: 2, txTime: 200, ethTxFee: 20, HederaTxFee: 10 });
-		BlockStat.addTransaction({ blockNumber: 3, txTime: 150, ethTxFee: 15, HederaTxFee: 7 });
-		BlockStat.addTransaction({ blockNumber: 4, txTime: 120, ethTxFee: 12, HederaTxFee: 6 });
+		BlockStat.addTransaction({ blockNumber: 1, txTime: 100, ethTxFee: 10, hederaTxFee: 5 });
+		BlockStat.addTransaction({ blockNumber: 2, txTime: 200, ethTxFee: 20, hederaTxFee: 10 });
+		BlockStat.addTransaction({ blockNumber: 3, txTime: 150, ethTxFee: 15, hederaTxFee: 7 });
+		BlockStat.addTransaction({ blockNumber: 4, txTime: 120, ethTxFee: 12, hederaTxFee: 6 });
 
 		expect(csvLoggerMock.info).toHaveBeenCalledTimes(3);
 
