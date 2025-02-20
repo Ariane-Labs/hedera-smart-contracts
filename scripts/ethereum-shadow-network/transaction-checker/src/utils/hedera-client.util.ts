@@ -1,14 +1,27 @@
-import { AccountBalanceQuery, Client, TransactionReceiptQuery } from '@hashgraph/sdk';
+import { AccountBalanceQuery, Client, TransactionReceipt, TransactionReceiptQuery, TransactionRecord, TransactionRecordQuery } from '@hashgraph/sdk';
 import { TransactionPayload } from "../models/transaction-payload.model";
 
-export async function getTransactionReceiptFromHederaNode(client: Client, payload: TransactionPayload): Promise<string> {
+export async function getTransactionReceiptFromHederaNode(client: Client, payload: TransactionPayload): Promise<TransactionReceipt> {
   try {
     const receipt = await new TransactionReceiptQuery()
       .setTransactionId(payload.transactionId)
       .execute(client)
 
     console.log(`Hedera node's receipt for transaction ${payload.transactionId}:\n`, receipt);
-    return receipt.status.toString();
+    return receipt;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function getTransactionRecord(client: Client, payload: TransactionPayload) {
+  try {
+    const record = await new TransactionRecordQuery()
+    .setTransactionId(payload.transactionId)
+    .execute(client)
+
+    console.log(`Hedera node's receipt for transaction ${payload.transactionId}:\n`, record);
+    return record;
   } catch (error) {
     throw error;
   }
