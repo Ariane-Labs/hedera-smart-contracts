@@ -18,10 +18,10 @@ show_menu() {
 # Function to execute the selected script
 run_script() {
   case $1 in
-    1) ./setup.sh ;;
-    2) ./reset.sh ;;
-    3) ./start.sh ;;
-    4) ./stop.sh ;;
+    1) ./cli/setup.sh ;;
+    2) ./cli/reset.sh ;;
+    3) ./cli/start.sh ;;
+    4) ./cli/stop.sh ;;
     5) progress ;;
     6) echo "Remember that exiting does not stop the process! To stop the process use 'stop' option."; exit 0 ;;
     *) echo "Invalid choice, please try again." ;;
