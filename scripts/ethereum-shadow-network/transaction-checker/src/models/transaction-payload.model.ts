@@ -8,4 +8,6 @@ export interface TransactionPayload {
   currentTimestamp: string;
   ethereumTransactionHash?: string;
   hederaTransactionHash: string;
+	ethGas: number;
+	ethGasPrice: number;
 }

@@ -27,7 +27,7 @@ export async function createEthereumTransaction(
 	currentBlock: number
 ): Promise<any> {
 	try {
-		// RPC API call to Erigon to get raw transaction body we will user later on. 
+		// RPC API call to Erigon to get raw transaction body we will user later on.
 		// See for more information about this method https://docs.chainstack.com/reference/base-getrawtransactionbyhash
 		const rawBody = await getRawTransaction(transactionData.txHash);
 		const txId = TransactionId.generate(accountId);
@@ -58,10 +58,11 @@ export async function createEthereumTransaction(
 			addressFrom: transactionData.addressFrom,
 			evmAddress: transactionData.addressTo,
 			txTimestamp: transactionTimestamp,
+			ethGas: transactionData.ethGas,
+			ethGasPrice: transactionData.ethGasPrice,
 		});
-		return txResponse.toJSON();
 	} catch (error: any) {
-		// Sometimes we would catch DUPLICATE_TRANSACTION error that was thrown when Transaction ID was duplicated. 
+		// Sometimes we would catch DUPLICATE_TRANSACTION error that was thrown when Transaction ID was duplicated.
 		// We minimalized this risk by generating it manually but when sometimes this happens you need to process this transaction one more time
 		if (error.status && error.status === 'DUPLICATE_TRANSACTION') {
 			writeLogFile(
@@ -78,7 +79,7 @@ export async function createEthereumTransaction(
 				currentBlock
 			);
 		}
-		// PLATFORM_NOT_ACTIVE is an error that we precisely do not know why is happening. 
+		// PLATFORM_NOT_ACTIVE is an error that we precisely do not know why is happening.
 		// We know that after some time when hedera local node is running it will generate this error and after this error is thrown all next transaction will result the same
 		// So to this a workaround to this problem. When this error happens we reset hedera local node with function resetHederaLocalNode() and then we hit createEthereumTrasanction one more time with same data for it to process transaction
 		// To prevent this behaviour we also reset hedera after processing 100000 blocks in iteration

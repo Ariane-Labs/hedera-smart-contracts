@@ -17,4 +17,6 @@ export interface TransactionData {
 	addressTo: string;
 	txHash: string;
 	gas: number;
+	ethGas: number;
+	ethGasPrice: number;
 }
