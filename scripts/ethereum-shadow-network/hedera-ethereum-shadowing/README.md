@@ -20,7 +20,7 @@ This is achieved by re-executing all Ethereum transaction on by one on local Hed
 
 ### Pre-requisities
 
-- Create a `.env` file in the root of project and add all variables from `.env.example`. API key for `OPERATOR_PRIVATE`
+- Create a `.env` file in the root of project and add all variables from `.env.example`. API key for `OPERATOR_ACCOUNT_KEY`
   [can be found in this article](https://docs.hedera.com/hedera/sdks-and-apis/sdks/client).
 - Add `logs` directory in the root of the project for logs
 - Make sure that the rest of the services are up and running

@@ -7,7 +7,7 @@ import { testForSmartContracts } from './send-transaction-for-contracts';
 import { replicatePlatformNotActiveError } from './platfrom-not-active-error';
 import { compareContractRootStates } from './compare-contract-state-root';
 dotenv.config();
-const OPERATOR_PRIVATE = process.env.OPERATOR_PRIVATE;
+const OPERATOR_PRIVATE = process.env.OPERATOR_ACCOUNT_KEY;
 const node = { '127.0.0.1:50211': new AccountId(3) };
 const client = Client.forNetwork(node).setMirrorNetwork('127.0.0.1:5600');
 const accountId = new AccountId(2);
@@ -28,7 +28,7 @@ client.setOperator(accountId, OPERATOR_PRIVATE || '');
 	// 	},
 	// 	accountId,
 	// 	client,
-	// 	OPERATOR_PRIVATE || ''
+	// 	OPERATOR_ACCOUNT_KEY || ''
 	// );
 
 	// GET BLOCK REWARD
@@ -45,12 +45,12 @@ client.setOperator(accountId, OPERATOR_PRIVATE || '');
 	// 	},
 	// 	accountId,
 	// 	client,
-	// 	OPERATOR_PRIVATE || ''
+	// 	OPERATOR_ACCOUNT_KEY || ''
 	// );
 	//
 	//BAD CONTRACT VALUES TEST FOR CONTRACT 0xbdf6a09235fa130c5e5ddb60a3c06852e7943475
-	// testForSmartContracts(new AccountId(2), client, new AccountId(3), OPERATOR_PRIVATE || '');
+	// testForSmartContracts(new AccountId(2), client, new AccountId(3), OPERATOR_ACCOUNT_KEY || '');
 	//PLATFORM_NOT_ACTIVE error
-	// replicatePlatformNotActiveError(new AccountId(2), client, OPERATOR_PRIVATE || '');
+	// replicatePlatformNotActiveError(new AccountId(2), client, OPERATOR_ACCOUNT_KEY || '');
 	compareContractRootStates(new AccountId(2), client, new AccountId(3));
 })();

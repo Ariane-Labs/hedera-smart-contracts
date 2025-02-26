@@ -4,6 +4,7 @@ import { sendBlockReward } from '@/apps/shadowing/transfers/send-block-reward';
 import { createEthereumTransaction } from '@/apps/shadowing/ethereum/create-ethereum-transaction';
 import { resetHederaLocalNode } from '@/utils/helpers/reset-hedera-local-node';
 import { ErigonTransactionLog } from '../types';
+import { balanceValidator } from '@/utils/balance-validator';
 
 export async function getTransactionByBlock(
 	startFromBlock: number,
@@ -42,6 +43,9 @@ export async function getTransactionByBlock(
 					if (transaction?.hash) {
 						console.log(`transaction found ${transaction.hash}`);
 						//Create hedera transaction with function createEthereumTransaction that uses Hashgraph SDK EthereumTransaction
+
+						await balanceValidator(transaction.hash, transaction.from);
+
 						await createEthereumTransaction(
 							{
 								addressFrom: transaction.from,

@@ -14,7 +14,7 @@ import { resetHederaLocalNode } from '@/utils/helpers/reset-hedera-local-node';
 import { TransactionData } from '@/utils/types';
 dotenv.config();
 
-const OPERATOR_PRIVATE = process.env.OPERATOR_PRIVATE;
+const OPERATOR_PRIVATE = process.env.OPERATOR_ACCOUNT_KEY;
 
 // Create a hedera transaction using a raw transaction Data from Erigon api. More info here
 // All the logs that are created here can be found in logs/ directory
