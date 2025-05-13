@@ -49,7 +49,7 @@ async function deploy(wallet, cache) {
 
     const event = receipt.logs.find(log => {
         try {
-            return factory.interface.parseLog(log)?.name === "Deployed";
+            return factory.interface.parseLog(log)?.name === 'Deployed';
         } catch (e) {
             return false;
         }
