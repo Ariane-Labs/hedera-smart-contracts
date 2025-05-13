@@ -3,6 +3,7 @@
 const { ethers: { ContractFactory, parseUnits, Wallet, Contract } } = require('ethers');
 const { loadArtifact } = require('../../../utils/artifact');
 const { options } = require('../options');
+
 const artifact = loadArtifact('ERC20');
 
 /**

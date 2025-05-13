@@ -1,6 +1,7 @@
 const { ethers: { ContractFactory, Wallet, Contract } } = require('ethers');
 const { loadArtifact } = require('../../../utils/artifact');
 const { options } = require('../options');
+
 const artifact = loadArtifact('ERC721');
 
 /**

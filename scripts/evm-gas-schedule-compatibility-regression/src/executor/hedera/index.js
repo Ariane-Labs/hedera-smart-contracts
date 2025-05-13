@@ -2,8 +2,8 @@
 
 const { Client, PrivateKey, AccountId } = require('@hashgraph/sdk');
 const dotenv = require('dotenv');
-const { Cache } = require('../../cache');
 const { JsonRpcProvider, Wallet } = require('ethers');
+const { Cache } = require('../../cache');
 
 dotenv.config();
 
