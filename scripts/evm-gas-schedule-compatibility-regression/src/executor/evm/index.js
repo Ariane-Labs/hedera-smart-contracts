@@ -2,7 +2,7 @@
 
 const { ethers: { JsonRpcProvider, Wallet } } = require('ethers');
 const dotenv = require('dotenv');
-const { Cache } = require("../../cache");
+const { Cache } = require('../../cache');
 
 dotenv.config();
 

@@ -52,7 +52,7 @@ const mint = async function (wallet, cache) {
   const contract = getContract(contractAddress, wallet);
   const tx = await contract.mint(parseUnits('100', 18), await options(wallet, 200000));
   const receipt = await tx.wait();
-  if (!receipt) throw new Error("Failed to get transaction receipt");
+  if (!receipt) throw new Error('Failed to get transaction receipt');
   return {
     success: true,
     gasUsed: Number(receipt.gasUsed) || 0,
@@ -71,7 +71,7 @@ const burn = async function (wallet, cache) {
   const contract = getContract(contractAddress, wallet);
   const tx = await contract.burn(parseUnits('100', 18), await options(wallet, 200000));
   const receipt = await tx.wait();
-  if (!receipt) throw new Error("Failed to get transaction receipt");
+  if (!receipt) throw new Error('Failed to get transaction receipt');
   return {
     success: true,
     gasUsed: Number(receipt.gasUsed) || 0,
@@ -91,7 +91,7 @@ const transfer = async function (wallet, cache) {
   const randomWallet = Wallet.createRandom();
   const tx = await contract.transfer(randomWallet.address, parseUnits('100', 18), await options(wallet, 200000));
   const receipt = await tx.wait();
-  if (!receipt) throw new Error("Failed to get transaction receipt");
+  if (!receipt) throw new Error('Failed to get transaction receipt');
   return {
     success: true,
     gasUsed: Number(receipt.gasUsed) || 0,
@@ -111,7 +111,7 @@ const approve = async function (wallet, cache) {
   const randomWallet = Wallet.createRandom();
   const tx = await contract.approve(randomWallet.address, parseUnits('100', 18), await options(wallet, 200000));
   const receipt = await tx.wait();
-  if (!receipt) throw new Error("Failed to get transaction receipt");
+  if (!receipt) throw new Error('Failed to get transaction receipt');
   return {
     success: true,
     gasUsed: Number(receipt.gasUsed) || 0,
@@ -131,7 +131,7 @@ const transferFrom = async function (wallet, cache) {
   const randomWallet = Wallet.createRandom();
   const tx = await contract.transferFrom(wallet.address, randomWallet.address, parseUnits('100', 18), await options(wallet, 200000));
   const receipt = await tx.wait();
-  if (!receipt) throw new Error("Failed to get transaction receipt");
+  if (!receipt) throw new Error('Failed to get transaction receipt');
   return {
     success: true,
     gasUsed: Number(receipt.gasUsed) || 0,

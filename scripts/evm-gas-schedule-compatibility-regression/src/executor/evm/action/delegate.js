@@ -71,7 +71,7 @@ const call = async function (wallet, cache) {
   const caller = getCallerContract(callerAddress, wallet);
   const tx = await caller.callIncrement(counterAddress);
   const receipt = await tx.wait();
-  if (!receipt) throw new Error("Failed to get transaction receipt");
+  if (!receipt) throw new Error('Failed to get transaction receipt');
   return {
     success: true,
     gasUsed: Number(receipt.gasUsed) || 0,

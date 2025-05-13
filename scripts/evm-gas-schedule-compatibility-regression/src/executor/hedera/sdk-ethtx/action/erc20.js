@@ -2,7 +2,7 @@
 
 const { loadArtifact } = require('../../../../utils/artifact');
 const hedera = require('../../client');
-const { options } = require("../../../evm/options");
+const { options } = require('../../../evm/options');
 const { ethers: { ContractFactory, parseUnits, Wallet, Contract } } = require('ethers');
 const artifact = loadArtifact('ERC20');
 

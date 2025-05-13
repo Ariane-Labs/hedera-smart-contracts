@@ -2,8 +2,8 @@
 
 const { ethers: { ContractFactory, Wallet, Contract } } = require('ethers');
 const { loadArtifact } = require('../../../../utils/artifact');
-const { options } = require("../../../evm/options");
-const hedera = require("../../client");
+const { options } = require('../../../evm/options');
+const hedera = require('../../client');
 
 const [factoryArtifact, counterArtifact] = [
   loadArtifact('Factory'),
