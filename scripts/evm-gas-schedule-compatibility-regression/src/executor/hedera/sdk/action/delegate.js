@@ -17,7 +17,7 @@ const initCaller = async function (client, cache) {
     await hedera.deploy(client, callerArtifact.bytecode, new ContractFunctionParameters());
 
   const contractAddress = contractId.toSolidityAddress();
-  cache.write('delegatecall::caller', contractAddress);
+  cache.write('delegate::call::caller', contractAddress);
   return {
     success: status,
     gasUsed,
@@ -36,7 +36,7 @@ const initCounter = async function (client, cache) {
     await hedera.deploy(client, counterArtifact.bytecode, new ContractFunctionParameters());
 
   const contractAddress = contractId.toSolidityAddress();
-  cache.write('delegatecall::counter', contractAddress);
+  cache.write('delegate::call::counter', contractAddress);
   return {
     success: status,
     gasUsed,
@@ -52,8 +52,8 @@ const initCounter = async function (client, cache) {
  * @returns {Promise<{gasUsed: (number|number), success: boolean, transactionHash: string}>}
  */
 const call = async function (client, cache) {
-  let callerAddress = cache.read('delegatecall::caller');
-  let counterAddress = cache.read('delegatecall::counter');
+  let callerAddress = cache.read('delegate::call::caller');
+  let counterAddress = cache.read('delegate::call::counter');
   if (callerAddress === null) callerAddress = (await initCaller(client, cache)).additionalData.contractAddress;
   if (counterAddress === null) counterAddress = (await initCounter(client, cache)).additionalData.contractAddress;
   const contractId = ContractId.fromEvmAddress(0, 0, callerAddress);

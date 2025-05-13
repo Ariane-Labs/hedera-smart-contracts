@@ -44,7 +44,7 @@ const initCaller = async function (client, wallet, cache) {
     { ...tx, to: null, type: 2, accessList: [] }
   );
   const contractAddress = evmAddress || contractId.toSolidityAddress();
-  cache.write('delegatecall::caller::sdk-ethtx', contractAddress);
+  cache.write('delegate::call::caller::sdk-ethTx', contractAddress);
   await delay(2000);
   return {
     success: status,
@@ -70,7 +70,7 @@ const initCounter = async function (client, wallet, cache) {
     { ...tx, to: null, type: 2, accessList: [] }
   );
   const contractAddress = evmAddress || contractId.toSolidityAddress();
-  cache.write('delegatecall::counter::sdk-ethtx', contractAddress);
+  cache.write('delegate::call::counter::sdk-ethTx', contractAddress);
   await delay(2000);
   return {
     success: status,
@@ -88,8 +88,8 @@ const initCounter = async function (client, wallet, cache) {
  * @returns {Promise<{gasUsed: (number|number), success: boolean, transactionHash: string}>}
  */
 const call = async function (client, wallet, cache) {
-  let callerAddress = cache.read('delegatecall::caller::sdk-ethtx');
-  let counterAddress = cache.read('delegatecall::counter::sdk-ethtx');
+  let callerAddress = cache.read('delegate::call::caller::sdk-ethTx');
+  let counterAddress = cache.read('delegate::call::counter::sdk-ethTx');
   if (callerAddress === null) callerAddress = (await initCaller(client, wallet, cache)).additionalData.contractAddress;
   if (counterAddress === null) counterAddress = (await initCounter(client, wallet, cache)).additionalData.contractAddress;
   const contract = getContract(callerAddress, wallet);

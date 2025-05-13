@@ -4,8 +4,8 @@ const { loadArtifact } = require('../../../../utils/artifact');
 const hedera = require('../../client');
 const { ContractFunctionParameters, ContractId } = require('@hashgraph/sdk');
 
-const factoryArtifact = loadArtifact('Factory');
 const counterArtifact = loadArtifact('Counter');
+const factoryArtifact = loadArtifact('Factory');
 
 /**
  * @param {import('@hashgraph/sdk').Client} client
