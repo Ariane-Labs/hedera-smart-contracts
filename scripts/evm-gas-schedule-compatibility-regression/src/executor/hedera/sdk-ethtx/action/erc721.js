@@ -23,7 +23,7 @@ const getContract = function (address, wallet) {
  * @param {import('@hashgraph/sdk').Client} client
  * @param {import('ethers').Wallet} wallet
  * @param {Cache} cache
- * @returns {Promise<{lastToken: number, tx: import('ethers').PreparedTransactionRequest, encode: (fragment: (import('ethers').FunctionFragment | string), values?: any[]) => string}>}
+ * @returns {Promise<{lastToken: number, tx: import('ethers').PreparedTransactionRequest, contract: import('ethers').BaseContract }>}
  */
 const initTokenId = async function (client, wallet, cache) {
   let contractAddress = cache.read('erc721::contract::sdk-ethTx');
@@ -35,7 +35,7 @@ const initTokenId = async function (client, wallet, cache) {
     ...(await options(wallet, 200000)),
     to: contractAddress,
   };
-  return { lastToken, tx, encode: contract.interface.encodeFunctionData };
+  return { lastToken, tx, contract };
 }
 
 /**
@@ -104,8 +104,8 @@ const mint = async function (client, wallet, cache) {
  * @returns {Promise<{gasUsed: (number|number), success: boolean, transactionHash: string, additionalData: { hederaTxId: string }}>}
  */
 const burn = async function (client, wallet, cache) {
-  const { tx, lastToken, encode } = await initTokenId(client, wallet, cache);
-  tx.data = encode('burn(uint256)', [lastToken - 1]);
+  const { tx, lastToken, contract } = await initTokenId(client, wallet, cache);
+  tx.data = contract.interface.encodeFunctionData('burn(uint256)', [lastToken - 1]);
   cache.write('erc721::last::sdk-ethTx', '0');
   const { status, gasUsed, contractId, transactionHash } = await hedera.forward(
       client,
@@ -128,8 +128,8 @@ const burn = async function (client, wallet, cache) {
  * @returns {Promise<{gasUsed: (number|number), success: boolean, transactionHash: string, additionalData: { hederaTxId: string }}>}
  */
 const approve = async function (client, wallet, cache) {
-  const { tx, lastToken, encode } = await initTokenId(client, wallet, cache);
-  tx.data = encode('approve(address,uint256)', [Wallet.createRandom().address, lastToken - 1]);
+  const { tx, lastToken, contract } = await initTokenId(client, wallet, cache);
+  tx.data = contract.interface.encodeFunctionData('approve(address,uint256)', [Wallet.createRandom().address, lastToken - 1]);
   cache.write('erc721::last::sdk-ethTx', '0');
   const { status, gasUsed, contractId, transactionHash } = await hedera.forward(
     client,
@@ -183,8 +183,8 @@ const setApprovalForAll = async function (client, wallet, cache) {
  * @returns {Promise<{gasUsed: (number|number), success: boolean, transactionHash: string, additionalData: { hederaTxId: string }}>}
  */
 const transferFrom = async function (client, wallet, cache) {
-  const { tx, lastToken, encode } = await initTokenId(client, wallet, cache);
-  tx.data = encode('transferFrom(address,address,uint256)', [wallet.address, Wallet.createRandom().address, lastToken - 1]);
+  const { tx, lastToken, contract } = await initTokenId(client, wallet, cache);
+  tx.data = contract.interface.encodeFunctionData('transferFrom(address,address,uint256)', [wallet.address, Wallet.createRandom().address, lastToken - 1]);
   cache.write('erc721::last::sdk-ethTx', '0');
   const { status, gasUsed, contractId, transactionHash } = await hedera.forward(
     client,
@@ -207,8 +207,8 @@ const transferFrom = async function (client, wallet, cache) {
  * @returns {Promise<{gasUsed: (number|number), success: boolean, transactionHash: string, additionalData: { hederaTxId: string }}>}
  */
 const safeTransferFrom = async function (client, wallet, cache) {
-  const { tx, lastToken, encode } = await initTokenId(client, wallet, cache);
-  tx.data = encode('safeTransferFrom(address,address,uint256)', [wallet.address, Wallet.createRandom().address, lastToken - 1]);
+  const { tx, lastToken, contract } = await initTokenId(client, wallet, cache);
+  tx.data = contract.interface.encodeFunctionData('safeTransferFrom(address,address,uint256)', [wallet.address, Wallet.createRandom().address, lastToken - 1]);
   cache.write('erc721::last::sdk-ethTx', '0');
   const { status, gasUsed, contractId, transactionHash } = await hedera.forward(
       client,
