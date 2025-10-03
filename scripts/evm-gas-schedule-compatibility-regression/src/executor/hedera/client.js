@@ -92,13 +92,15 @@ module.exports = {
    * @param {import('@hashgraph/sdk').Client} client
    * @param {string} bytecode
    * @param {ContractFunctionParameters|undefined} parameters
+   * @param {Hbar|undefined} initialBalance
    * @returns {Promise<{ status: boolean, gasUsed: number, transactionId: string, transactionHash: string, contractId: import('@hashgraph/sdk').ContractId }>}
    */
-  deploy: async function (client, bytecode, parameters) {
+  deploy: async function (client, bytecode, parameters, initialBalance) {
     const contractTx = await new ContractCreateFlow()
       .setBytecode(bytecode)
       .setGas(DEFAULT_GAS_LIMIT);
     if (parameters) contractTx.setConstructorParameters(parameters);
+    if (initialBalance) contractTx.setInitialBalance(initialBalance);
     const contractResponse = await contractTx.execute(client);
     const contractReceipt = await contractResponse.getReceipt(client);
     const record = await contractResponse.getRecord(client);
@@ -116,13 +118,15 @@ module.exports = {
    * @param {import('@hashgraph/sdk').ContractId} contractId
    * @param {string} method
    * @param {ContractFunctionParameters|undefined} parameters
+   * @param {number|undefined} value
    * @returns {Promise<{ status: boolean, gasUsed: number, transactionId: string, transactionHash: string, contractAddress: string }>}
    */
-  call: async function (client, contractId, method, parameters) {
+  call: async function (client, contractId, method, parameters, value) {
     const executeTx = new ContractExecuteTransaction()
       .setContractId(contractId)
       .setGas(DEFAULT_GAS_LIMIT)
       .setFunction(method, parameters);
+    if (value) executeTx.setPayableAmount(value);
     const response = await executeTx.execute(client);
     const receipt = await response.getReceipt(client);
     const record = await response.getRecord(client);

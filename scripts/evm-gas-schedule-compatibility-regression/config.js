@@ -53,6 +53,20 @@ const tests = [
             { name: 'Transferring token with transfer from method', code: 'erc721::transferFrom' },
             { name: 'Transferring token with safe transfer from method', code: 'erc721::safeTransferFrom' },
         ],
+    },
+    {
+        name: 'Sending funds to non-existing account',
+        cases: [
+            { name: 'Deploying a new contract', code: 'account-creator::deploy' },
+            { name: 'Transferring funds to non-existing account', code: 'account-creator::send' },
+        ],
+    },
+    {
+        name: 'Context related gas usage differences',
+        cases: [
+            { name: 'Deploying a new contract', code: 'context-showcase::deploy' },
+            { name: 'Making a call strictly dependant on the ETH precision', code: 'context-showcase::precision' },
+        ],
     }
 ];
 
