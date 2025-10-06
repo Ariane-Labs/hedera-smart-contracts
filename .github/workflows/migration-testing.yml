@@ -78,12 +78,6 @@ jobs:
         run: npx hardhat test --grep ${{ inputs.preMigrationTestTags }}
         timeout-minutes: 15
 
-      - name: Freeze the network
-        run: |
-          npx hardhat run scripts/freeze-network-node.js
-          sleep 30
-        timeout-minutes: 5
-
       - name: Stop docker containers (network node)
         run: docker stop network-node json-rpc-relay json-rpc-relay-ws
         timeout-minutes: 5
