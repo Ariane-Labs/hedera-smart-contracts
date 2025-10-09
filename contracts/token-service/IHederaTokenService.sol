@@ -12,6 +12,10 @@ interface IHederaTokenService {
     /// transaction fee is still charged. This transaction must be signed by the keys for all the sending
     /// accounts, and for any receiving accounts that have receiverSigRequired == true. The signatures
     /// are in the same order as the accounts, skipping those accounts that don't need a signature.
+    ///
+    /// This struct is only relevant to fungible/common token transfers.
+    /// Non-fungible/unique (NFT) token transfers MUST use the NftTransfer struct.
+    ///
     /// @custom:version 0.3.0 previous version did not include isApproval
     struct AccountAmount {
         // The Account ID, as a solidity address, that sends/receives cryptocurrency or tokens
@@ -19,10 +23,16 @@ interface IHederaTokenService {
 
         // The amount of  the lowest denomination of the given token that
         // the account sends(negative) or receives(positive)
+        //
+        // For HBAR this SHALL be tinybar (10<sup>-8</sup> HBAR).<br/>
+        // For other fungible/common tokens this SHALL depend on the value of
+        // `decimals` for that token
         int64 amount;
 
+        // An approved allowance flag.
         // If true then the transfer is expected to be an approved allowance and the
-        // accountID is expected to be the owner. The default is false (omitted).
+        // accountID is expected to be the owner that previously approved the allowance.
+        // The default is false (omitted).
         bool isApproval;
     }
 
@@ -40,24 +50,57 @@ interface IHederaTokenService {
         // The serial number of the NFT
         int64 serialNumber;
 
-        // If true then the transfer is expected to be an approved allowance and the
-        // accountID is expected to be the owner. The default is false (omitted).
+        // An approved allowance flag.
+        // If set, `senderAccountID` SHALL be the owner that previously approved
+        // the allowance.
+        // If set, the `senderAccountID` MUST be the "payer" account for
+        // the transaction.
+        // The default is false (omitted).
         bool isApproval;
     }
 
+
+    // A list of transfers for a particular (non-HBAR) token type.
+    // A `TokenTransferList` applies to a single token type, but may contain many
+    // individual transfers.
+    // Each transfer of a fungible/common token MUST specify an `accountID` and
+    // `amount`. Amount SHALL be positive when the account receives tokens, and
+    // SHALL be negative when the account sends tokens. The amount SHOULD NOT be
+    // `0`.
+    // In a transfer list containing fungible/common tokens in the `transfers`
+    // list, the sum of all such transfers MUST be zero (`0`).
+    // Each transfer of a unique token SHALL specify both sender and receiver, as
+    // well as the serial number transferred.
+    // A single `TokenTransferList` MUST contain `transfers` or `nftTransfers`,
+    // but MUST NOT contain both.
     struct TokenTransferList {
-        // The ID of the token as a solidity address
+        // The ID of the token as a solidity address This is the token to be transferred.
         address token;
 
-        // Applicable to tokens of type FUNGIBLE_COMMON. Multiple list of AccountAmounts, each of which
-        // has an account and amount.
+        // Multiple list of AccountAmounts.
+        //
+        // Each entry SHALL have an account and amount.
+        // These transfers SHALL be "double-entry" style; the credits (positive
+        // amount) and debits (negative amount) MUST sum to 0, unless this
+        // transfer list is part of a `mint` or `burn` operation.
+        // This SHALL be be set for fungible/common tokens and MUST be
+        // empty otherwise.
         AccountAmount[] transfers;
 
-        // Applicable to tokens of type NON_FUNGIBLE_UNIQUE. Multiple list of NftTransfers, each of
-        // which has a sender and receiver account, including the serial number of the NFT
+        // A list of NftTransfers.
+        // Each entry SHALL have a sender and receiver account, and the
+        // serial number of the unique token to transfer.
+        // This SHALL be be set for non-fungible/unique tokens and SHALL be
+        // empty otherwise.
         NftTransfer[] nftTransfers;
     }
 
+
+    // A list of accounts and amounts to transfer.
+    // Each `AccountAmount` SHALL specify the account and the amount to
+    // send(negative) or receive(positive).
+    // The `TransferList` SHALL only be used for HBAR transfers. Other token types
+    // MUST use the `TokenTransferList` struct.
     struct TransferList {
         // Multiple list of AccountAmounts, each of which has an account and amount.
         // Used to transfer hbars between the accounts in the list.
@@ -839,7 +882,7 @@ interface IHederaTokenService {
     /// @notice Recipients will receive tokens in one of these ways:
     /// @notice     - Immediately if already associated with the token
     /// @notice     - Immediately with auto-association if they have available slots
-    /// @notice     - As a pending airdrop requiring claim if they have "receiver signature required" 
+    /// @notice     - As a pending airdrop requiring claim if they have "receiver signature required"
     /// @notice     - As a pending airdrop requiring claim if they have no available auto-association slots
     /// @notice Immediate airdrops are irreversible, pending airdrops can be canceled
     /// @notice All transfer fees and auto-renewal rent costs are charged to the transaction submitter
