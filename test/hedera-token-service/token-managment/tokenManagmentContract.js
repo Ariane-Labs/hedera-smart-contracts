@@ -60,7 +60,7 @@ describe('TokenManagmentContract Test Suite', function () {
     tokenAddress = await utils.createFungibleTokenWithSECP256K1AdminKey(
       tokenCreateContract,
       signers[0].address,
-      utils.getSignerCompressedPublicKey()
+      await utils.getSignerCompressedPublicKey()
     );
     await utils.updateTokenKeysViaHapi(tokenAddress, [
       await tokenCreateContract.getAddress(),
@@ -71,7 +71,7 @@ describe('TokenManagmentContract Test Suite', function () {
     nftTokenAddress = await utils.createNonFungibleTokenWithSECP256K1AdminKey(
       tokenCreateContract,
       signers[0].address,
-      utils.getSignerCompressedPublicKey()
+      await utils.getSignerCompressedPublicKey()
     );
     await utils.updateTokenKeysViaHapi(nftTokenAddress, [
       await tokenCreateContract.getAddress(),
@@ -102,7 +102,7 @@ describe('TokenManagmentContract Test Suite', function () {
       await utils.createFungibleTokenWithSECP256K1AdminKey(
         tokenCreateContract,
         signers[0].address,
-        utils.getSignerCompressedPublicKey()
+        await utils.getSignerCompressedPublicKey()
       );
     await utils.updateTokenKeysViaHapi(newTokenAddress, [
       await tokenCreateContract.getAddress(),
@@ -603,7 +603,7 @@ describe('TokenManagmentContract Test Suite', function () {
         tokenAddress = await utils.createFungibleTokenWithSECP256K1AdminKey(
           tokenCreateContract,
           signers[0].address,
-          utils.getSignerCompressedPublicKey()
+          await utils.getSignerCompressedPublicKey()
         );
         await utils.updateTokenKeysViaHapi(tokenAddress, [
           await tokenCreateContract.getAddress(),
@@ -689,7 +689,7 @@ describe('TokenManagmentContract Test Suite', function () {
         {
           const updatedKeyAfter = updateTokenInfoValues(
             utils.KeyValueType.SECP256K1,
-            utils.getSignerCompressedPublicKey()
+            await utils.getSignerCompressedPublicKey()
           );
 
           const tokenAfter = {
@@ -800,7 +800,7 @@ describe('TokenManagmentContract Test Suite', function () {
         {
           const updatedKeyAfter = updateTokenInfoValues(
             utils.KeyValueType.SECP256K1,
-            utils.getSignerCompressedPublicKey()
+            await utils.getSignerCompressedPublicKey()
           );
 
           const tokenAfter = {
@@ -933,7 +933,7 @@ describe('TokenManagmentContract Test Suite', function () {
         {
           const updatedKeyAfter = updateTokenInfoValues(
             utils.KeyValueType.SECP256K1,
-            utils.getSignerCompressedPublicKey()
+            await utils.getSignerCompressedPublicKey()
           );
 
           const tokenAfter = {
@@ -1075,7 +1075,7 @@ describe('TokenManagmentContract Test Suite', function () {
         tokenAddress = await utils.createFungibleTokenWithSECP256K1AdminKey(
           tokenCreateContract,
           signers[0].address,
-          utils.getSignerCompressedPublicKey()
+          await utils.getSignerCompressedPublicKey()
         );
 
         await utils.updateTokenKeysViaHapi(tokenAddress, [
@@ -1296,7 +1296,7 @@ describe('TokenManagmentContract Test Suite', function () {
           tokenAddress = await utils.createFungibleTokenWithSECP256K1AdminKey(
             tokenCreateContract,
             signers[0].address,
-            utils.getSignerCompressedPublicKey()
+            await utils.getSignerCompressedPublicKey()
           );
         });
         it('should not be able to pause the token with different PAUSE key', async function () {
@@ -1396,7 +1396,7 @@ describe('TokenManagmentContract Test Suite', function () {
       const adminKey = utils.constructIHederaTokenKey(
         'ADMIN',
         'SECP256K1',
-        utils.getSignerCompressedPublicKey(0)
+        await utils.getSignerCompressedPublicKey(0)
       );
       const kycKey = utils.constructIHederaTokenKey(
         'KYC',

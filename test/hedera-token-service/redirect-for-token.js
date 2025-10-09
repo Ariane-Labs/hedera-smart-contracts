@@ -53,7 +53,7 @@ describe('RedirectForToken Test Suite', function () {
     const tokenAddressTx =
       await tokenCreateContract.createFungibleTokenWithSECP256K1AdminKeyPublic(
         signers[0].address,
-        utils.getSignerCompressedPublicKey(),
+        await utils.getSignerCompressedPublicKey(),
         {
           value: '10000000000000000000',
           gasLimit: 1_000_000,
