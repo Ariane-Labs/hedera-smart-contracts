@@ -1,38 +1,35 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import utils from '../utils.js';
-import { network } from "hardhat";
-const { ethers } = await network.connect();
+import { network } from 'hardhat';
 import { expectValidHash } from '../assertions.js';
 import Constants from '../../constants.js';
 import { pollForNewERC20Balance } from '../../helpers.js';
-import {
-  TokenCreateTransaction,
-  TransactionId,
-  PublicKey,
-  TokenSupplyType,
-  AccountId,
-} from '@hashgraph/sdk';
+import { AccountId, PublicKey, TokenCreateTransaction, TokenSupplyType, TransactionId, } from '@hashgraph/sdk';
+
+const { ethers } = await network.connect();
 
 describe('TokenCreateContract Test Suite', function () {
   let tokenCreateContract;
   let tokenTransferContract;
-  let tokenManagmentContract;
+  let tokenManagementContract;
   let tokenQueryContract;
   let erc20Contract;
+  let erc721Contract;
   let tokenAddress;
   let nftTokenAddress;
   let signers;
+  let mintedTokenSerialNumber;
 
   before(async function () {
     signers = await ethers.getSigners();
     tokenCreateContract = await utils.deployTokenCreateContract();
     tokenTransferContract = await utils.deployTokenTransferContract();
-    tokenManagmentContract = await utils.deployTokenManagementContract();
+    tokenManagementContract = await utils.deployTokenManagementContract();
     await utils.updateAccountKeysViaHapi([
       await tokenCreateContract.getAddress(),
       await tokenTransferContract.getAddress(),
-      await tokenManagmentContract.getAddress(),
+      await tokenManagementContract.getAddress(),
     ]);
     erc20Contract = await utils.deployERC20Contract();
     erc721Contract = await utils.deployERC721Contract();
@@ -44,7 +41,7 @@ describe('TokenCreateContract Test Suite', function () {
     await utils.updateTokenKeysViaHapi(tokenAddress, [
       await tokenCreateContract.getAddress(),
       await tokenTransferContract.getAddress(),
-      await tokenManagmentContract.getAddress(),
+      await tokenManagementContract.getAddress(),
     ]);
     nftTokenAddress = await utils.createNonFungibleTokenWithSECP256K1AdminKey(
       tokenCreateContract,
@@ -54,7 +51,7 @@ describe('TokenCreateContract Test Suite', function () {
     await utils.updateTokenKeysViaHapi(nftTokenAddress, [
       await tokenCreateContract.getAddress(),
       await tokenTransferContract.getAddress(),
-      await tokenManagmentContract.getAddress(),
+      await tokenManagementContract.getAddress(),
     ]);
     await utils.associateToken(
       tokenCreateContract,
@@ -81,7 +78,7 @@ describe('TokenCreateContract Test Suite', function () {
       tokenAddress,
       signers[0].address
     );
-    await tokenManagmentContract.burnTokenPublic(tokenAddress, amount, []);
+    await tokenManagementContract.burnTokenPublic(tokenAddress, amount, []);
 
     const balanceAfter = await pollForNewERC20Balance(
       erc20Contract,
@@ -98,7 +95,7 @@ describe('TokenCreateContract Test Suite', function () {
 
   it('should be able to execute dissociateTokens and associateTokens', async function () {
     const tokenCreateContractWallet2 = tokenCreateContract.connect(signers[1]);
-    const tokenManagmentContractWallet2 = tokenManagmentContract.connect(
+    const tokenManagmentContractWallet2 = tokenManagementContract.connect(
       signers[1]
     );
 
@@ -130,7 +127,7 @@ describe('TokenCreateContract Test Suite', function () {
 
   it('should be able to execute dissociateToken and associateToken', async function () {
     const tokenCreateContractWallet2 = tokenCreateContract.connect(signers[1]);
-    const tokenManagmentContractWallet2 = tokenManagmentContract.connect(
+    const tokenManagmentContractWallet2 = tokenManagementContract.connect(
       signers[1]
     );
 
@@ -271,7 +268,7 @@ describe('TokenCreateContract Test Suite', function () {
     ).to.equal(22);
   });
 
-  describe('Hapi vs Ethereum token create test', function () {
+  describe('Hapi vs Ethereum token create test', async function() {
     // @notice: The param values below are preset to match the values preset in the
     // `createFungibleTokenWithSECP256K1AdminKeyPublic()` method in the TokenCreateContract.sol
     const tokenName = 'tokenName';
@@ -281,10 +278,10 @@ describe('TokenCreateContract Test Suite', function () {
     const maxSupply = 20000000000;
     const decimals = 8;
     const freezeDefaultStatus = false;
-    const key = PublicKey.fromBytes(utils.getSignerCompressedPublicKey());
+    const key = PublicKey.fromBytes(await utils.getSignerCompressedPublicKey());
     let signers;
 
-    before(async function () {
+    before(async function() {
       signers = await ethers.getSigners();
       tokenCreateContract = await utils.deployTokenCreateContract();
       tokenQueryContract = await utils.deployTokenQueryContract();
@@ -319,8 +316,8 @@ describe('TokenCreateContract Test Suite', function () {
         .execute(client);
 
       const receipt = await tokenCreate.getReceipt(client);
-      const tokenId = receipt.tokenId.toString();
-      return tokenId;
+
+      return receipt.tokenId.toString();
     }
 
     async function createTokenviaSystemContract() {
@@ -342,7 +339,7 @@ describe('TokenCreateContract Test Suite', function () {
       return tokenAddress;
     }
 
-    it('should be able to compare tokens created from system contract and hapi', async function () {
+    it('should be able to compare tokens created from system contract and hapi', async function() {
       const hapiTokenAddress =
         '0x' +
         AccountId.fromString(await createTokenviaHapi()).toSolidityAddress();

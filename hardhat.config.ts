@@ -12,11 +12,10 @@ const OPERATOR_KEY_A: string =
   process.env.OPERATOR_KEY_A ??
   '0x0000000000000000000000000000000000000000000000000000000000000000';
 
-const PRIVATE_KEYS: string[] = process.env.PRIVATE_KEYS
-  ? process.env.PRIVATE_KEYS.split(',')
-      .map((k) => k.trim())
-      .filter(Boolean)
-  : [];
+const PRIVATE_KEYS: string[] = (process.env.PRIVATE_KEYS ?? "")
+  .split(",")
+  .map(k => k.trim())
+  .filter(Boolean);
 
 const NETWORKS = {
   local: {

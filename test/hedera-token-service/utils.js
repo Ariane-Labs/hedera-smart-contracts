@@ -598,14 +598,14 @@ class Utils {
     await accountDeleteTransaction.execute(signer);
   }
 
-  static getSignerCompressedPublicKey(
+  static async getSignerCompressedPublicKey(
     index = 0,
     asBuffer = true,
     prune0x = true
   ) {
-    const wallet = new ethers.Wallet(
-      config.networks[Utils.getCurrentNetwork()].accounts[index]
-    );
+    const account = config.networks[Utils.getCurrentNetwork()].accounts[index];
+    const privateKey = await account._getRawValue();
+    const wallet = new ethers.Wallet(privateKey);
     const cpk = prune0x
       ? wallet.signingKey.compressedPublicKey.replace('0x', '')
       : wallet.signingKey.compressedPublicKey;
@@ -615,13 +615,19 @@ class Utils {
 
   static async getHardhatSignersPrivateKeys(add0xPrefix = true) {
     const network = Utils.getCurrentNetwork();
-    return config.networks[network].accounts.map((pk) =>
-      add0xPrefix ? pk : pk.replace('0x', '')
+    const accounts = config.networks[network].accounts;
+    const keys = await Promise.all(
+      accounts.map(async (acc) => {
+        const pk = await acc._getRawValue();
+        return add0xPrefix ? pk : pk.replace('0x', '');
+      })
     );
+    return keys;
   }
 
-  static getHardhatSignerPrivateKeyByIndex(index = 0) {
-    return config.networks[Utils.getCurrentNetwork()].accounts[index];
+  static async getHardhatSignerPrivateKeyByIndex(index = 0) {
+    const account = config.networks[Utils.getCurrentNetwork()].accounts[index];
+    return await account._getRawValue();
   }
 
   static async updateAccountKeysViaHapi(
@@ -895,7 +901,7 @@ class Utils {
       await this.createNonFungibleTokenWithSECP256K1AdminKeyWithoutKYC(
         tokenCreateContract,
         owner,
-        this.getSignerCompressedPublicKey()
+        await this.getSignerCompressedPublicKey()
       );
 
     await this.updateTokenKeysViaHapi(
@@ -924,7 +930,7 @@ class Utils {
       await this.createFungibleTokenWithSECP256K1AdminKeyWithoutKYC(
         tokenCreateContract,
         owner,
-        this.getSignerCompressedPublicKey()
+        await this.getSignerCompressedPublicKey()
       );
 
     await this.updateTokenKeysViaHapi(
