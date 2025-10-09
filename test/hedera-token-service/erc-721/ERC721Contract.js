@@ -4,6 +4,7 @@ import { network } from "hardhat";
 const { ethers } = await network.connect();
 import utils from '../utils.js';
 import Constants from '../../constants.js';
+import { expect } from "chai";
 
 describe('ERC721Contract Test Suite', function () {
   let tokenCreateContract;

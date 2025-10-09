@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
+import { expect } from "chai";
 import { network } from "hardhat";
 const { ethers } = await network.connect();
 import utils from '../utils.js';

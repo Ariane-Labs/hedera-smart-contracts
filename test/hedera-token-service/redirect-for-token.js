@@ -4,6 +4,7 @@ import utils from './utils.js';
 import Constants from '../constants.js';
 import { network } from "hardhat";
 const { ethers } = await network.connect();
+import { expect } from "chai";
 
 describe('RedirectForToken Test Suite', function () {
   const amount = 33;

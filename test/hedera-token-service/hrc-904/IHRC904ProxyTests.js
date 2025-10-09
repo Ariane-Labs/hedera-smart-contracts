@@ -4,7 +4,7 @@ import { network } from "hardhat";
 const { ethers } = await network.connect();
 import utils from '../utils.js';
 import Constants from '../../constants.js';
-import { Contract } from 'ethers';
+import { expect } from "chai";
 
 describe('HIP904Batch2 IHRC904Facade Contract Test Suite', function () {
   let airdropContract;

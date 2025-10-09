@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-
+import { expect } from "chai";
 import Utils from '../../hedera-token-service/utils.js';
 import { network } from "hardhat";
 const { ethers } = await network.connect();
@@ -34,7 +34,6 @@ describe('@HAS IHRC-632 Test Suite', () => {
     );
     aliasAccountUtility = await AliasAccountUtilityFactory.deploy();
     await aliasAccountUtility.waitForDeployment();
-
     sdkClient = await Utils.createSDKClient();
 
     const walletAAccountId = await Utils.getAccountId(
@@ -301,8 +300,8 @@ describe('@HAS IHRC-632 Test Suite', () => {
     before(async () => {
       // Load and compile protobuf definitions
       const signatureMapProto = path.resolve(__dirname, 'signature_map.proto');
-      root = await protobuf.load(signatureMapProto);
-      SignatureMap = root.lookupType('SignatureMap');
+      let root = await protobuf.load(signatureMapProto);
+      let SignatureMap = root.lookupType('SignatureMap');
     });
 
     // Helper function to create a signature blob which align with the SignatureMap protobuf message struct

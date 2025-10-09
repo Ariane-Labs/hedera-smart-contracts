@@ -5,7 +5,7 @@ const { ethers } = await network.connect();
 import Utils from '../../hedera-token-service/utils.js';
 import Constants from '../../constants.js';
 import HashgraphProto from '@hashgraph/proto';
-
+import { expect } from "chai";
 import {
   ScheduleCreateTransaction,
   TransferTransaction,
