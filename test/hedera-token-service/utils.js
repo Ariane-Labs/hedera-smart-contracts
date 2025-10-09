@@ -545,20 +545,23 @@ class Utils {
 
   static async createSDKClient(operatorId, operatorKey) {
     const network = Utils.getCurrentNetwork();
+    const sdk = config.networks[network].sdkClient;
 
     const hederaNetwork = {};
-    hederaNetwork[config.networks[network].sdkClient.networkNodeUrl] =
-      AccountId.fromString(config.networks[network].sdkClient.nodeId);
-    const { mirrorNode } = config.networks[network].sdkClient;
+    hederaNetwork[sdk.networkNodeUrl] = AccountId.fromString(sdk.nodeId);
+    const { mirrorNode } = sdk;
 
-    operatorId =
-      operatorId || config.networks[network].sdkClient.operatorId;
-    operatorKey =
-      operatorKey || config.networks[network].sdkClient.operatorKey;
+    const resolvedOperatorId = operatorId || sdk.operatorId;
+    let resolvedOperatorKey = operatorKey || sdk.operatorKey;
+
+    // If the operator key is provided as a Hardhat account-like object, resolve its raw value
+    if (resolvedOperatorKey && typeof resolvedOperatorKey === 'object' && typeof resolvedOperatorKey._getRawValue === 'function') {
+      resolvedOperatorKey = await resolvedOperatorKey._getRawValue();
+    }
 
     const client = Client.forNetwork(hederaNetwork)
       .setMirrorNetwork(mirrorNode)
-      .setOperator(operatorId, operatorKey);
+      .setOperator(resolvedOperatorId, resolvedOperatorKey);
 
     return client;
   }

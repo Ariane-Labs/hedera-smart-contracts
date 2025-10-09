@@ -97,7 +97,8 @@ describe('HIP755 Test Suite', function () {
       transferAmountAsWeibar
     } = await createScheduleTransactionForTransfer(senderInfo, receiverInfo, genesisSdkClient);
 
-    const privateKey = PrivateKey.fromStringECDSA(Utils.getHardhatSignerPrivateKeyByIndex(0));
+    const rawPk = await Utils.getHardhatSignerPrivateKeyByIndex(0);
+    const privateKey = PrivateKey.fromStringECDSA(rawPk.replace('0x', ''));
     const scheduleIdAsBytes = convertScheduleIdToUint8Array(scheduleId.toString());
     const sigMapProtoEncoded = await HashgraphProto.proto.SignatureMap.encode({
       sigPair: [{
