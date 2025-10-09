@@ -53,30 +53,6 @@ const NETWORKS = {
   },
 } as const;
 
-export const SDK_CLIENTS = {
-  local: {
-    operatorId: OPERATOR_ID_A,
-    operatorKey: OPERATOR_KEY_A,
-    networkNodeUrl: NETWORKS.local.networkNodeUrl,
-    nodeId: NETWORKS.local.nodeId,
-    mirrorNode: NETWORKS.local.mirrorNode,
-  },
-  testnet: {
-    operatorId: OPERATOR_ID_A,
-    operatorKey: OPERATOR_KEY_A,
-    networkNodeUrl: NETWORKS.testnet.networkNodeUrl,
-    nodeId: NETWORKS.testnet.nodeId,
-    mirrorNode: NETWORKS.testnet.mirrorNode,
-  },
-  previewnet: {
-    operatorId: OPERATOR_ID_A,
-    operatorKey: OPERATOR_KEY_A,
-    networkNodeUrl: NETWORKS.previewnet.networkNodeUrl,
-    nodeId: NETWORKS.previewnet.nodeId,
-    mirrorNode: NETWORKS.previewnet.mirrorNode,
-  },
-};
-
 const config: HardhatUserConfig = {
   solidity: {
     version: '0.8.24',
@@ -100,12 +76,26 @@ const config: HardhatUserConfig = {
       url: NETWORKS.testnet.url,
       accounts: PRIVATE_KEYS,
       chainId: NETWORKS.testnet.chainId,
+      sdkClient: {
+        operatorId: OPERATOR_ID_A,
+        operatorKey: OPERATOR_KEY_A,
+        networkNodeUrl: NETWORKS.testnet.networkNodeUrl,
+        nodeId: NETWORKS.testnet.nodeId,
+        mirrorNode: NETWORKS.testnet.mirrorNode,
+      },
     } as any,
     previewnet: {
       type: 'http',
       url: NETWORKS.previewnet.url,
       accounts: PRIVATE_KEYS,
       chainId: NETWORKS.previewnet.chainId,
+      sdkClient: {
+        operatorId: OPERATOR_ID_A,
+        operatorKey: OPERATOR_KEY_A,
+        networkNodeUrl: NETWORKS.previewnet.networkNodeUrl,
+        nodeId: NETWORKS.previewnet.nodeId,
+        mirrorNode: NETWORKS.previewnet.mirrorNode,
+      },
     } as any,
     besu_local: {
       type: 'http',
