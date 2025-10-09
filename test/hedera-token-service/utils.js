@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 import { network } from "hardhat";
 import config from '../../hardhat.config.ts';
+const hre = { config };
 const { ethers } = await network.connect();
 import { expect } from "chai";
 import {
