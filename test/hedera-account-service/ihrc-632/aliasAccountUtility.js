@@ -2,7 +2,9 @@
 import { expect } from "chai";
 import Utils from '../../hedera-token-service/utils.js';
 import { network } from "hardhat";
-const { ethers } = await network.connect();
+const { ethers } = await network.connect(
+  'local'
+);
 import Constants from '../../constants.js';
 import {
   Hbar,
