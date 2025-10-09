@@ -7,7 +7,7 @@ import Constants from '../../constants.js';
 import { pollForNewERC20Balance } from '../../helpers.js';
 
 describe('TokenManagmentContract Test Suite', function () {
-  const TX_SUCCESS_CODE = 22;
+  const TX_SUCCESS_CODE = 22n;
   const CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES = '244';
   const TOKEN_HAS_NO_FEE_SCHEDULE_KEY = '240';
   const CUSTOM_FEE_MUST_BE_POSITIVE = '239';
@@ -34,6 +34,11 @@ describe('TokenManagmentContract Test Suite', function () {
   let tokenTransferContractAddress;
   let tokenQueryContractAddress;
   let tokenManagementContractAddress;
+  let initialSupply;
+  let maxSupply;
+  let decimals;
+  let setFeeScheduleKey;
+  let transactionHash;
 
   before(async function () {
     signers = await ethers.getSigners();

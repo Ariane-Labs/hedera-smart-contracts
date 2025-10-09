@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
-import { network } from "hardhat";
+import hre, { network } from "hardhat";
 const { ethers } = await network.connect();
 import utils from '../utils.js';
 import Constants from '../../constants.js';

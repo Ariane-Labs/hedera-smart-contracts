@@ -7,7 +7,7 @@ import Constants from '../../constants.js';
 import { expect } from "chai";
 
 describe('TokenQueryContract Test Suite', function () {
-  const TX_SUCCESS_CODE = 22;
+  const TX_SUCCESS_CODE = 22n;
 
   let tokenCreateContract;
   let tokenQueryContract;
@@ -298,6 +298,6 @@ describe('TokenQueryContract Test Suite', function () {
     )[0].args;
 
     expect(responseCode).to.equal(TX_SUCCESS_CODE);
-    expect(tokenType).to.equal(0);
+    expect(tokenType).to.equal(0n);
   });
 });

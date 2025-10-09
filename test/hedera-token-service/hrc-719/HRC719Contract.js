@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Constants from '../../constants.js';
-import { network } from "hardhat";
+import hre, { network } from "hardhat";
 const { ethers } = await network.connect();
 import utils from '../utils.js';
 import { expect } from "chai";
@@ -50,7 +50,7 @@ describe('@HRC-719 Test Suite', function () {
     ]);
 
     // create a contract object for the token
-    hrcToken = new Contract(tokenAddress, IHRC719, signers[0]);
+    hrcToken = new ethers.Contract(tokenAddress, IHRC719, signers[0]);
   });
 
   describe('HRC719 wrapper contract', () => {
