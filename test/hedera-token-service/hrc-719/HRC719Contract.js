@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
 import Constants from '../../constants.js';
-import { Contract } from 'ethers';
 import { network } from "hardhat";
 const { ethers } = await network.connect();
 import utils from '../utils.js';
+import { expect } from "chai";
 
 describe('@HRC-719 Test Suite', function () {
   let tokenCreateContract;
