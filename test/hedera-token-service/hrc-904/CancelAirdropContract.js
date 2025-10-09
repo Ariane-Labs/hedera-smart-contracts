@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const utils = require('../utils');
-const Constants = require('../../constants');
+import { network } from "hardhat";
+const { ethers } = await network.connect();
+import utils from '../utils.js';
+import Constants from '../../constants.js';
 
 describe('HIP904Batch2 CancelAirdropContract Test Suite', function () {
   let airdropContract;

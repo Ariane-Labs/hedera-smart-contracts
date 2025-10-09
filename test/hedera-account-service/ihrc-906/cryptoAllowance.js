@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const utils = require('../../hedera-token-service/utils');
-const Utils = require('../../hedera-token-service/utils');
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const Constants = require('../../constants');
-const {
+import utils from '../../hedera-token-service/utils.js';
+import Utils from '../../hedera-token-service/utils.js';
+import { network } from "hardhat";
+const { ethers } = await network.connect();
+import Constants from '../../constants.js';
+import {
   pollForNewSignerBalanceUsingProvider,
-} = require('../../helpers');
+} from '../../helpers.js';
 
 describe('@HAS IHRC-906 Test Suite', () => {
   let walletA,

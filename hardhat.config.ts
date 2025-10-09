@@ -1,7 +1,9 @@
-import 'dotenv/config';
 import type { HardhatUserConfig } from 'hardhat/types/config';
 import hardhatMocha from '@nomicfoundation/hardhat-mocha';
 import hardhatAbiExporter from '@solidstate/hardhat-abi-exporter';
+import hardhatEthers from "@nomicfoundation/hardhat-ethers";
+import dotenv from "dotenv";
+dotenv.config();
 
 /**  @type string */
 const OPERATOR_ID_A: string = process.env.OPERATOR_ID_A ?? '0.0.0';
@@ -143,6 +145,6 @@ const config: HardhatUserConfig = {
 };
 
 export default {
-  plugins: [hardhatMocha, hardhatAbiExporter],
+  plugins: [hardhatMocha, hardhatAbiExporter, hardhatEthers],
   ...config,
 };

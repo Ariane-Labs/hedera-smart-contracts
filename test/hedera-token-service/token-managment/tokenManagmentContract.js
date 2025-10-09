@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const utils = require('../utils');
-const Constants = require('../../constants');
-const { pollForNewERC20Balance } = require('../../helpers');
+import { network } from "hardhat";
+const { ethers } = await network.connect();
+import utils from '../utils.js';
+import Constants from '../../constants.js';
+import { pollForNewERC20Balance } from '../../helpers.js';
 
 describe('TokenManagmentContract Test Suite', function () {
   const TX_SUCCESS_CODE = 22;

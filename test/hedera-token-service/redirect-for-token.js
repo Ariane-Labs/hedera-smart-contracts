@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const { expect } = require('chai');
-const utils = require('./utils');
-const Constants = require('../constants');
-const hre = require('hardhat');
-const { ethers } = hre;
+import utils from './utils.js';
+import Constants from '../constants.js';
+import { network } from "hardhat";
+const { ethers } = await network.connect();
 
 describe('RedirectForToken Test Suite', function () {
   const amount = 33;

@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const utils = require('../utils');
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const { expectValidHash } = require('../assertions');
-const Constants = require('../../constants');
-const { pollForNewERC20Balance } = require('../../helpers');
-const {
+import utils from '../utils.js';
+import { network } from "hardhat";
+const { ethers } = await network.connect();
+import { expectValidHash } from '../assertions.js';
+import Constants from '../../constants.js';
+import { pollForNewERC20Balance } from '../../helpers.js';
+import {
   TokenCreateTransaction,
   TransactionId,
   PublicKey,
   TokenSupplyType,
   AccountId,
-} = require('@hashgraph/sdk');
+} from '@hashgraph/sdk';
 
 describe('TokenCreateContract Test Suite', function () {
   let tokenCreateContract;

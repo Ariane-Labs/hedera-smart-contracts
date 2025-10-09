@@ -1,17 +1,21 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const Utils = require('../../hedera-token-service/utils');
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const Constants = require('../../constants');
-const {
+import Utils from '../../hedera-token-service/utils.js';
+import { network } from "hardhat";
+const { ethers } = await network.connect();
+import Constants from '../../constants.js';
+import {
   Hbar,
   PrivateKey,
   AccountCreateTransaction,
   KeyList,
-} = require('@hashgraph/sdk');
-const path = require('path');
-const protobuf = require('protobufjs');
+} from '@hashgraph/sdk';
+import path from 'path';
+import protobuf from 'protobufjs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 describe('@HAS IHRC-632 Test Suite', () => {
   let walletA,

@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const utils = require('../utils');
-const Constants = require('../../constants');
-const { Contract } = require('ethers');
+import { network } from "hardhat";
+const { ethers } = await network.connect();
+import utils from '../utils.js';
+import Constants from '../../constants.js';
+import { Contract } from 'ethers';
 
 describe('HIP904Batch2 IHRC904Facade Contract Test Suite', function () {
   let airdropContract;
@@ -34,7 +34,7 @@ describe('HIP904Batch2 IHRC904Facade Contract Test Suite', function () {
     owner = signers[0].address;
     receiverPrivateKey = ethers.hexlify(ethers.randomBytes(32));
     receiver = new ethers.Wallet(receiverPrivateKey).connect(ethers.provider);
-    invalidSender = ethers.Wallet.createRandom().connect(ethers.provider);
+    const invalidSender = ethers.Wallet.createRandom().connect(ethers.provider);
 
     // Send some HBAR to activate the account
     await signers[0].sendTransaction({

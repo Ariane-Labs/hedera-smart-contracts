@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const utils = require('../utils');
-const Constants = require('../../constants');
-const {
+import { network } from "hardhat";
+const { ethers } = await network.connect();
+import utils from '../utils.js';
+import Constants from '../../constants.js';
+import {
   pollForNewBalance,
   pollForNewSignerBalance,
-} = require('../../helpers');
+} from '../../helpers.js';
 
 describe('IERC20 Test Suite', function () {
   let tokenCreateContract;

@@ -1,18 +1,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const {expect} = require('chai');
-const {ethers} = require('hardhat');
-const Utils = require('../../hedera-token-service/utils');
-const Constants = require('../../constants');
-const HashgraphProto = require('@hashgraph/proto');
+import { network } from "hardhat";
+const { ethers } = await network.connect();
+import Utils from '../../hedera-token-service/utils.js';
+import Constants from '../../constants.js';
+import HashgraphProto from '@hashgraph/proto';
 
-const {
+import {
   ScheduleCreateTransaction,
   TransferTransaction,
   Hbar,
   HbarUnit,
   PrivateKey
-} = require('@hashgraph/sdk');
+} from '@hashgraph/sdk';
 
 const convertScheduleIdToUint8Array = (scheduleId) => {
   const [shard, realm, num] = scheduleId.split('.');

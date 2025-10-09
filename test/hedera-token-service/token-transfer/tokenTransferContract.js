@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const utils = require('../utils');
-const Constants = require('../../constants');
-const {
+import { network } from "hardhat";
+const { ethers } = await network.connect();
+import utils from '../utils.js';
+import Constants from '../../constants.js';
+import {
   pollForNewERC20Balance,
   pollForNewSignerBalanceUsingProvider,
-} = require('../../helpers');
+} from '../../helpers.js';
 
 describe('TokenTransferContract Test Suite', function () {
   const TX_SUCCESS_CODE = 22;
