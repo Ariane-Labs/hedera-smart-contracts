@@ -3,6 +3,7 @@
 import { network } from "hardhat";
 const { ethers } = await network.connect();
 import Constants from '../constants';
+import { expect } from "chai";
 
 describe('PrngSystemContract Test Suite', function () {
   let prngSystemContract;

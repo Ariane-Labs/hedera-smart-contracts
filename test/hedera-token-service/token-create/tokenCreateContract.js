@@ -6,7 +6,7 @@ import { expectValidHash } from '../assertions.js';
 import Constants from '../../constants.js';
 import { pollForNewERC20Balance } from '../../helpers.js';
 import { AccountId, PublicKey, TokenCreateTransaction, TokenSupplyType, TransactionId, } from '@hashgraph/sdk';
-
+import { expect } from "chai";
 const { ethers } = await network.connect();
 
 describe('TokenCreateContract Test Suite', function () {

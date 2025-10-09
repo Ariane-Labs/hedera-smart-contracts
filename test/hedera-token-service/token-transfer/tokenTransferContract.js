@@ -8,6 +8,7 @@ import {
   pollForNewERC20Balance,
   pollForNewSignerBalanceUsingProvider,
 } from '../../helpers.js';
+import { expect } from "chai";
 
 describe('TokenTransferContract Test Suite', function () {
   const TX_SUCCESS_CODE = 22;

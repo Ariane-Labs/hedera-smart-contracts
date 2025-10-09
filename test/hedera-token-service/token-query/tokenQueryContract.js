@@ -79,7 +79,7 @@ describe('TokenQueryContract Test Suite', function () {
     )[0].args;
 
     expect(responseCode).to.equal(TX_SUCCESS_CODE);
-    expect(amount).to.equal(0);
+    expect(amount).to.equal(0n);
   });
 
   it('should query getApproved', async function () {
@@ -166,7 +166,7 @@ describe('TokenQueryContract Test Suite', function () {
 
     expect(responseCode).to.equal(TX_SUCCESS_CODE);
 
-    expect(fixedFees[0].amount).to.equal(1);
+    expect(fixedFees[0].amount).to.equal(1n);
     expect(fixedFees[0].tokenId).to.equal(tokenAddress);
     expect(fixedFees[0].useHbarsForPayment).to.equal(false);
     expect(fixedFees[0].useCurrentTokenForPayment).to.equal(false);

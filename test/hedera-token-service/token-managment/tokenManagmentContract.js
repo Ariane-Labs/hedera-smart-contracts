@@ -5,6 +5,7 @@ const { ethers } = await network.connect();
 import utils from '../utils.js';
 import Constants from '../../constants.js';
 import { pollForNewERC20Balance } from '../../helpers.js';
+import { expect } from "chai";
 
 describe('TokenManagmentContract Test Suite', function () {
   const TX_SUCCESS_CODE = 22n;
@@ -2927,8 +2928,8 @@ describe('TokenManagmentContract Test Suite', function () {
       )[0].args.tokenInfo;
 
       // fractional fee is at position 7 in the tokenInfo array
-      expect(tokenInfoResponse[0][5].length).to.be.greaterThan(0);
-      expect(tokenInfoResponse[0][7].length).to.be.greaterThan(0);
+      expect(tokenInfoResponse[0][5].length).to.be.greaterThan(0n);
+      expect(tokenInfoResponse[0][7].length).to.be.greaterThan(0n);
       expect(tokenInfoResponse[0][5][0][0]).to.equal(63);
       expect(tokenInfoResponse[0][5][0][1]).to.equal(feeToken);
       expect(tokenInfoResponse[0][7][0][2]).to.equal(twentyHbars);
