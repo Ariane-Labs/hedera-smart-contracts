@@ -18,6 +18,7 @@ import {
   AccountDeleteTransaction,
 } from '@hashgraph/sdk';
 import Constants from '../constants';
+import { SDK_CLIENTS } from "../../hardhat.config";
 import axios from 'axios';
 function getMirrorNodeUrl(network) {
   switch (network) {
@@ -545,14 +546,14 @@ class Utils {
 
   static async createSDKClient(operatorId, operatorKey) {
     const network = Utils.getCurrentNetwork();
-    const sdk = config.networks[network].sdkClient;
+    const sdkClient = await SDK_CLIENTS[network];
 
     const hederaNetwork = {};
-    hederaNetwork[sdk.networkNodeUrl] = AccountId.fromString(sdk.nodeId);
-    const { mirrorNode } = sdk;
+    hederaNetwork[sdkClient.networkNodeUrl] = AccountId.fromString(sdkClient.nodeId);
+    const { mirrorNode } = sdkClient;
 
-    const resolvedOperatorId = operatorId || sdk.operatorId;
-    let resolvedOperatorKey = operatorKey || sdk.operatorKey;
+    const resolvedOperatorId = operatorId || sdkClient.operatorId;
+    let resolvedOperatorKey = operatorKey || sdkClient.operatorKey;
 
     // If the operator key is provided as a Hardhat account-like object, resolve its raw value
     if (resolvedOperatorKey && typeof resolvedOperatorKey === 'object' && typeof resolvedOperatorKey._getRawValue === 'function') {
