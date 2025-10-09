@@ -2,7 +2,9 @@
 import { expect } from "chai";
 import Utils from '../../hedera-token-service/utils.js';
 import { network } from "hardhat";
-const { ethers } = await network.connect();
+const { ethers } = await network.connect(
+  'local'
+);
 import Constants from '../../constants.js';
 import {
   Hbar,
@@ -32,8 +34,8 @@ describe('@HAS IHRC-632 Test Suite', () => {
     const AliasAccountUtilityFactory = await ethers.getContractFactory(
       Constants.Contract.AliasAccountUtility
     );
-    aliasAccountUtility = await AliasAccountUtilityFactory.deploy();
-    await aliasAccountUtility.waitForDeployment();
+    // aliasAccountUtility = await AliasAccountUtilityFactory.deploy();
+    // await aliasAccountUtility.waitForDeployment();
     sdkClient = await Utils.createSDKClient();
 
     const walletAAccountId = await Utils.getAccountId(
