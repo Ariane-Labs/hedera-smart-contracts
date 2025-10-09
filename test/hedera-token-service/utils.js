@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
-import { network, config} from "hardhat";
+import { network } from "hardhat";
+import config from '../../hardhat.config.ts';
 const { ethers } = await network.connect();
-
+import { expect } from "chai";
 import {
   AccountId,
   Client,
@@ -547,14 +548,16 @@ class Utils {
     const network = Utils.getCurrentNetwork();
 
     const hederaNetwork = {};
-    hederaNetwork[config.networks[network].sdkClient.networkNodeUrl] =
-      AccountId.fromString(config.networks[network].sdkClient.nodeId);
-    const { mirrorNode } = config.networks[network].sdkClient;
+
+    const sdkClient = await config.networks[network].sdkClient;
+    hederaNetwork[sdkClient.networkNodeUrl] =
+      AccountId.fromString(sdkClient.nodeId);
+    const { mirrorNode } = sdkClient;
 
     operatorId =
-      operatorId || config.networks[network].sdkClient.operatorId;
+      operatorId || sdkClient.operatorId;
     operatorKey =
-      operatorKey || config.networks[network].sdkClient.operatorKey;
+      operatorKey || sdkClient.operatorKey;
 
     const client = Client.forNetwork(hederaNetwork)
       .setMirrorNetwork(mirrorNode)
@@ -603,8 +606,7 @@ class Utils {
     asBuffer = true,
     prune0x = true
   ) {
-    const account = config.networks[Utils.getCurrentNetwork()].accounts[index];
-    const privateKey = await account._getRawValue();
+    const privateKey = config.networks[Utils.getCurrentNetwork()].accounts[index];
     const wallet = new ethers.Wallet(privateKey);
     const cpk = prune0x
       ? wallet.signingKey.compressedPublicKey.replace('0x', '')
@@ -618,7 +620,7 @@ class Utils {
     const accounts = config.networks[network].accounts;
     const keys = await Promise.all(
       accounts.map(async (acc) => {
-        const pk = await acc._getRawValue();
+        const pk = acc;
         return add0xPrefix ? pk : pk.replace('0x', '');
       })
     );
@@ -627,7 +629,7 @@ class Utils {
 
   static async getHardhatSignerPrivateKeyByIndex(index = 0) {
     const account = config.networks[Utils.getCurrentNetwork()].accounts[index];
-    return await account._getRawValue();
+    return account;
   }
 
   static async updateAccountKeysViaHapi(

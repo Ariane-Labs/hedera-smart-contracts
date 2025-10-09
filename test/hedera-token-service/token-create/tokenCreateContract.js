@@ -36,7 +36,7 @@ describe('TokenCreateContract Test Suite', function () {
     tokenAddress = await utils.createFungibleTokenWithSECP256K1AdminKey(
       tokenCreateContract,
       signers[0].address,
-      utils.getSignerCompressedPublicKey()
+      await utils.getSignerCompressedPublicKey()
     );
     await utils.updateTokenKeysViaHapi(tokenAddress, [
       await tokenCreateContract.getAddress(),
@@ -46,7 +46,7 @@ describe('TokenCreateContract Test Suite', function () {
     nftTokenAddress = await utils.createNonFungibleTokenWithSECP256K1AdminKey(
       tokenCreateContract,
       signers[0].address,
-      utils.getSignerCompressedPublicKey()
+      await utils.getSignerCompressedPublicKey()
     );
     await utils.updateTokenKeysViaHapi(nftTokenAddress, [
       await tokenCreateContract.getAddress(),
@@ -325,7 +325,7 @@ describe('TokenCreateContract Test Suite', function () {
       const tokenAddressTx =
         await tokenCreateContract.createFungibleTokenWithSECP256K1AdminKeyPublic(
           signers[0].address,
-          utils.getSignerCompressedPublicKey(),
+          await utils.getSignerCompressedPublicKey(),
           {
             value: '30000000000000000000',
             gasLimit: 1_000_000,
