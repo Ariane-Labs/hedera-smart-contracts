@@ -34,8 +34,8 @@ describe('@HAS IHRC-632 Test Suite', () => {
     const AliasAccountUtilityFactory = await ethers.getContractFactory(
       Constants.Contract.AliasAccountUtility
     );
-    // aliasAccountUtility = await AliasAccountUtilityFactory.deploy();
-    // await aliasAccountUtility.waitForDeployment();
+    aliasAccountUtility = await AliasAccountUtilityFactory.deploy();
+    await aliasAccountUtility.waitForDeployment();
     sdkClient = await Utils.createSDKClient();
 
     const walletAAccountId = await Utils.getAccountId(
