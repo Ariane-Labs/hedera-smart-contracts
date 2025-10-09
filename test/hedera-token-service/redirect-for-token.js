@@ -4,6 +4,7 @@ import utils from './utils.js';
 import Constants from '../constants.js';
 import { network } from "hardhat";
 const { ethers } = await network.connect();
+import { expect } from "chai";
 
 describe('RedirectForToken Test Suite', function () {
   const amount = 33;
@@ -53,7 +54,7 @@ describe('RedirectForToken Test Suite', function () {
     const tokenAddressTx =
       await tokenCreateContract.createFungibleTokenWithSECP256K1AdminKeyPublic(
         signers[0].address,
-        utils.getSignerCompressedPublicKey(),
+        await utils.getSignerCompressedPublicKey(),
         {
           value: '10000000000000000000',
           gasLimit: 1_000_000,

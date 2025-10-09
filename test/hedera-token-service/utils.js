@@ -2,7 +2,7 @@
 import { network } from "hardhat";
 import config from '../../hardhat.config.ts';
 const { ethers } = await network.connect();
-
+import { expect } from "chai";
 import {
   AccountId,
   Client,
@@ -20,7 +20,6 @@ import {
 } from '@hashgraph/sdk';
 import Constants from '../constants';
 import axios from 'axios';
-
 function getMirrorNodeUrl(network) {
   switch (network) {
     case 'mainnet':
