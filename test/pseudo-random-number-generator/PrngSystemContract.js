@@ -25,6 +25,6 @@ describe('PrngSystemContract Test Suite', function () {
     )[0].args[0];
 
     expect(result).to.exist;
-    expect(result).to.not.hexEqual(ethers.ZeroHash);
+    expect(result).to.not.equal(ethers.ZeroHash);
   });
 });
