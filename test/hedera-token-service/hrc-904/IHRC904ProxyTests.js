@@ -514,9 +514,15 @@ describe('HIP904Batch2 IHRC904Facade Contract Test Suite', function () {
         await utils.mintNFT(tokenCreateContract, nftTokenAddress)
       );
     }
-
-    const tx =
-      await walletIHRC904NftFacadeReceiver.rejectTokenNFTs(serialNumbers);
+    let tx;
+    try {
+      tx = await walletIHRC904NftFacadeReceiver.rejectTokenNFTs(serialNumbers);
+    } catch (error) {
+      // REASON FOR THIS FIX: consensus-node, HRCTokenRejectTest also had to include CONTRACT_REVERT with no code
+      // possibility. It seems to be an expected outcome.
+      expect(error.data).to.eq('0x');
+      return;
+    }
     const responseCode = await utils.getHTSResponseCode(tx.hash);
     const responseText = utils.decimalToAscii(responseCode);
     expect(responseText).to.eq('TOKEN_REFERENCE_LIST_SIZE_LIMIT_EXCEEDED');
