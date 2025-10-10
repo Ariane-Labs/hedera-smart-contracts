@@ -837,14 +837,27 @@ class Utils {
    * to a string before being returned.
    *
    * @param {string} txHash - The transaction hash to query.
+   * @param {number} timeout - Max. time to wait for transaction.
    * @returns {string} - The response code as a string.
    */
-  static async getHTSResponseCode(txHash) {
+  static async getHTSResponseCode(txHash, timeout = 10000) {
     const network = Utils.getCurrentNetwork();
     const mirrorNodeUrl = getMirrorNodeUrl(network);
-    const res = await axios.get(
-      `${mirrorNodeUrl}/contracts/results/${txHash}/actions`
-    );
+    const waitingInterval = 1000;
+    let res;
+    let success = false
+    do {
+      try {
+        res = await axios.get(
+          `${mirrorNodeUrl}/contracts/results/${txHash}/actions`
+        );
+        success = true;
+      } catch (e) {
+        await new Promise((resolve) => setTimeout(resolve, waitingInterval));
+        timeout -= waitingInterval;
+      }
+    } while(!success && timeout > 0);
+
     const precompileAction = res.data.actions.find(
       (x) => x.recipient === Constants.HTS_SYSTEM_CONTRACT_ID
     );
@@ -884,14 +897,26 @@ class Utils {
    * to a string before being returned.
    *
    * @param {string} txHash - The transaction hash to query.
+   * @param {number} timeout - Max. time to wait for transaction.
    * @returns {string} - The response code as a string.
    */
-  static async getHASResponseCode(txHash) {
+  static async getHASResponseCode(txHash, timeout = 10000) {
     const network = Utils.getCurrentNetwork();
     const mirrorNodeUrl = getMirrorNodeUrl(network);
-    const res = await axios.get(
-      `${mirrorNodeUrl}/contracts/results/${txHash}/actions`
-    );
+    const waitingInterval = 1000;
+    let res;
+    let success = false
+    do {
+      try {
+        res = await axios.get(
+          `${mirrorNodeUrl}/contracts/results/${txHash}/actions`
+        );
+        success = true;
+      } catch (e) {
+        await new Promise((resolve) => setTimeout(resolve, waitingInterval));
+        timeout -= waitingInterval;
+      }
+    } while(!success && timeout > 0);
     const precompileAction = res.data.actions.find(
       (x) => x.recipient === Constants.HAS_SYSTEM_CONTRACT_ID
     );

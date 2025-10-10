@@ -2,6 +2,7 @@
 
 import hre, { network } from "hardhat";
 const { ethers } = await network.connect();
+const Contract = ethers.Contract;
 import utils from '../utils.js';
 import Constants from '../../constants.js';
 import { expect } from "chai";
