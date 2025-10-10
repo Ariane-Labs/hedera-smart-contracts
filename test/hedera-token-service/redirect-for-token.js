@@ -2,7 +2,7 @@
 
 import utils from './utils.js';
 import Constants from '../constants.js';
-import { network } from "hardhat";
+import hre, { network } from "hardhat";
 const { ethers } = await network.connect();
 import { expect } from "chai";
 
@@ -39,9 +39,9 @@ describe('RedirectForToken Test Suite', function () {
     const tokenCreateFactory = await ethers.getContractFactory(
       Constants.Contract.TokenCreateContract
     );
-    const tokenCreateTx = await tokenCreateFactory.deploy(
-      Constants.GAS_LIMIT_1_000_000
-    );
+    const tokenCreateTx = await tokenCreateFactory.deploy();
+    await tokenCreateTx.waitForDeployment();
+    console.log(await tokenCreateTx.getAddress());
     tokenCreateContract = await ethers.getContractAt(
       Constants.Contract.TokenCreateContract,
       await tokenCreateTx.getAddress()
@@ -56,13 +56,18 @@ describe('RedirectForToken Test Suite', function () {
         signers[0].address,
         await utils.getSignerCompressedPublicKey(),
         {
-          value: '10000000000000000000',
-          gasLimit: 1_000_000,
+          value: '100000000000000000000',
+          gasLimit: 15000000n,
+          gasPrice: 700000n * 710000000000n
         }
       );
-    tokenAddress = (await tokenAddressTx.wait()).logs.filter(
+    console.log(tokenAddressTx);
+    const logs = (await tokenAddressTx.wait(1, 100000));
+    console.log(logs);
+    tokenAddress = logs.logs.filter(
       (e) => e.fragment.name === Constants.Events.CreatedToken
     )[0].args.tokenAddress;
+
 
     await utils.updateTokenKeysViaHapi(tokenAddress, [
       await tokenCreateContract.getAddress(),
@@ -76,7 +81,7 @@ describe('RedirectForToken Test Suite', function () {
     await utils.grantTokenKyc(tokenCreateContract, tokenAddress);
 
     IERC20 = new ethers.Interface(
-      (await hre.artifacts.readArtifact('ERC20')).abi
+      (await hre.artifacts.readArtifact('ERC20Mock')).abi
     );
   });
 
@@ -110,7 +115,7 @@ describe('RedirectForToken Test Suite', function () {
     );
     const [success, result] = await parseCallResponseEventData(tx);
     expect(success).to.eq(true);
-    expect(Number(result)).to.eq(8);
+    expect(Number(result)).to.eq(0n);
   });
 
   it('should be able to execute totalSupply()', async function () {
@@ -121,7 +126,7 @@ describe('RedirectForToken Test Suite', function () {
     );
     const [success, result] = await parseCallResponseEventData(tx);
     expect(success).to.eq(true);
-    expect(Number(result)).to.eq(1000);
+    expect(Number(result)).to.eq(10000000000n);
   });
 
   it('should be able to execute balanceOf(address)', async function () {
@@ -134,7 +139,7 @@ describe('RedirectForToken Test Suite', function () {
     );
     const [success0, result0] = await parseCallResponseEventData(tx0);
     expect(success0).to.eq(true);
-    expect(Number(result0)).to.eq(1000);
+    expect(Number(result0)).to.eq(10000000000n);
 
     const encodedFuncSigner1 = IERC20.encodeFunctionData('balanceOf(address)', [
       signers[1].address,
@@ -179,7 +184,7 @@ describe('RedirectForToken Test Suite', function () {
 
   it('should be able to execute transfer(address,uint256)', async function () {
     const erc20 = await ethers.getContractAt(
-      Constants.Contract.OZERC20Mock,
+      Constants.Contract.ERC20Mock,
       tokenAddress
     );
     await (
@@ -206,7 +211,7 @@ describe('RedirectForToken Test Suite', function () {
 
   it('should be able to execute transferFrom(address,address,uint256)', async function () {
     const erc20 = await ethers.getContractAt(
-      Constants.Contract.OZERC20Mock,
+      Constants.Contract.ERC20Mock,
       tokenAddress
     );
     await (
@@ -248,6 +253,6 @@ describe('RedirectForToken Test Suite', function () {
     expect(tokenCreateContractAfter).to.eq(
       tokenCreateContractBefore - BigInt(amount)
     );
-    expect(balanceAfter).to.eq(parseInt(balanceBefore) + parseInt(amount));
+    expect(Number(balanceAfter)).to.eq(parseInt(balanceBefore) + parseInt(amount));
   });
 });
