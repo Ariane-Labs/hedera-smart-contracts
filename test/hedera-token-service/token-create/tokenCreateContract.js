@@ -110,7 +110,7 @@ describe('TokenCreateContract Test Suite', function () {
       receiptDisassociate.logs.filter(
         (e) => e.fragment.name === Constants.Events.ResponseCode
       )[0].args.responseCode
-    ).to.equal(22);
+    ).to.equal(22n);
 
     const txAssociate = await tokenCreateContractWallet2.associateTokensPublic(
       signers[1].address,
@@ -122,7 +122,7 @@ describe('TokenCreateContract Test Suite', function () {
       receiptAssociate.logs.filter(
         (e) => e.fragment.name === Constants.Events.ResponseCode
       )[0].args.responseCode
-    ).to.equal(22);
+    ).to.equal(22n);
   });
 
   it('should be able to execute dissociateToken and associateToken', async function () {
@@ -142,7 +142,7 @@ describe('TokenCreateContract Test Suite', function () {
       receiptDisassociate.logs.filter(
         (e) => e.fragment.name === Constants.Events.ResponseCode
       )[0].args.responseCode
-    ).to.equal(22);
+    ).to.equal(22n);
 
     const txAssociate = await tokenCreateContractWallet2.associateTokenPublic(
       signers[1].address,
@@ -154,7 +154,7 @@ describe('TokenCreateContract Test Suite', function () {
       receiptAssociate.logs.filter(
         (e) => e.fragment.name === Constants.Events.ResponseCode
       )[0].args.responseCode
-    ).to.equal(22);
+    ).to.equal(22n);
   });
 
   it('should be able to execute createFungibleToken', async function () {
@@ -248,7 +248,7 @@ describe('TokenCreateContract Test Suite', function () {
     const { responseCode } = receipt.logs.filter(
       (e) => e.fragment.name === Constants.Events.ResponseCode
     )[0].args;
-    expect(responseCode).to.equal(22);
+    expect(responseCode).to.equal(22n);
     const { serialNumbers } = receipt.logs.filter(
       (e) => e.fragment.name === Constants.Events.MintedToken
     )[0].args;
@@ -265,7 +265,7 @@ describe('TokenCreateContract Test Suite', function () {
       (await grantKycTx.wait()).logs.filter(
         (e) => e.fragment.name === Constants.Events.ResponseCode
       )[0].args.responseCode
-    ).to.equal(22);
+    ).to.equal(22n);
   });
 
   describe('Hapi vs Ethereum token create test', async function() {
@@ -367,12 +367,12 @@ describe('TokenCreateContract Test Suite', function () {
         (await hapiTokenInfoTx.wait()).logs.filter(
           (e) => e.fragment.name === Constants.Events.ResponseCode
         )[0].args.responseCode
-      ).to.equal(22);
+      ).to.equal(22n);
       expect(
         (await precompileTokenInfoTx.wait()).logs.filter(
           (e) => e.fragment.name === Constants.Events.ResponseCode
         )[0].args.responseCode
-      ).to.equal(22);
+      ).to.equal(22n);
       expect(hapiTokenInfo).not.null;
       expect(precompileTokenInfo).not.null;
 
