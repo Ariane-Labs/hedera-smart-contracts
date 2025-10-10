@@ -35,6 +35,8 @@ function getMirrorNodeUrl(network) {
   }
 }
 
+const __sdkClients = [];
+
 class Utils {
   static createTokenCost = '50000000000000000000';
   static createTokenCustomFeesCost = '60000000000000000000';
@@ -554,16 +556,31 @@ class Utils {
       AccountId.fromString(sdkClient.nodeId);
     const { mirrorNode } = sdkClient;
 
-    operatorId =
-      operatorId || sdkClient.operatorId;
-    operatorKey =
-      operatorKey || sdkClient.operatorKey;
+    operatorId = operatorId || sdkClient.operatorId;
+    operatorKey = operatorKey || sdkClient.operatorKey;
 
     const client = Client.forNetwork(hederaNetwork)
       .setMirrorNetwork(mirrorNode)
       .setOperator(operatorId, operatorKey);
 
+    // Track created clients for teardown to prevent hanging test processes
+    try { __sdkClients.push(client); } catch (_) {}
+
     return client;
+  }
+
+  static async closeAllSDKClients() {
+    // Close any Hedera SDK clients created during tests
+    while (__sdkClients.length) {
+      const c = __sdkClients.pop();
+      try {
+        if (c && typeof c.close === 'function') {
+          await c.close();
+        }
+      } catch (_) {
+        // ignore errors on shutdown
+      }
+    }
   }
 
   static async getAccountId(evmAddress, client) {
@@ -1050,6 +1067,17 @@ class Utils {
     const hex = BigInt(decimalStr).toString(16);
     return Buffer.from(hex, 'hex').toString('ascii');
   }
+}
+
+// Ensure Hedera SDK clients are closed after the entire test run to prevent hanging processes
+try {
+  if (typeof after === 'function') {
+    after(async () => {
+      await Utils.closeAllSDKClients();
+    });
+  }
+} catch (_) {
+  // ignore if mocha globals are not available
 }
 
 export default Utils;
