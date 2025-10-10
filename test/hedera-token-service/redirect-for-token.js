@@ -41,7 +41,6 @@ describe('RedirectForToken Test Suite', function () {
     );
     const tokenCreateTx = await tokenCreateFactory.deploy();
     await tokenCreateTx.waitForDeployment();
-    console.log(await tokenCreateTx.getAddress());
     tokenCreateContract = await ethers.getContractAt(
       Constants.Contract.TokenCreateContract,
       await tokenCreateTx.getAddress()
@@ -61,9 +60,7 @@ describe('RedirectForToken Test Suite', function () {
           gasPrice: 700000n * 710000000000n
         }
       );
-    console.log(tokenAddressTx);
     const logs = (await tokenAddressTx.wait(1, 100000));
-    console.log(logs);
     tokenAddress = logs.logs.filter(
       (e) => e.fragment.name === Constants.Events.CreatedToken
     )[0].args.tokenAddress;
