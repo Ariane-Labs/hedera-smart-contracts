@@ -171,10 +171,10 @@ describe('TokenQueryContract Test Suite', function () {
     expect(fixedFees[0].useHbarsForPayment).to.equal(false);
     expect(fixedFees[0].useCurrentTokenForPayment).to.equal(false);
 
-    expect(fractionalFees[0].numerator).to.equal(4);
-    expect(fractionalFees[0].denominator).to.equal(5);
-    expect(fractionalFees[0].minimumAmount).to.equal(10);
-    expect(fractionalFees[0].maximumAmount).to.equal(30);
+    expect(fractionalFees[0].numerator).to.equal(4n);
+    expect(fractionalFees[0].denominator).to.equal(5n);
+    expect(fractionalFees[0].minimumAmount).to.equal(10n);
+    expect(fractionalFees[0].maximumAmount).to.equal(30n);
     expect(fractionalFees[0].netOfTransfers).to.equal(false);
   });
 
