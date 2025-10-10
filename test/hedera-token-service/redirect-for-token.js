@@ -115,7 +115,7 @@ describe('RedirectForToken Test Suite', function () {
     );
     const [success, result] = await parseCallResponseEventData(tx);
     expect(success).to.eq(true);
-    expect(Number(result)).to.eq(0n);
+    expect(Number(result)).to.eq(0);
   });
 
   it('should be able to execute totalSupply()', async function () {
@@ -126,7 +126,7 @@ describe('RedirectForToken Test Suite', function () {
     );
     const [success, result] = await parseCallResponseEventData(tx);
     expect(success).to.eq(true);
-    expect(Number(result)).to.eq(10000000000n);
+    expect(Number(result)).to.eq(10000000000);
   });
 
   it('should be able to execute balanceOf(address)', async function () {
@@ -139,7 +139,7 @@ describe('RedirectForToken Test Suite', function () {
     );
     const [success0, result0] = await parseCallResponseEventData(tx0);
     expect(success0).to.eq(true);
-    expect(Number(result0)).to.eq(10000000000n);
+    expect(Number(result0)).to.eq(10000000000);
 
     const encodedFuncSigner1 = IERC20.encodeFunctionData('balanceOf(address)', [
       signers[1].address,
