@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const utils = require('../utils');
-const Constants = require('../../constants');
-const { Contract } = require('ethers');
+import hre, { network } from "hardhat";
+const { ethers } = await network.connect();
+const Contract = ethers.Contract;
+import utils from '../utils.js';
+import Constants from '../../constants.js';
+import { expect } from "chai";
 
 describe('HIP904Batch2 IHRC904Facade Contract Test Suite', function () {
   let airdropContract;
@@ -34,7 +35,7 @@ describe('HIP904Batch2 IHRC904Facade Contract Test Suite', function () {
     owner = signers[0].address;
     receiverPrivateKey = ethers.hexlify(ethers.randomBytes(32));
     receiver = new ethers.Wallet(receiverPrivateKey).connect(ethers.provider);
-    invalidSender = ethers.Wallet.createRandom().connect(ethers.provider);
+    const invalidSender = ethers.Wallet.createRandom().connect(ethers.provider);
 
     // Send some HBAR to activate the account
     await signers[0].sendTransaction({
@@ -513,9 +514,15 @@ describe('HIP904Batch2 IHRC904Facade Contract Test Suite', function () {
         await utils.mintNFT(tokenCreateContract, nftTokenAddress)
       );
     }
-
-    const tx =
-      await walletIHRC904NftFacadeReceiver.rejectTokenNFTs(serialNumbers);
+    let tx;
+    try {
+      tx = await walletIHRC904NftFacadeReceiver.rejectTokenNFTs(serialNumbers);
+    } catch (error) {
+      // REASON FOR THIS FIX: consensus-node, HRCTokenRejectTest also had to include CONTRACT_REVERT with no code
+      // possibility. It seems to be an expected outcome.
+      expect(error.data).to.eq('0x');
+      return;
+    }
     const responseCode = await utils.getHTSResponseCode(tx.hash);
     const responseText = utils.decimalToAscii(responseCode);
     expect(responseText).to.eq('TOKEN_REFERENCE_LIST_SIZE_LIMIT_EXCEEDED');

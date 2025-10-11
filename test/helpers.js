@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
-require('dotenv').config();
-const Constants = require('./constants');
+import dotenv from 'dotenv';
+import Constants from './constants.js';
+dotenv.config();
 
 const delay = (ms) => {
   return new Promise((resolve) =>
@@ -419,7 +420,7 @@ const genericPoll = async (toPollFromPromise, comparator, ms, forOperation) => {
   `);
 };
 
-module.exports = {
+export {
   delay,
   pauseAndPoll,
   pollForNewERC20Balance,

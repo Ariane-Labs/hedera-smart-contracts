@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const utils = require('../utils');
-const Constants = require('../../constants');
+import hre, { network } from "hardhat";
+const { ethers } = await network.connect();
+import utils from '../utils.js';
+import Constants from '../../constants.js';
+import { expect } from "chai";
 
 describe('HIP904Batch2 CancelAirdropContract Test Suite', function () {
   let airdropContract;
@@ -15,6 +16,7 @@ describe('HIP904Batch2 CancelAirdropContract Test Suite', function () {
   let owner;
   let receiver;
   let contractAddresses;
+  let tokenAddress;
 
   before(async function () {
     signers = await ethers.getSigners();

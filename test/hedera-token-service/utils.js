@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
-
-const hre = require('hardhat');
-const { ethers } = hre;
-const { expect } = require('chai');
-const {
+import { network } from "hardhat";
+import config from '../../hardhat.config.ts';
+const { ethers } = await network.connect();
+import { expect } from "chai";
+import {
   AccountId,
   Client,
   AccountInfoQuery,
@@ -17,9 +17,9 @@ const {
   AccountBalanceQuery,
   ContractInfoQuery,
   AccountDeleteTransaction,
-} = require('@hashgraph/sdk');
-const Constants = require('../constants');
-const axios = require('axios');
+} from '@hashgraph/sdk';
+import Constants from '../constants';
+import axios from 'axios';
 function getMirrorNodeUrl(network) {
   switch (network) {
     case 'mainnet':
@@ -34,6 +34,8 @@ function getMirrorNodeUrl(network) {
       throw new Error('Unknown network');
   }
 }
+
+const __sdkClients = [];
 
 class Utils {
   static createTokenCost = '50000000000000000000';
@@ -548,20 +550,37 @@ class Utils {
     const network = Utils.getCurrentNetwork();
 
     const hederaNetwork = {};
-    hederaNetwork[hre.config.networks[network].sdkClient.networkNodeUrl] =
-      AccountId.fromString(hre.config.networks[network].sdkClient.nodeId);
-    const { mirrorNode } = hre.config.networks[network].sdkClient;
 
-    operatorId =
-      operatorId || hre.config.networks[network].sdkClient.operatorId;
-    operatorKey =
-      operatorKey || hre.config.networks[network].sdkClient.operatorKey;
+    const sdkClient = await config.networks[network].sdkClient;
+    hederaNetwork[sdkClient.networkNodeUrl] =
+      AccountId.fromString(sdkClient.nodeId);
+    const { mirrorNode } = sdkClient;
+
+    operatorId = operatorId || sdkClient.operatorId;
+    operatorKey = operatorKey || sdkClient.operatorKey;
 
     const client = Client.forNetwork(hederaNetwork)
       .setMirrorNetwork(mirrorNode)
       .setOperator(operatorId, operatorKey);
 
+    // Track created clients for teardown to prevent hanging test processes
+    try { __sdkClients.push(client); } catch (_) {}
+
     return client;
+  }
+
+  static async closeAllSDKClients() {
+    // Close any Hedera SDK clients created during tests
+    while (__sdkClients.length) {
+      const c = __sdkClients.pop();
+      try {
+        if (c && typeof c.close === 'function') {
+          await c.close();
+        }
+      } catch (_) {
+        // ignore errors on shutdown
+      }
+    }
   }
 
   static async getAccountId(evmAddress, client) {
@@ -599,14 +618,13 @@ class Utils {
     await accountDeleteTransaction.execute(signer);
   }
 
-  static getSignerCompressedPublicKey(
+  static async getSignerCompressedPublicKey(
     index = 0,
     asBuffer = true,
     prune0x = true
   ) {
-    const wallet = new ethers.Wallet(
-      hre.config.networks[hre.network.name].accounts[index]
-    );
+    const privateKey = config.networks[Utils.getCurrentNetwork()].accounts[index];
+    const wallet = new ethers.Wallet(privateKey);
     const cpk = prune0x
       ? wallet.signingKey.compressedPublicKey.replace('0x', '')
       : wallet.signingKey.compressedPublicKey;
@@ -616,13 +634,19 @@ class Utils {
 
   static async getHardhatSignersPrivateKeys(add0xPrefix = true) {
     const network = Utils.getCurrentNetwork();
-    return hre.config.networks[network].accounts.map((pk) =>
-      add0xPrefix ? pk : pk.replace('0x', '')
+    const accounts = config.networks[network].accounts;
+    const keys = await Promise.all(
+      accounts.map(async (acc) => {
+        const pk = acc;
+        return add0xPrefix ? pk : pk.replace('0x', '');
+      })
     );
+    return keys;
   }
 
-  static getHardhatSignerPrivateKeyByIndex(index = 0) {
-    return hre.config.networks[hre.network.name].accounts[index];
+  static async getHardhatSignerPrivateKeyByIndex(index = 0) {
+    const account = config.networks[Utils.getCurrentNetwork()].accounts[index];
+    return account;
   }
 
   static async updateAccountKeysViaHapi(
@@ -723,7 +747,7 @@ class Utils {
   }
 
   static getCurrentNetwork() {
-    return hre.network.name;
+    return 'local';
   }
 
   static convertAccountIdToLongZeroAddress(accountId, prepend0x = false) {
@@ -759,10 +783,10 @@ class Utils {
 
   static defaultKeyValues = {
     inheritAccountKey: false,
-    contractId: ethers.ZeroAddress,
+    contractId: '0x0000000000000000000000000000000000000000',
     ed25519: Buffer.from('', 'hex'),
     ECDSA_secp256k1: Buffer.from('', 'hex'),
-    delegatableContractId: ethers.ZeroAddress,
+    delegatableContractId: '0x0000000000000000000000000000000000000000',
   };
 
   /**
@@ -830,14 +854,27 @@ class Utils {
    * to a string before being returned.
    *
    * @param {string} txHash - The transaction hash to query.
+   * @param {number} timeout - Max. time to wait for transaction.
    * @returns {string} - The response code as a string.
    */
-  static async getHTSResponseCode(txHash) {
-    const network = hre.network.name;
+  static async getHTSResponseCode(txHash, timeout = 10000) {
+    const network = Utils.getCurrentNetwork();
     const mirrorNodeUrl = getMirrorNodeUrl(network);
-    const res = await axios.get(
-      `${mirrorNodeUrl}/contracts/results/${txHash}/actions`
-    );
+    const waitingInterval = 1000;
+    let res;
+    let success = false
+    do {
+      try {
+        res = await axios.get(
+          `${mirrorNodeUrl}/contracts/results/${txHash}/actions`
+        );
+        success = true;
+      } catch (e) {
+        await new Promise((resolve) => setTimeout(resolve, waitingInterval));
+        timeout -= waitingInterval;
+      }
+    } while(!success && timeout > 0);
+
     const precompileAction = res.data.actions.find(
       (x) => x.recipient === Constants.HTS_SYSTEM_CONTRACT_ID
     );
@@ -845,7 +882,7 @@ class Utils {
   }
 
   static async getTokenInfoByMN(tokenAddress) {
-    const network = hre.network.name;
+    const network = Utils.getCurrentNetwork();
     const mirrorNodeUrl = getMirrorNodeUrl(network);
     const res = await axios.get(
         `${mirrorNodeUrl}/tokens/${tokenAddress}`
@@ -864,7 +901,7 @@ class Utils {
    */
   static async getContractResultFromMN(txHash) {
     const res = await axios.get(
-        `${getMirrorNodeUrl(hre.network.name)}/contracts/results/${txHash}`
+        `${getMirrorNodeUrl(Utils.getCurrentNetwork())}/contracts/results/${txHash}`
     );
 
     return res.data;
@@ -877,14 +914,26 @@ class Utils {
    * to a string before being returned.
    *
    * @param {string} txHash - The transaction hash to query.
+   * @param {number} timeout - Max. time to wait for transaction.
    * @returns {string} - The response code as a string.
    */
-  static async getHASResponseCode(txHash) {
-    const network = hre.network.name;
+  static async getHASResponseCode(txHash, timeout = 10000) {
+    const network = Utils.getCurrentNetwork();
     const mirrorNodeUrl = getMirrorNodeUrl(network);
-    const res = await axios.get(
-      `${mirrorNodeUrl}/contracts/results/${txHash}/actions`
-    );
+    const waitingInterval = 1000;
+    let res;
+    let success = false
+    do {
+      try {
+        res = await axios.get(
+          `${mirrorNodeUrl}/contracts/results/${txHash}/actions`
+        );
+        success = true;
+      } catch (e) {
+        await new Promise((resolve) => setTimeout(resolve, waitingInterval));
+        timeout -= waitingInterval;
+      }
+    } while(!success && timeout > 0);
     const precompileAction = res.data.actions.find(
       (x) => x.recipient === Constants.HAS_SYSTEM_CONTRACT_ID
     );
@@ -896,7 +945,7 @@ class Utils {
       await this.createNonFungibleTokenWithSECP256K1AdminKeyWithoutKYC(
         tokenCreateContract,
         owner,
-        this.getSignerCompressedPublicKey()
+        await this.getSignerCompressedPublicKey()
       );
 
     await this.updateTokenKeysViaHapi(
@@ -925,7 +974,7 @@ class Utils {
       await this.createFungibleTokenWithSECP256K1AdminKeyWithoutKYC(
         tokenCreateContract,
         owner,
-        this.getSignerCompressedPublicKey()
+        await this.getSignerCompressedPublicKey()
       );
 
     await this.updateTokenKeysViaHapi(
@@ -1008,7 +1057,7 @@ class Utils {
    * @throws {Error} If there was an error fetching the data from mirror node
    */
   static async getMaxAutomaticTokenAssociations(evmAddress) {
-    const network = hre.network.name;
+    const network = Utils.getCurrentNetwork();
     const mirrorNodeUrl = getMirrorNodeUrl(network);
     const response = await axios.get(`${mirrorNodeUrl}/accounts/${evmAddress}`);
     return response.data.max_automatic_token_associations;
@@ -1020,4 +1069,15 @@ class Utils {
   }
 }
 
-module.exports = Utils;
+// Ensure Hedera SDK clients are closed after the entire test run to prevent hanging processes
+try {
+  if (typeof after === 'function') {
+    after(async () => {
+      await Utils.closeAllSDKClients();
+    });
+  }
+} catch (_) {
+  // ignore if mocha globals are not available
+}
+
+export default Utils;

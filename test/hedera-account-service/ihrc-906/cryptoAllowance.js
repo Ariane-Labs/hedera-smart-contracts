@@ -1,18 +1,20 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const utils = require('../../hedera-token-service/utils');
-const Utils = require('../../hedera-token-service/utils');
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const Constants = require('../../constants');
-const {
+import utils from '../../hedera-token-service/utils.js';
+import Utils from '../../hedera-token-service/utils.js';
+import hre, { network } from "hardhat";
+const { ethers } = await network.connect();
+import Constants from '../../constants.js';
+import { expect } from "chai";
+import {
   pollForNewSignerBalanceUsingProvider,
-} = require('../../helpers');
+} from '../../helpers.js';
 
 describe('@HAS IHRC-906 Test Suite', () => {
   let walletA,
     walletB,
     walletC,
+    receiver,
     cryptoAllowanceContract,
     cryptoOwnerContract,
     cryptoAllowanceAddress,
@@ -86,7 +88,7 @@ describe('@HAS IHRC-906 Test Suite', () => {
     expect(responseCode.args).to.deep.eq([22n]);
     expect(logs.args[0]).to.eq(cryptoAllowanceAddress);
     expect(logs.args[1]).to.eq(walletB.address);
-    expect(logs.args[2]).to.eq(amount);
+    expect(Number(logs.args[2])).to.eq(amount);
   });
 
   it('Should allow an approval on behalf of hbar owner WITH its signature', async () => {
@@ -120,7 +122,7 @@ describe('@HAS IHRC-906 Test Suite', () => {
     expect(responseCode.args).to.deep.eq([22n]);
     expect(logs.args[0]).to.eq(walletA.address);
     expect(logs.args[1]).to.eq(walletB.address);
-    expect(logs.args[2]).to.eq(amount);
+    expect(Number(logs.args[2])).to.eq(amount);
   });
 
   it('Should NOT allow an approval on behalf of hbar owner WITHOUT its signature', async () => {

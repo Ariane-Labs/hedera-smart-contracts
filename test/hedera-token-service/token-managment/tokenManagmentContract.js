@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const utils = require('../utils');
-const Constants = require('../../constants');
-const { pollForNewERC20Balance } = require('../../helpers');
+import { network } from "hardhat";
+const { ethers } = await network.connect();
+import utils from '../utils.js';
+import Constants from '../../constants.js';
+import { pollForNewERC20Balance } from '../../helpers.js';
+import { expect } from "chai";
 
 describe('TokenManagmentContract Test Suite', function () {
-  const TX_SUCCESS_CODE = 22;
+  const TX_SUCCESS_CODE = 22n;
   const CUSTOM_SCHEDULE_ALREADY_HAS_NO_FEES = '244';
   const TOKEN_HAS_NO_FEE_SCHEDULE_KEY = '240';
   const CUSTOM_FEE_MUST_BE_POSITIVE = '239';
@@ -34,6 +35,11 @@ describe('TokenManagmentContract Test Suite', function () {
   let tokenTransferContractAddress;
   let tokenQueryContractAddress;
   let tokenManagementContractAddress;
+  let initialSupply;
+  let maxSupply;
+  let decimals;
+  let setFeeScheduleKey;
+  let transactionHash;
 
   before(async function () {
     signers = await ethers.getSigners();
@@ -60,7 +66,7 @@ describe('TokenManagmentContract Test Suite', function () {
     tokenAddress = await utils.createFungibleTokenWithSECP256K1AdminKey(
       tokenCreateContract,
       signers[0].address,
-      utils.getSignerCompressedPublicKey()
+      await utils.getSignerCompressedPublicKey()
     );
     await utils.updateTokenKeysViaHapi(tokenAddress, [
       await tokenCreateContract.getAddress(),
@@ -71,7 +77,7 @@ describe('TokenManagmentContract Test Suite', function () {
     nftTokenAddress = await utils.createNonFungibleTokenWithSECP256K1AdminKey(
       tokenCreateContract,
       signers[0].address,
-      utils.getSignerCompressedPublicKey()
+      await utils.getSignerCompressedPublicKey()
     );
     await utils.updateTokenKeysViaHapi(nftTokenAddress, [
       await tokenCreateContract.getAddress(),
@@ -102,7 +108,7 @@ describe('TokenManagmentContract Test Suite', function () {
       await utils.createFungibleTokenWithSECP256K1AdminKey(
         tokenCreateContract,
         signers[0].address,
-        utils.getSignerCompressedPublicKey()
+        await utils.getSignerCompressedPublicKey()
       );
     await utils.updateTokenKeysViaHapi(newTokenAddress, [
       await tokenCreateContract.getAddress(),
@@ -342,12 +348,10 @@ describe('TokenManagmentContract Test Suite', function () {
   });
 
   it('should be able to update token expiry info', async function () {
-    const AUTO_RENEW_PERIOD = 8000000;
-    const NEW_AUTO_RENEW_PERIOD = 7999900;
+    const AUTO_RENEW_PERIOD = 8000000n;
+    const NEW_AUTO_RENEW_PERIOD = 7999900n;
     const AUTO_RENEW_SECOND = 0;
-    const epoch = parseInt(
-      (Date.now() / 1000 + NEW_AUTO_RENEW_PERIOD).toFixed(0)
-    );
+    const epoch = (BigInt(Math.floor(Date.now() / 1000)) + NEW_AUTO_RENEW_PERIOD);
 
     const getTokenExpiryInfoTxBefore =
       await tokenQueryContract.getTokenExpiryInfoPublic(
@@ -497,7 +501,7 @@ describe('TokenManagmentContract Test Suite', function () {
       receiptDisassociate.logs.filter(
         (e) => e.fragment.name === Constants.Events.ResponseCode
       )[0].args.responseCode
-    ).to.equal(22);
+    ).to.equal(22n);
 
     const txAssociate = await tokenCreateContractWallet2.associateTokensPublic(
       signers[1].address,
@@ -509,7 +513,7 @@ describe('TokenManagmentContract Test Suite', function () {
       receiptAssociate.logs.filter(
         (e) => e.fragment.name === Constants.Events.ResponseCode
       )[0].args.responseCode
-    ).to.equal(22);
+    ).to.equal(22n);
   });
 
   it('should be able to dissociate token', async function () {
@@ -530,7 +534,7 @@ describe('TokenManagmentContract Test Suite', function () {
       receiptDisassociate.logs.filter(
         (e) => e.fragment.name === Constants.Events.ResponseCode
       )[0].args.responseCode
-    ).to.equal(22);
+    ).to.equal(22n);
 
     const txAssociate = await tokenCreateContractWallet2.associateTokenPublic(
       signers[1].address,
@@ -542,7 +546,7 @@ describe('TokenManagmentContract Test Suite', function () {
       receiptAssociate.logs.filter(
         (e) => e.fragment.name === Constants.Events.ResponseCode
       )[0].args.responseCode
-    ).to.equal(22);
+    ).to.equal(22n);
   });
 
   describe('Extended update token info and keys test suite', function () {
@@ -603,7 +607,7 @@ describe('TokenManagmentContract Test Suite', function () {
         tokenAddress = await utils.createFungibleTokenWithSECP256K1AdminKey(
           tokenCreateContract,
           signers[0].address,
-          utils.getSignerCompressedPublicKey()
+          await utils.getSignerCompressedPublicKey()
         );
         await utils.updateTokenKeysViaHapi(tokenAddress, [
           await tokenCreateContract.getAddress(),
@@ -689,7 +693,7 @@ describe('TokenManagmentContract Test Suite', function () {
         {
           const updatedKeyAfter = updateTokenInfoValues(
             utils.KeyValueType.SECP256K1,
-            utils.getSignerCompressedPublicKey()
+            await utils.getSignerCompressedPublicKey()
           );
 
           const tokenAfter = {
@@ -800,7 +804,7 @@ describe('TokenManagmentContract Test Suite', function () {
         {
           const updatedKeyAfter = updateTokenInfoValues(
             utils.KeyValueType.SECP256K1,
-            utils.getSignerCompressedPublicKey()
+            await utils.getSignerCompressedPublicKey()
           );
 
           const tokenAfter = {
@@ -933,7 +937,7 @@ describe('TokenManagmentContract Test Suite', function () {
         {
           const updatedKeyAfter = updateTokenInfoValues(
             utils.KeyValueType.SECP256K1,
-            utils.getSignerCompressedPublicKey()
+            await utils.getSignerCompressedPublicKey()
           );
 
           const tokenAfter = {
@@ -1075,7 +1079,7 @@ describe('TokenManagmentContract Test Suite', function () {
         tokenAddress = await utils.createFungibleTokenWithSECP256K1AdminKey(
           tokenCreateContract,
           signers[0].address,
-          utils.getSignerCompressedPublicKey()
+          await utils.getSignerCompressedPublicKey()
         );
 
         await utils.updateTokenKeysViaHapi(tokenAddress, [
@@ -1296,7 +1300,7 @@ describe('TokenManagmentContract Test Suite', function () {
           tokenAddress = await utils.createFungibleTokenWithSECP256K1AdminKey(
             tokenCreateContract,
             signers[0].address,
-            utils.getSignerCompressedPublicKey()
+            await utils.getSignerCompressedPublicKey()
           );
         });
         it('should not be able to pause the token with different PAUSE key', async function () {
@@ -1396,7 +1400,7 @@ describe('TokenManagmentContract Test Suite', function () {
       const adminKey = utils.constructIHederaTokenKey(
         'ADMIN',
         'SECP256K1',
-        utils.getSignerCompressedPublicKey(0)
+        await utils.getSignerCompressedPublicKey(0)
       );
       const kycKey = utils.constructIHederaTokenKey(
         'KYC',
@@ -1667,7 +1671,7 @@ describe('TokenManagmentContract Test Suite', function () {
 
       expect(parseFloat(balanceAfterTransfer)).to.be.equal(
         parseFloat(balanceBeforeTransfer0) -
-          parseFloat(tenHbars / utils.tinybarToHbarCoef)
+        parseFloat(tenHbars / utils.tinybarToHbarCoef)
       );
       const updatedFixedFee = [
         {
@@ -1704,7 +1708,7 @@ describe('TokenManagmentContract Test Suite', function () {
 
       expect(parseFloat(balanceAfterUpdate)).to.be.equal(
         parseFloat(balanceAfterTransfer) -
-          parseFloat(twentyHbars / utils.tinybarToHbarCoef)
+        parseFloat(twentyHbars / utils.tinybarToHbarCoef)
       );
       const tokenInfoTx = await tokenQueryContract.getTokenInfoPublic(
         tokenWithFixedHbarFee
@@ -1963,7 +1967,7 @@ describe('TokenManagmentContract Test Suite', function () {
 
       expect(parseFloat(balanceAfterTransfer)).to.be.equal(
         parseFloat(balanceBeforeTransfer0) -
-          parseFloat((tenHbars + thirtyHbars) / utils.tinybarToHbarCoef)
+        parseFloat((tenHbars + thirtyHbars) / utils.tinybarToHbarCoef)
       );
       const updatedFixedFee = {
         amount: twentyHbars,
@@ -2001,7 +2005,7 @@ describe('TokenManagmentContract Test Suite', function () {
 
       expect(parseFloat(balanceAfterUpdate)).to.be.equal(
         parseFloat(balanceAfterTransfer) -
-          parseFloat((twentyHbars * 2) / utils.tinybarToHbarCoef)
+        parseFloat((twentyHbars * 2) / utils.tinybarToHbarCoef)
       );
 
       const tokenInfoTx = await tokenQueryContract.getTokenInfoPublic(
@@ -2278,7 +2282,6 @@ describe('TokenManagmentContract Test Suite', function () {
       const fractionalFeeNumerator = 30;
       const fractionalFeeDenominator = 100;
       const fractionalFeeNumerator2 = 10;
-      console.log('Creating token');
       const feeToken2 = await utils.createFungibleTokenWithPresetKeysPublic(
         tokenCreateCustomContract,
         'FeeToken2',
@@ -2403,8 +2406,8 @@ describe('TokenManagmentContract Test Suite', function () {
       );
       const feeToBeCharged = Math.floor(
         400 *
-          ((updatedFractionalFeeNumerator + updatedFractionalFeeNumerator2) /
-            fractionalFeeDenominator)
+        ((updatedFractionalFeeNumerator + updatedFractionalFeeNumerator2) /
+          fractionalFeeDenominator)
       );
 
       const transferTx1 = await tokenTransferContract.transferTokensPublic(
@@ -2507,13 +2510,13 @@ describe('TokenManagmentContract Test Suite', function () {
         parseFloat(await utils.getHbarBalance(signers[2].address))
       ).to.equal(
         beforeNftTransferHbars2 +
-          parseFloat(twentyHbars / utils.tinybarToHbarCoef)
+        parseFloat(twentyHbars / utils.tinybarToHbarCoef)
       );
       expect(
         parseFloat(await utils.getHbarBalance(signers[3].address))
       ).to.equal(
         beforeNftTransferHbars3 -
-          parseFloat(twentyHbars / utils.tinybarToHbarCoef)
+        parseFloat(twentyHbars / utils.tinybarToHbarCoef)
       );
     });
 
@@ -2602,13 +2605,13 @@ describe('TokenManagmentContract Test Suite', function () {
         parseFloat(await utils.getHbarBalance(signers[2].address))
       ).to.equal(
         beforeNftTransferHbars2 +
-          parseFloat((twentyHbars + tenHbars) / utils.tinybarToHbarCoef)
+        parseFloat((twentyHbars + tenHbars) / utils.tinybarToHbarCoef)
       );
       expect(
         parseFloat(await utils.getHbarBalance(signers[3].address))
       ).to.equal(
         beforeNftTransferHbars3 -
-          parseFloat((twentyHbars + tenHbars) / utils.tinybarToHbarCoef)
+        parseFloat((twentyHbars + tenHbars) / utils.tinybarToHbarCoef)
       );
     });
 
@@ -2687,13 +2690,13 @@ describe('TokenManagmentContract Test Suite', function () {
         parseFloat(await utils.getHbarBalance(signers[2].address))
       ).to.equal(
         beforeNftTransferHbars2 +
-          parseFloat(twentyHbars / utils.tinybarToHbarCoef)
+        parseFloat(twentyHbars / utils.tinybarToHbarCoef)
       );
       expect(
         parseFloat(await utils.getHbarBalance(signers[1].address))
       ).to.equal(
         beforeNftTransferHbars1 -
-          parseFloat(twentyHbars / utils.tinybarToHbarCoef)
+        parseFloat(twentyHbars / utils.tinybarToHbarCoef)
       );
     });
 
@@ -2922,11 +2925,11 @@ describe('TokenManagmentContract Test Suite', function () {
       )[0].args.tokenInfo;
 
       // fractional fee is at position 7 in the tokenInfo array
-      expect(tokenInfoResponse[0][5].length).to.be.greaterThan(0);
-      expect(tokenInfoResponse[0][7].length).to.be.greaterThan(0);
-      expect(tokenInfoResponse[0][5][0][0]).to.equal(63);
+      expect(tokenInfoResponse[0][5].length).to.be.greaterThan(0n);
+      expect(tokenInfoResponse[0][7].length).to.be.greaterThan(0n);
+      expect(tokenInfoResponse[0][5][0][0]).to.equal(63n);
       expect(tokenInfoResponse[0][5][0][1]).to.equal(feeToken);
-      expect(tokenInfoResponse[0][7][0][2]).to.equal(twentyHbars);
+      expect(tokenInfoResponse[0][7][0][2]).to.equal(2000000000n);
       expect(tokenInfoResponse[0][7][0][4]).to.equal(true);
       expect(updateFeeResponseCode).to.equal(TX_SUCCESS_CODE);
 
@@ -2993,13 +2996,13 @@ describe('TokenManagmentContract Test Suite', function () {
         parseFloat(await utils.getHbarBalance(signers[2].address))
       ).to.equal(
         beforeNftTransferHbars2 +
-          parseFloat(twentyHbars / utils.tinybarToHbarCoef)
+        parseFloat(twentyHbars / utils.tinybarToHbarCoef)
       );
       expect(
         parseFloat(await utils.getHbarBalance(signers[3].address))
       ).to.equal(
         beforeNftTransferHbars3 -
-          parseFloat(twentyHbars / utils.tinybarToHbarCoef)
+        parseFloat(twentyHbars / utils.tinybarToHbarCoef)
       );
     });
 
