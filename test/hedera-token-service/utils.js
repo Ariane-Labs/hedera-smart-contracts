@@ -1,5 +1,6 @@
 // SPDX-License-Identifier: Apache-2.0
-import { network, config} from "hardhat";
+import { network } from "hardhat";
+import config from '../../hardhat.config.ts';
 const { ethers } = await network.connect();
 import { expect } from "chai";
 import {
@@ -18,7 +19,6 @@ import {
   AccountDeleteTransaction,
 } from '@hashgraph/sdk';
 import Constants from '../constants';
-import { SDK_CLIENTS } from "../../hardhat.config";
 import axios from 'axios';
 function getMirrorNodeUrl(network) {
   switch (network) {
@@ -34,6 +34,8 @@ function getMirrorNodeUrl(network) {
       throw new Error('Unknown network');
   }
 }
+
+const __sdkClients = [];
 
 class Utils {
   static createTokenCost = '50000000000000000000';
@@ -546,25 +548,39 @@ class Utils {
 
   static async createSDKClient(operatorId, operatorKey) {
     const network = Utils.getCurrentNetwork();
-    const sdkClient = await SDK_CLIENTS[network];
 
     const hederaNetwork = {};
-    hederaNetwork[sdkClient.networkNodeUrl] = AccountId.fromString(sdkClient.nodeId);
+
+    const sdkClient = await config.networks[network].sdkClient;
+    hederaNetwork[sdkClient.networkNodeUrl] =
+      AccountId.fromString(sdkClient.nodeId);
     const { mirrorNode } = sdkClient;
 
-    const resolvedOperatorId = operatorId || sdkClient.operatorId;
-    let resolvedOperatorKey = operatorKey || sdkClient.operatorKey;
-
-    // If the operator key is provided as a Hardhat account-like object, resolve its raw value
-    if (resolvedOperatorKey && typeof resolvedOperatorKey === 'object' && typeof resolvedOperatorKey._getRawValue === 'function') {
-      resolvedOperatorKey = await resolvedOperatorKey._getRawValue();
-    }
+    operatorId = operatorId || sdkClient.operatorId;
+    operatorKey = operatorKey || sdkClient.operatorKey;
 
     const client = Client.forNetwork(hederaNetwork)
       .setMirrorNetwork(mirrorNode)
-      .setOperator(resolvedOperatorId, resolvedOperatorKey);
+      .setOperator(operatorId, operatorKey);
+
+    // Track created clients for teardown to prevent hanging test processes
+    try { __sdkClients.push(client); } catch (_) {}
 
     return client;
+  }
+
+  static async closeAllSDKClients() {
+    // Close any Hedera SDK clients created during tests
+    while (__sdkClients.length) {
+      const c = __sdkClients.pop();
+      try {
+        if (c && typeof c.close === 'function') {
+          await c.close();
+        }
+      } catch (_) {
+        // ignore errors on shutdown
+      }
+    }
   }
 
   static async getAccountId(evmAddress, client) {
@@ -607,8 +623,7 @@ class Utils {
     asBuffer = true,
     prune0x = true
   ) {
-    const account = config.networks[Utils.getCurrentNetwork()].accounts[index];
-    const privateKey = await account._getRawValue();
+    const privateKey = config.networks[Utils.getCurrentNetwork()].accounts[index];
     const wallet = new ethers.Wallet(privateKey);
     const cpk = prune0x
       ? wallet.signingKey.compressedPublicKey.replace('0x', '')
@@ -622,7 +637,7 @@ class Utils {
     const accounts = config.networks[network].accounts;
     const keys = await Promise.all(
       accounts.map(async (acc) => {
-        const pk = await acc._getRawValue();
+        const pk = acc;
         return add0xPrefix ? pk : pk.replace('0x', '');
       })
     );
@@ -631,7 +646,7 @@ class Utils {
 
   static async getHardhatSignerPrivateKeyByIndex(index = 0) {
     const account = config.networks[Utils.getCurrentNetwork()].accounts[index];
-    return await account._getRawValue();
+    return account;
   }
 
   static async updateAccountKeysViaHapi(
@@ -839,14 +854,27 @@ class Utils {
    * to a string before being returned.
    *
    * @param {string} txHash - The transaction hash to query.
+   * @param {number} timeout - Max. time to wait for transaction.
    * @returns {string} - The response code as a string.
    */
-  static async getHTSResponseCode(txHash) {
+  static async getHTSResponseCode(txHash, timeout = 10000) {
     const network = Utils.getCurrentNetwork();
     const mirrorNodeUrl = getMirrorNodeUrl(network);
-    const res = await axios.get(
-      `${mirrorNodeUrl}/contracts/results/${txHash}/actions`
-    );
+    const waitingInterval = 1000;
+    let res;
+    let success = false
+    do {
+      try {
+        res = await axios.get(
+          `${mirrorNodeUrl}/contracts/results/${txHash}/actions`
+        );
+        success = true;
+      } catch (e) {
+        await new Promise((resolve) => setTimeout(resolve, waitingInterval));
+        timeout -= waitingInterval;
+      }
+    } while(!success && timeout > 0);
+
     const precompileAction = res.data.actions.find(
       (x) => x.recipient === Constants.HTS_SYSTEM_CONTRACT_ID
     );
@@ -886,14 +914,26 @@ class Utils {
    * to a string before being returned.
    *
    * @param {string} txHash - The transaction hash to query.
+   * @param {number} timeout - Max. time to wait for transaction.
    * @returns {string} - The response code as a string.
    */
-  static async getHASResponseCode(txHash) {
+  static async getHASResponseCode(txHash, timeout = 10000) {
     const network = Utils.getCurrentNetwork();
     const mirrorNodeUrl = getMirrorNodeUrl(network);
-    const res = await axios.get(
-      `${mirrorNodeUrl}/contracts/results/${txHash}/actions`
-    );
+    const waitingInterval = 1000;
+    let res;
+    let success = false
+    do {
+      try {
+        res = await axios.get(
+          `${mirrorNodeUrl}/contracts/results/${txHash}/actions`
+        );
+        success = true;
+      } catch (e) {
+        await new Promise((resolve) => setTimeout(resolve, waitingInterval));
+        timeout -= waitingInterval;
+      }
+    } while(!success && timeout > 0);
     const precompileAction = res.data.actions.find(
       (x) => x.recipient === Constants.HAS_SYSTEM_CONTRACT_ID
     );
@@ -1027,6 +1067,17 @@ class Utils {
     const hex = BigInt(decimalStr).toString(16);
     return Buffer.from(hex, 'hex').toString('ascii');
   }
+}
+
+// Ensure Hedera SDK clients are closed after the entire test run to prevent hanging processes
+try {
+  if (typeof after === 'function') {
+    after(async () => {
+      await Utils.closeAllSDKClients();
+    });
+  }
+} catch (_) {
+  // ignore if mocha globals are not available
 }
 
 export default Utils;

@@ -59,7 +59,7 @@ describe('IERC20 Test Suite', function () {
 
   it('should be able to get token decimals', async function () {
     const decimals = await IERC20.decimals();
-    expect(decimals).to.equal(0);
+    expect(decimals).to.equal(0n);
   });
 
   it('should be able to get token totalSupply', async function () {
@@ -75,11 +75,11 @@ describe('IERC20 Test Suite', function () {
     const signer1Balance = await IERC20.balanceOf(signers[1].address);
 
     expect(contractOwnerBalance).to.exist;
-    expect(contractOwnerBalance).to.eq(0);
+    expect(contractOwnerBalance).to.eq(0n);
     expect(signer0Balance).to.exist;
     expect(signer0Balance).to.eq(TOTAL_SUPPLY);
     expect(signer1Balance).to.exist;
-    expect(signer1Balance).to.eq(0);
+    expect(signer1Balance).to.eq(0n);
   });
 
   it('should be able to approve another account', async function () {
@@ -97,7 +97,7 @@ describe('IERC20 Test Suite', function () {
       signers[1].address
     );
 
-    expect(signer1AllowanceBefore).to.eq(0);
+    expect(signer1AllowanceBefore).to.eq(0n);
     expect(signer1AllowanceAfter).to.eq(AMOUNT);
   });
 

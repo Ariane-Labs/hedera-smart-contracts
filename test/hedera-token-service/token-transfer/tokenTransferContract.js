@@ -8,9 +8,10 @@ import {
   pollForNewERC20Balance,
   pollForNewSignerBalanceUsingProvider,
 } from '../../helpers.js';
+import { expect } from "chai";
 
 describe('TokenTransferContract Test Suite', function () {
-  const TX_SUCCESS_CODE = 22;
+  const TX_SUCCESS_CODE = 22n;
 
   let tokenCreateContract;
   let tokenTransferContract;
@@ -202,8 +203,8 @@ describe('TokenTransferContract Test Suite', function () {
       wallet1BalanceBefore
     );
 
-    expect(wallet1BalanceAfter).to.equal(wallet1BalanceBefore - amount);
-    expect(wallet2BalanceAfter).to.equal(wallet2BalanceBefore + amount);
+    expect(Number(wallet1BalanceAfter)).to.equal(wallet1BalanceBefore - amount);
+    expect(Number(wallet2BalanceAfter)).to.equal(wallet2BalanceBefore + amount);
   });
 
   it('should be able to execute transferNFT', async function () {
