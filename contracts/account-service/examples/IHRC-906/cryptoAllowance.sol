@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "../../HederaAccountService.sol";
-import "../../../hedera-token-service/HederaTokenService.sol";
+import "../../../token-service/HederaTokenService.sol";
 
 contract CryptoAllowance is HederaAccountService, HederaTokenService {
     event ResponseCode(int responseCode);

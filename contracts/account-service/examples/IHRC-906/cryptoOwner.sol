@@ -2,7 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "../../HederaAccountService.sol";
-import "../../../hedera-token-service/HederaTokenService.sol";
+import "../../../token-service/HederaTokenService.sol";
 
 interface ICryptoAllowance {
     function cryptoTransferPublic(IHederaTokenService.TransferList calldata transferList, IHederaTokenService.TokenTransferList[] calldata tokenTransferList) external returns (int responseCode);
@@ -41,7 +41,7 @@ contract CryptoOwner is HederaAccountService {
         IHederaTokenService.TransferList memory transferList = IHederaTokenService.TransferList({
             transfers: accountAmounts
         });
-        
+
         // prepare IHTS.TokenTransferList
         IHederaTokenService.TokenTransferList[] memory tokenTransferList = new IHederaTokenService.TokenTransferList[](0);
 

@@ -2,7 +2,7 @@
 pragma solidity >=0.4.9 <0.9.0;
 
 import "../../HederaScheduleService.sol";
-import "../../../hedera-token-service/HederaTokenService.sol";
+import "../../../token-service/HederaTokenService.sol";
 
 pragma experimental ABIEncoderV2;
 

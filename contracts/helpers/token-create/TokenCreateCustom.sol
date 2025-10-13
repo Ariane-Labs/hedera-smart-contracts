@@ -2,10 +2,10 @@
 pragma solidity >=0.5.0 <0.9.0;
 pragma experimental ABIEncoderV2;
 
-import "../../HederaTokenService.sol";
-import "../../ExpiryHelper.sol";
-import "../../KeyHelper.sol";
-import "../../FeeHelper.sol";
+import "../../token-service/HederaTokenService.sol";
+import "../../token-service/ExpiryHelper.sol";
+import "../../token-service/KeyHelper.sol";
+import "../../token-service/FeeHelper.sol";
 
 contract TokenCreateCustomContract is HederaTokenService, ExpiryHelper, KeyHelper, FeeHelper {
     bool finiteTotalSupplyType = true;
@@ -33,7 +33,7 @@ contract TokenCreateCustomContract is HederaTokenService, ExpiryHelper, KeyHelpe
         IHederaTokenService.HederaToken memory token = IHederaTokenService.HederaToken(
             name, symbol, treasury, memo, finiteTotalSupplyType, maxSupply, freezeDefaultStatus, keys, expiry
         );
-        
+
         (int responseCode, address tokenAddress) =
         HederaTokenService.createFungibleToken(token, initialTotalSupply, decimals);
 
@@ -68,7 +68,7 @@ contract TokenCreateCustomContract is HederaTokenService, ExpiryHelper, KeyHelpe
         IHederaTokenService.HederaToken memory token = IHederaTokenService.HederaToken(
             name, symbol, treasury, memo, finiteTotalSupplyType, maxSupply, freezeDefaultStatus, keys, expiry
         );
-        
+
         (int responseCode, address tokenAddress) =
         HederaTokenService.createFungibleToken(token, initialTotalSupply, decimals);
 
