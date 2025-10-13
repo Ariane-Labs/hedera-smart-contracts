@@ -11,7 +11,7 @@ const delay = (ms) => {
 };
 
 const getBalance = async (erc20Contract, tokenAddress, signersAddress) => {
-  const balance = await erc20Contract.balanceOf(tokenAddress, signersAddress);
+  const balance = await erc20Contract['balanceOf(address,address)'](tokenAddress, signersAddress);
   return balance;
 };
 
