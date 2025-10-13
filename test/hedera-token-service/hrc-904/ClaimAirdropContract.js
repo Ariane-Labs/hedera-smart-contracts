@@ -1,10 +1,21 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const utils = require('../utils');
-const Constants = require('../../constants');
-const Utils = require("../utils");
+import hre, { network } from "hardhat";
+const { ethers } = await network.connect();
+import utils from '../utils.js';
+import Constants from '../../constants.js';
+import Utils from '../utils.js';
+import { expect } from "chai";
+
+const expectToBeRejectedWith = async (promise, message) => {
+  let errorMessage = '';
+  try {
+    await promise();
+  } catch (e) {
+    errorMessage = e.message;
+  }
+  expect(errorMessage).to.contain(message);
+};
 
 describe('HIP904Batch3 ClaimAirdropContract Test Suite', function () {
   let airdropContract;
@@ -17,6 +28,7 @@ describe('HIP904Batch3 ClaimAirdropContract Test Suite', function () {
   let receiver;
   let receiverPrivateKey;
   let contractAddresses;
+  let tokenAddress;
 
   before(async function () {
     signers = await ethers.getSigners();
@@ -386,8 +398,7 @@ describe('HIP904Batch3 ClaimAirdropContract Test Suite', function () {
           ...Constants.GAS_LIMIT_2_000_000
         }
     );
-
-    await expect(airdropTx2.wait()).to.be.rejectedWith('transaction execution reverted');
+    await expectToBeRejectedWith(() => airdropTx2.wait(), 'transaction execution reverted');
     expect(await Utils.getHTSResponseCode(airdropTx2.hash)).to.equal('237'); // SENDER_DOES_NOT_OWN_NFT_SERIAL_NO
   });
 
@@ -428,8 +439,7 @@ describe('HIP904Batch3 ClaimAirdropContract Test Suite', function () {
           ...Constants.GAS_LIMIT_2_000_000
         }
     );
-
-    await expect(airdropTx2.wait()).to.be.rejectedWith('transaction execution reverted');
+    await expectToBeRejectedWith(() => airdropTx2.wait(), 'transaction execution reverted');
     expect(await Utils.getHTSResponseCode(airdropTx2.hash)).to.equal('364'); // PENDING_NFT_AIRDROP_ALREADY_EXISTS
   });
 
@@ -452,8 +462,7 @@ describe('HIP904Batch3 ClaimAirdropContract Test Suite', function () {
           ...Constants.GAS_LIMIT_2_000_000
         }
     );
-
-    await expect(airdropTx.wait()).to.be.rejectedWith('transaction execution reverted');
+    await expectToBeRejectedWith(airdropTx.wait(), 'transaction execution reverted');
     expect(await Utils.getHTSResponseCode(airdropTx.hash)).to.equal('74'); // ACCOUNT_REPEATED_IN_ACCOUNT_AMOUNTS
   });
 
@@ -483,8 +492,7 @@ describe('HIP904Batch3 ClaimAirdropContract Test Suite', function () {
     await airdropTx.wait();
 
     const deleteTx = await sampleContract.selfDestructSample();
-
-    await expect(deleteTx.wait()).to.be.rejectedWith('reverted');
+    await expectToBeRejectedWith(deleteTx.wait(), 'reverted');
     const cr = await Utils.getContractResultFromMN(deleteTx.hash);
     expect(cr.error_message).to.equal('CONTRACT_STILL_OWNS_NFTS');
   });
@@ -495,16 +503,15 @@ describe('HIP904Batch3 ClaimAirdropContract Test Suite', function () {
         owner,
         contractAddresses
     );
-
-    await expect(airdropContract.tokenAirdrop(
-        tokenAddress,
-        signers[0].address,
-        receiver.address,
-        Number.MAX_SAFE_INTEGER + 1,
-        {
-          value: Constants.ONE_HBAR,
-          ...Constants.GAS_LIMIT_2_000_000
-        }
-    )).to.be.rejectedWith('overflow');
+    await expectToBeRejectedWith(airdropContract.tokenAirdrop(
+      tokenAddress,
+      signers[0].address,
+      receiver.address,
+      Number.MAX_SAFE_INTEGER + 1,
+      {
+        value: Constants.ONE_HBAR,
+        ...Constants.GAS_LIMIT_2_000_000
+      }
+    ), 'overflow');
   });
 });

@@ -1,16 +1,17 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const utils = require('../utils');
-const Constants = require('../../constants');
-const {
+import { network } from "hardhat";
+const { ethers } = await network.connect();
+import utils from '../utils.js';
+import Constants from '../../constants.js';
+import {
   pollForNewERC20Balance,
   pollForNewSignerBalanceUsingProvider,
-} = require('../../helpers');
+} from '../../helpers.js';
+import { expect } from "chai";
 
 describe('TokenTransferContract Test Suite', function () {
-  const TX_SUCCESS_CODE = 22;
+  const TX_SUCCESS_CODE = 22n;
 
   let tokenCreateContract;
   let tokenTransferContract;
@@ -37,7 +38,7 @@ describe('TokenTransferContract Test Suite', function () {
     tokenAddress = await utils.createFungibleTokenWithSECP256K1AdminKey(
       tokenCreateContract,
       signers[0].address,
-      utils.getSignerCompressedPublicKey()
+      await utils.getSignerCompressedPublicKey()
     );
     await utils.updateTokenKeysViaHapi(tokenAddress, [
       await tokenCreateContract.getAddress(),
@@ -47,7 +48,7 @@ describe('TokenTransferContract Test Suite', function () {
     nftTokenAddress = await utils.createNonFungibleTokenWithSECP256K1AdminKey(
       tokenCreateContract,
       signers[0].address,
-      utils.getSignerCompressedPublicKey()
+      await utils.getSignerCompressedPublicKey()
     );
     await utils.updateTokenKeysViaHapi(nftTokenAddress, [
       await tokenCreateContract.getAddress(),
@@ -202,8 +203,8 @@ describe('TokenTransferContract Test Suite', function () {
       wallet1BalanceBefore
     );
 
-    expect(wallet1BalanceAfter).to.equal(wallet1BalanceBefore - amount);
-    expect(wallet2BalanceAfter).to.equal(wallet2BalanceBefore + amount);
+    expect(Number(wallet1BalanceAfter)).to.equal(wallet1BalanceBefore - amount);
+    expect(Number(wallet2BalanceAfter)).to.equal(wallet2BalanceBefore + amount);
   });
 
   it('should be able to execute transferNFT', async function () {

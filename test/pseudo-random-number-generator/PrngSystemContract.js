@@ -1,8 +1,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const Constants = require('../constants');
+import { network } from "hardhat";
+const { ethers } = await network.connect();
+import Constants from '../constants';
+import { expect } from "chai";
 
 describe('PrngSystemContract Test Suite', function () {
   let prngSystemContract;
@@ -24,6 +25,6 @@ describe('PrngSystemContract Test Suite', function () {
     )[0].args[0];
 
     expect(result).to.exist;
-    expect(result).to.not.hexEqual(ethers.ZeroHash);
+    expect(result).to.not.equal(ethers.ZeroHash);
   });
 });

@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
-
-const { expect } = require('chai');
+import { expect } from "chai";
 
 const expectValidHash = (hash, len = 0) => {
   let regex;
@@ -13,6 +12,6 @@ const expectValidHash = (hash, len = 0) => {
   expect(!!hash.match(regex)).to.eq(true);
 };
 
-module.exports = {
+export {
   expectValidHash,
 };

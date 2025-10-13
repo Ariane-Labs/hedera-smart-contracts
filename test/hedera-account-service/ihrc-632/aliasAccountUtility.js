@@ -1,17 +1,23 @@
 // SPDX-License-Identifier: Apache-2.0
-
-const Utils = require('../../hedera-token-service/utils');
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const Constants = require('../../constants');
-const {
+import { expect } from "chai";
+import Utils from '../../hedera-token-service/utils.js';
+import { network } from "hardhat";
+const { ethers } = await network.connect(
+  'local'
+);
+import Constants from '../../constants.js';
+import {
   Hbar,
   PrivateKey,
   AccountCreateTransaction,
   KeyList,
-} = require('@hashgraph/sdk');
-const path = require('path');
-const protobuf = require('protobufjs');
+} from '@hashgraph/sdk';
+import path from 'path';
+import protobuf from 'protobufjs';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 describe('@HAS IHRC-632 Test Suite', () => {
   let walletA,
@@ -30,7 +36,6 @@ describe('@HAS IHRC-632 Test Suite', () => {
     );
     aliasAccountUtility = await AliasAccountUtilityFactory.deploy();
     await aliasAccountUtility.waitForDeployment();
-
     sdkClient = await Utils.createSDKClient();
 
     const walletAAccountId = await Utils.getAccountId(
@@ -55,7 +60,7 @@ describe('@HAS IHRC-632 Test Suite', () => {
         (log) => log.fragment.name === 'AddressAliasResponse'
       ).args;
 
-      expect(evmAddressAliasLog[0]).to.eq(22); // responseCode 22 = success
+      expect(evmAddressAliasLog[0]).to.eq(22n); // responseCode 22 = success
       expect(evmAddressAliasLog[1]).to.eq(walletA.address); // evm address
     });
 
@@ -70,7 +75,7 @@ describe('@HAS IHRC-632 Test Suite', () => {
       const evmAddressAlias = receipt.logs.find(
         (log) => log.fragment.name === 'AddressAliasResponse'
       ).args;
-      expect(evmAddressAlias[0]).to.eq(15); // responseCode 15 = INVALID_ACCOUNT_ID
+      expect(evmAddressAlias[0]).to.eq(15n); // responseCode 15 = INVALID_ACCOUNT_ID
       expect(evmAddressAlias[1]).to.eq(ethers.ZeroAddress);
     });
   });
@@ -88,7 +93,7 @@ describe('@HAS IHRC-632 Test Suite', () => {
         (log) => log.fragment.name === 'AddressAliasResponse'
       ).args;
 
-      expect(evmAddressAliasLog[0]).to.eq(22); // responseCode 22 = success
+      expect(evmAddressAliasLog[0]).to.eq(22n); // responseCode 22 = success
       expect(evmAddressAliasLog[1].toLowerCase()).to.eq(
         walletAHederaAccountNumAlias
       ); // evm address
@@ -105,7 +110,7 @@ describe('@HAS IHRC-632 Test Suite', () => {
       const evmAddressAlias = receipt.logs.find(
         (log) => log.fragment.name === 'AddressAliasResponse'
       ).args;
-      expect(evmAddressAlias[0]).to.eq(22); // responseCode 22 = success
+      expect(evmAddressAlias[0]).to.eq(22n); // responseCode 22 = success
       expect(evmAddressAlias[1]).to.eq(walletA.address);
     });
   });
@@ -123,7 +128,7 @@ describe('@HAS IHRC-632 Test Suite', () => {
         (log) => log.fragment.name === 'IsValidAliasResponse'
       ).args;
 
-      expect(evmAddressAliasLog[0]).to.eq(22); // responseCode 22 = success
+      expect(evmAddressAliasLog[0]).to.eq(22n); // responseCode 22 = success
       expect(evmAddressAliasLog[1]).to.be.true;
     });
 
@@ -139,7 +144,7 @@ describe('@HAS IHRC-632 Test Suite', () => {
         (log) => log.fragment.name === 'IsValidAliasResponse'
       ).args;
 
-      expect(evmAddressAliasLog[0]).to.eq(22); // responseCode 22 = success
+      expect(evmAddressAliasLog[0]).to.eq(22n); // responseCode 22 = success
       expect(evmAddressAliasLog[1]).to.be.true;
     });
 
@@ -155,7 +160,7 @@ describe('@HAS IHRC-632 Test Suite', () => {
         (log) => log.fragment.name === 'IsValidAliasResponse'
       ).args;
 
-      expect(evmAddressAliasLog[0]).to.eq(22); // responseCode 22 = success
+      expect(evmAddressAliasLog[0]).to.eq(22n); // responseCode 22 = success
       expect(evmAddressAliasLog[1]).to.be.false;
     });
   });
@@ -206,7 +211,7 @@ describe('@HAS IHRC-632 Test Suite', () => {
         (l) => l.fragment.name === 'AccountAuthorizationResponse'
       ).args;
 
-      expect(correctSignerReceiptResponse[0]).to.eq(22);
+      expect(correctSignerReceiptResponse[0]).to.eq(22n);
       expect(correctSignerReceiptResponse[1]).to.eq(walletB.address);
       expect(correctSignerReceiptResponse[2]).to.be.true;
     });
@@ -228,7 +233,7 @@ describe('@HAS IHRC-632 Test Suite', () => {
         (l) => l.fragment.name === 'AccountAuthorizationResponse'
       ).args;
 
-      expect(incorrectSignerReceiptResponse[0]).to.eq(22);
+      expect(incorrectSignerReceiptResponse[0]).to.eq(22n);
       expect(incorrectSignerReceiptResponse[1]).to.eq(walletC.address);
       expect(incorrectSignerReceiptResponse[2]).to.be.false;
     });
@@ -247,7 +252,7 @@ describe('@HAS IHRC-632 Test Suite', () => {
         (l) => l.fragment.name === 'AccountAuthorizationResponse'
       ).args;
 
-      expect(correctSignerReceiptResponse[0]).to.eq(22);
+      expect(correctSignerReceiptResponse[0]).to.eq(22n);
       expect(correctSignerReceiptResponse[1].toLowerCase()).to.eq(
         EDItems[0].signerAlias.toLowerCase()
       );
@@ -268,7 +273,7 @@ describe('@HAS IHRC-632 Test Suite', () => {
         (l) => l.fragment.name === 'AccountAuthorizationResponse'
       ).args;
 
-      expect(incorrectSignerReceiptResponse[0]).to.eq(22);
+      expect(incorrectSignerReceiptResponse[0]).to.eq(22n);
       expect(incorrectSignerReceiptResponse[1].toLowerCase()).to.eq(
         EDItems[0].signerAlias.toLowerCase()
       );
@@ -293,11 +298,12 @@ describe('@HAS IHRC-632 Test Suite', () => {
   describe(`IsAuthorized`, () => {
     // raw messageToSign
     const messageToSign = 'Hedera Account Service';
+    let SignatureMap;
 
     before(async () => {
       // Load and compile protobuf definitions
       const signatureMapProto = path.resolve(__dirname, 'signature_map.proto');
-      root = await protobuf.load(signatureMapProto);
+      let root = await protobuf.load(signatureMapProto);
       SignatureMap = root.lookupType('SignatureMap');
     });
 
@@ -403,7 +409,7 @@ describe('@HAS IHRC-632 Test Suite', () => {
         (l) => l.fragment.name === 'AccountAuthorizationResponse'
       ).args;
 
-      expect(accountAuthorizationResponse[0]).to.eq(22);
+      expect(accountAuthorizationResponse[0]).to.eq(22n);
       expect(accountAuthorizationResponse[1].toLowerCase()).to.eq(
         sigBlobData.accountAddress.toLowerCase()
       );
@@ -425,7 +431,7 @@ describe('@HAS IHRC-632 Test Suite', () => {
         (l) => l.fragment.name === 'AccountAuthorizationResponse'
       ).args;
 
-      expect(accountAuthorizationResponse[0]).to.eq(22);
+      expect(accountAuthorizationResponse[0]).to.eq(22n);
       expect(accountAuthorizationResponse[1].toLowerCase()).to.eq(
         sigBlobData.accountAddress.toLowerCase()
       );
@@ -456,7 +462,7 @@ describe('@HAS IHRC-632 Test Suite', () => {
         (l) => l.fragment.name === 'AccountAuthorizationResponse'
       ).args;
 
-      expect(accountAuthorizationResponse[0]).to.eq(22);
+      expect(accountAuthorizationResponse[0]).to.eq(22n);
       expect(accountAuthorizationResponse[1].toLowerCase()).to.eq(
         sigBlobData.accountAddress.toLowerCase()
       );
@@ -482,7 +488,7 @@ describe('@HAS IHRC-632 Test Suite', () => {
         (l) => l.fragment.name === 'AccountAuthorizationResponse'
       ).args;
 
-      expect(accountAuthorizationResponse[0]).to.eq(22);
+      expect(accountAuthorizationResponse[0]).to.eq(22n);
       expect(accountAuthorizationResponse[1].toLowerCase()).to.eq(
         sigBlobData.accountAddress.toLowerCase()
       );

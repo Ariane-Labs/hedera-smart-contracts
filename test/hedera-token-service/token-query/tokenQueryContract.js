@@ -1,12 +1,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const utils = require('../utils');
-const Constants = require('../../constants.js');
+import { network } from "hardhat";
+const { ethers } = await network.connect();
+import utils from '../utils.js';
+import Constants from '../../constants.js';
+import { expect } from "chai";
 
 describe('TokenQueryContract Test Suite', function () {
-  const TX_SUCCESS_CODE = 22;
+  const TX_SUCCESS_CODE = 22n;
 
   let tokenCreateContract;
   let tokenQueryContract;
@@ -78,7 +79,7 @@ describe('TokenQueryContract Test Suite', function () {
     )[0].args;
 
     expect(responseCode).to.equal(TX_SUCCESS_CODE);
-    expect(amount).to.equal(0);
+    expect(amount).to.equal(0n);
   });
 
   it('should query getApproved', async function () {
@@ -165,15 +166,15 @@ describe('TokenQueryContract Test Suite', function () {
 
     expect(responseCode).to.equal(TX_SUCCESS_CODE);
 
-    expect(fixedFees[0].amount).to.equal(1);
+    expect(fixedFees[0].amount).to.equal(1n);
     expect(fixedFees[0].tokenId).to.equal(tokenAddress);
     expect(fixedFees[0].useHbarsForPayment).to.equal(false);
     expect(fixedFees[0].useCurrentTokenForPayment).to.equal(false);
 
-    expect(fractionalFees[0].numerator).to.equal(4);
-    expect(fractionalFees[0].denominator).to.equal(5);
-    expect(fractionalFees[0].minimumAmount).to.equal(10);
-    expect(fractionalFees[0].maximumAmount).to.equal(30);
+    expect(fractionalFees[0].numerator).to.equal(4n);
+    expect(fractionalFees[0].denominator).to.equal(5n);
+    expect(fractionalFees[0].minimumAmount).to.equal(10n);
+    expect(fractionalFees[0].maximumAmount).to.equal(30n);
     expect(fractionalFees[0].netOfTransfers).to.equal(false);
   });
 
@@ -297,6 +298,6 @@ describe('TokenQueryContract Test Suite', function () {
     )[0].args;
 
     expect(responseCode).to.equal(TX_SUCCESS_CODE);
-    expect(tokenType).to.equal(0);
+    expect(tokenType).to.equal(0n);
   });
 });

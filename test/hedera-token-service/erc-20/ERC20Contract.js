@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: Apache-2.0
 
-const { expect } = require('chai');
-const { ethers } = require('hardhat');
-const utils = require('../utils');
-const Constants = require('../../constants');
+import { network } from "hardhat";
+const { ethers } = await network.connect();
+import utils from '../utils.js';
+import Constants from '../../constants.js';
+import { expect } from "chai";
 
 describe('ERC20Contract Test Suite', function () {
   let tokenCreateContract;
@@ -51,12 +52,12 @@ describe('ERC20Contract Test Suite', function () {
 
   it('should be able to get token decimals', async function () {
     const decimals = await erc20Contract.decimals(tokenAddress);
-    expect(decimals).to.equal(0);
+    expect(decimals).to.equal(0n);
   });
 
   it('should be able to get token totalSupply', async function () {
     const totalSupply = await erc20Contract.totalSupply(tokenAddress);
-    expect(totalSupply).to.equal(TOTAL_SUPPLY);
+    expect(Number(totalSupply)).to.equal(TOTAL_SUPPLY);
   });
 
   it('should be able to get token balance of any account', async function () {
@@ -74,11 +75,11 @@ describe('ERC20Contract Test Suite', function () {
     );
 
     expect(contractOwnerBalance).to.exist;
-    expect(contractOwnerBalance).to.eq(0);
+    expect(contractOwnerBalance).to.eq(0n);
     expect(wallet1Balance).to.exist;
-    expect(wallet1Balance).to.eq(TOTAL_SUPPLY);
+    expect(Number(wallet1Balance)).to.eq(TOTAL_SUPPLY);
     expect(wallet2Balance).to.exist;
-    expect(wallet2Balance).to.eq(0);
+    expect(wallet2Balance).to.eq(0n);
   });
 
   it('should NOT be able to use transfer', async function () {
@@ -181,7 +182,7 @@ describe('ERC20Contract Test Suite', function () {
       signers[0].address,
       signers[1].address
     );
-    expect(allowanceBefore).to.eq(0);
+    expect(allowanceBefore).to.eq(0n);
 
     try {
       const tx = await erc20Contract
@@ -203,7 +204,7 @@ describe('ERC20Contract Test Suite', function () {
       signers[0].address,
       signers[1].address
     );
-    expect(allowanceAfter).to.eq(0);
+    expect(allowanceAfter).to.eq(0n);
   });
 
   it('should NOT be able to use delegateApprove and allowance', async function () {
@@ -215,7 +216,7 @@ describe('ERC20Contract Test Suite', function () {
       signers[0].address,
       signers[1].address
     );
-    expect(allowanceBefore).to.eq(0);
+    expect(allowanceBefore).to.eq(0n);
 
     try {
       const tx = await erc20Contract
