@@ -83,16 +83,12 @@ describe('IERC20 Test Suite', function () {
   });
 
   it('should be able to approve another account', async function () {
-    const signer1AllowanceBefore = await IERC20.allowance(
+    const signer1AllowanceBefore = await IERC20['allowance(address,address)'](
       signers[0].address,
       signers[1].address
     );
-    await IERC20.approve(
-      signers[1].address,
-      AMOUNT,
-      Constants.GAS_LIMIT_800000
-    );
-    const signer1AllowanceAfter = await IERC20.allowance(
+    await IERC20['approve(address,uint256)'](signers[1].address, AMOUNT);
+    const signer1AllowanceAfter = await IERC20['allowance(address,address)'](
       signers[0].address,
       signers[1].address
     );
@@ -124,17 +120,12 @@ describe('IERC20 Test Suite', function () {
     const signer0BalanceBefore = await IERC20.balanceOf(signers[0].address);
     const signer1BalanceBefore = await IERC20.balanceOf(signers[1].address);
 
-    await IERC20.approve(
-      signers[1].address,
-      AMOUNT,
-      Constants.GAS_LIMIT_800000
-    );
+    await IERC20['approve(address,uint256)'](signers[1].address, AMOUNT);
     const IERC20Signer1 = await IERC20.connect(signers[1]);
     await IERC20Signer1.transferFrom(
       signers[0].address,
       await tokenCreateContract.getAddress(),
-      AMOUNT,
-      Constants.GAS_LIMIT_800000
+      AMOUNT
     );
 
     const tokenCreateBalanceAfter = await pollForNewBalance(

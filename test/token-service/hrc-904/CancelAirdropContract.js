@@ -36,7 +36,7 @@ describe('HIP904Batch2 CancelAirdropContract Test Suite', function () {
       Constants.Contract.TokenCreateContract
     );
     erc20Contract = await utils.deployContract(
-      Constants.Contract.ERC20Contract
+      Constants.Contract.ERC20Mock
     );
     erc721Contract = await utils.deployContract(
       Constants.Contract.ERC721Contract
@@ -87,7 +87,7 @@ describe('HIP904Batch2 CancelAirdropContract Test Suite', function () {
       contractAddresses
     );
 
-    const initialBalance = await erc20Contract.balanceOf(
+    const initialBalance = await erc20Contract['balanceOf(address,address)'](
       tokenAddress,
       receiver.address
     );
@@ -112,7 +112,7 @@ describe('HIP904Batch2 CancelAirdropContract Test Suite', function () {
     );
     await cancelTx.wait();
 
-    const updatedBalance = await erc20Contract.balanceOf(
+    const updatedBalance = await erc20Contract['balanceOf(address,address)'](
       tokenAddress,
       receiver.address
     );
@@ -172,7 +172,7 @@ describe('HIP904Batch2 CancelAirdropContract Test Suite', function () {
       );
 
     const initialBalances = await Promise.all(
-      tokens.map(async (token) => erc20Contract.balanceOf(token, receiver))
+      tokens.map(async (token) => erc20Contract['balanceOf(address,address)'](token, receiver))
     );
 
     const cancelTx = await cancelAirdropContract.cancelMultipleAirdrops(
@@ -185,7 +185,7 @@ describe('HIP904Batch2 CancelAirdropContract Test Suite', function () {
     await cancelTx.wait();
 
     for (let i = 0; i < tokens.length; i++) {
-      const updatedBalance = await erc20Contract.balanceOf(tokens[i], receiver);
+      const updatedBalance = await erc20Contract['balanceOf(address,address)'](tokens[i], receiver);
       expect(updatedBalance).to.equal(initialBalances[i]);
     }
   });

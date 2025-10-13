@@ -44,7 +44,7 @@ describe('HIP904Batch2 IHRC904Facade Contract Test Suite', function () {
     });
 
     erc20Contract = await utils.deployContract(
-      Constants.Contract.ERC20Contract
+      Constants.Contract.ERC20Mock
     );
     erc721Contract = await utils.deployContract(
       Constants.Contract.ERC721Contract
@@ -122,7 +122,7 @@ describe('HIP904Batch2 IHRC904Facade Contract Test Suite', function () {
 
   // Positive tests
   it('should cancel a pending airdrop for a fungible token (FT)', async function () {
-    const initialBalance = await erc20Contract.balanceOf(
+    const initialBalance = await erc20Contract['balanceOf(address,address)'](
       tokenAddress,
       receiver.address
     );
@@ -144,7 +144,7 @@ describe('HIP904Batch2 IHRC904Facade Contract Test Suite', function () {
     const responseCode = await utils.getHTSResponseCode(tx.hash);
     expect(responseCode).to.eq('22');
 
-    const finalBalance = await erc20Contract.balanceOf(
+    const finalBalance = await erc20Contract['balanceOf(address,address)'](
       tokenAddress,
       receiver.address
     );
@@ -215,7 +215,7 @@ describe('HIP904Batch2 IHRC904Facade Contract Test Suite', function () {
   });
 
   it('should claim a pending airdrop for a fungible token (FT)', async function () {
-    const initialBalance = await erc20Contract.balanceOf(
+    const initialBalance = await erc20Contract['balanceOf(address,address)'](
       tokenAddress,
       receiver.address
     );
@@ -240,7 +240,7 @@ describe('HIP904Batch2 IHRC904Facade Contract Test Suite', function () {
     const responseCode = await utils.getHTSResponseCode(tx.hash);
     expect(responseCode).to.eq('22');
 
-    const finalBalance = await erc20Contract.balanceOf(
+    const finalBalance = await erc20Contract['balanceOf(address,address)'](
       tokenAddress,
       receiver.address
     );

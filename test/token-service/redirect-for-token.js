@@ -215,10 +215,10 @@ describe('RedirectForToken Test Suite', function () {
       await erc20.transfer(await tokenCreateContract.getAddress(), amount)
     ).wait();
 
-    const tokenCreateContractBefore = await erc20.balanceOf(
+    const tokenCreateContractBefore = await erc20['balanceOf(address)'](
       await tokenCreateContract.getAddress()
     );
-    const balanceBefore = await erc20.balanceOf(signers[1].address);
+    const balanceBefore = await erc20['balanceOf(address)'](signers[1].address);
 
     await (
       await tokenCreateContract.approvePublic(
@@ -241,11 +241,11 @@ describe('RedirectForToken Test Suite', function () {
     const [success] = await parseCallResponseEventData(tx);
     expect(success).to.eq(true);
 
-    const tokenCreateContractAfter = await erc20.balanceOf(
+    const tokenCreateContractAfter = await erc20['balanceOf(address)'](
       await tokenCreateContract.getAddress()
     );
 
-    const balanceAfter = await erc20.balanceOf(signers[1].address);
+    const balanceAfter = await erc20['balanceOf(address)'](signers[1].address);
     expect(balanceBefore).to.not.eq(balanceAfter);
     expect(tokenCreateContractAfter).to.eq(
       tokenCreateContractBefore - BigInt(amount)

@@ -2,9 +2,7 @@
 import { expect } from "chai";
 import Utils from '../../token-service/utils.js';
 import { network } from "hardhat";
-const { ethers } = await network.connect(
-  'local'
-);
+const { ethers } = await network.connect();
 import Constants from '../../constants.js';
 import {
   Hbar,

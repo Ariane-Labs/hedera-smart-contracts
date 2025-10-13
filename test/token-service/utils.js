@@ -1,4 +1,5 @@
 // SPDX-License-Identifier: Apache-2.0
+
 import { network } from "hardhat";
 import config from '../../hardhat.config.ts';
 const { ethers } = await network.connect();
@@ -20,6 +21,7 @@ import {
 } from '@hashgraph/sdk';
 import Constants from '../constants';
 import axios from 'axios';
+
 function getMirrorNodeUrl(network) {
   switch (network) {
     case 'mainnet':
@@ -110,7 +112,7 @@ class Utils {
   }
 
   static async deployERC20Contract() {
-    return await this.deployContract(Constants.Contract.ERC20Contract);
+    return await this.deployContract(Constants.Contract.ERC20Mock);
   }
 
   static async deployERC721Contract() {

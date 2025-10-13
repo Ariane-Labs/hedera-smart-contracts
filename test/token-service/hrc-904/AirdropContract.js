@@ -60,7 +60,7 @@ describe('HIP904Batch1 AirdropContract Test Suite', function () {
       contractAddresses
     );
 
-    const initialBalance = await erc20Contract.balanceOf(
+    const initialBalance = await erc20Contract['balanceOf(address,address)'](
       tokenAddress,
       receiver
     );
@@ -74,7 +74,7 @@ describe('HIP904Batch1 AirdropContract Test Suite', function () {
     );
     await tx.wait();
 
-    const updatedBalance = await erc20Contract.balanceOf(
+    const updatedBalance = await erc20Contract['balanceOf(address,address)'](
       tokenAddress,
       receiver
     );
@@ -111,7 +111,7 @@ describe('HIP904Batch1 AirdropContract Test Suite', function () {
       contractAddresses
     );
 
-    const initialBalance = await erc20Contract.balanceOf(
+    const initialBalance = await erc20Contract['balanceOf(address,address)'](
       tokenAddress,
       receiver
     );
@@ -125,7 +125,7 @@ describe('HIP904Batch1 AirdropContract Test Suite', function () {
     );
     await tx.wait();
 
-    const updatedBalance = await erc20Contract.balanceOf(
+    const updatedBalance = await erc20Contract['balanceOf(address,address)'](
       tokenAddress,
       receiver
     );
@@ -143,7 +143,7 @@ describe('HIP904Batch1 AirdropContract Test Suite', function () {
     const getBalances = async () =>
       Promise.all(
         accounts.map((account) =>
-          erc20Contract.balanceOf(tokenAddress, account)
+          erc20Contract['balanceOf(address,address)'](tokenAddress, account)
         )
       );
 
@@ -238,7 +238,7 @@ describe('HIP904Batch1 AirdropContract Test Suite', function () {
       );
       await tx.wait();
       for (let j = 0; j < tokens.length; j++) {
-        const balance = await erc20Contract.balanceOf(tokens[j], accounts[i]);
+        const balance = await erc20Contract['balanceOf(address,address)'](tokens[j], accounts[i]);
         expect(balance).to.equal(ftAmount);
       }
     }
@@ -448,7 +448,7 @@ describe('HIP904Batch1 AirdropContract Test Suite', function () {
     expect(responseCode).to.eq('22');
 
     // The airdrop will be pending, so the balance should still be 0
-    const balance = await erc20Contract.balanceOf(
+    const balance = await erc20Contract['balanceOf(address,address)'](
       tokenAddress,
       receiver.address
     );

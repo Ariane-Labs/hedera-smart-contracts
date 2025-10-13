@@ -78,7 +78,6 @@ const Contract = {
   TokenManagementContract: 'TokenManagementContract',
   TokenQueryContract: 'TokenQueryContract',
   TokenTransferContract: 'TokenTransferContract',
-  ERC20Contract: 'ERC20Contract',
   Exchange: 'Exchange',
   ExchangeV2: 'ExchangeV2',
   CounterV2: 'CounterV2',
