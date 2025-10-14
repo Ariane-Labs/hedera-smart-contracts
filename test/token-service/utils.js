@@ -14,28 +14,9 @@ import {
   PrivateKey,
   TokenId,
   TokenUpdateTransaction,
-  TokenAssociateTransaction,
   AccountBalanceQuery,
-  ContractInfoQuery,
-  AccountDeleteTransaction,
 } from '@hashgraph/sdk';
 import Constants from '../constants';
-import axios from 'axios';
-
-function getMirrorNodeUrl(network) {
-  switch (network) {
-    case 'mainnet':
-      return 'https://mainnet.mirrornode.hedera.com/api/v1';
-    case 'testnet':
-      return 'https://testnet.mirrornode.hedera.com/api/v1';
-    case 'previewnet':
-      return 'https://previewnet.mirrornode.hedera.com/api/v1';
-    case 'local':
-      return 'http://127.0.0.1:5551/api/v1';
-    default:
-      throw new Error('Unknown network');
-  }
-}
 
 const __sdkClients = [];
 
@@ -92,11 +73,15 @@ class Utils {
   }
 
   static async deployTokenCreateCustomContract() {
-    return await this.deployContract(Constants.Contract.TokenCreateCustomContract);
+    return await this.deployContract(
+      Constants.Contract.TokenCreateCustomContract
+    );
   }
 
   static async deployTokenManagementContract() {
-    return await this.deployContract(Constants.Contract.TokenManagementContract);
+    return await this.deployContract(
+      Constants.Contract.TokenManagementContract
+    );
   }
 
   static async deployTokenQueryContract() {
@@ -219,42 +204,6 @@ class Utils {
     );
   }
 
-  static async createFungibleTokenWithSECP256K1AdminKeyWithoutKYC(
-    contract,
-    treasury,
-    adminKey
-  ) {
-    return await this.getTokenAddress(
-      await contract.createFungibleTokenWithSECP256K1AdminKeyWithoutKYCPublic(
-        treasury,
-        adminKey,
-        {
-          value: BigInt(this.createTokenCost),
-          gasLimit: 1_000_000,
-        }
-      )
-    );
-  }
-
-  static async createFungibleTokenWithSECP256K1AdminKeyAssociateAndTransferToAddress(
-    contract,
-    treasury,
-    adminKey,
-    initialBalance = 300
-  ) {
-    return await this.getTokenAddress(
-      await contract.createFungibleTokenWithSECP256K1AdminKeyAssociateAndTransferToAddressPublic(
-        treasury,
-        adminKey,
-        initialBalance,
-        {
-          value: BigInt(this.createTokenCost),
-          gasLimit: 1_000_000,
-        }
-      )
-    );
-  }
-
   static async createFungibleTokenWithCustomFees(contract, feeTokenAddress) {
     return await this.getTokenAddress(
       await contract.createFungibleTokenWithCustomFeesPublic(
@@ -358,23 +307,6 @@ class Utils {
     );
   }
 
-  static async createNonFungibleTokenWithSECP256K1AdminKeyWithoutKYC(
-    contract,
-    treasury,
-    adminKey
-  ) {
-    return await this.getTokenAddress(
-      await contract.createNonFungibleTokenWithSECP256K1AdminKeyWithoutKYCPublic(
-        treasury,
-        adminKey,
-        {
-          value: BigInt(this.createTokenCost),
-          gasLimit: 1_000_000,
-        }
-      )
-    );
-  }
-
   static hexToASCII(str) {
     const hex = str.toString();
     let ascii = '';
@@ -422,7 +354,7 @@ class Utils {
     const accountBalanceJson = (
       await this.getAccountBalance(accountAddress)
     ).toJSON();
-    const tokenId = await AccountId.fromEvmAddress(
+    const tokenId = AccountId.fromEvmAddress(
       0,
       0,
       tokenAddress
@@ -432,22 +364,6 @@ class Utils {
     );
 
     return parseInt(balance.balance);
-  }
-
-  static async updateFungibleTokenCustomFees(
-    contract,
-    token,
-    treasury,
-    feeToken,
-    feeAmount
-  ) {
-    const updateFees = await contract.updateFungibleTokenCustomFeesPublic(
-      token,
-      treasury,
-      feeToken,
-      feeAmount
-    );
-    const receipt = await updateFees.wait();
   }
 
   static async getSerialNumbers(mintNftTx) {
@@ -480,9 +396,6 @@ class Utils {
 
     return await this.getSerialNumbers(mintNftTx);
   }
-
-  // Add Token association via hedera.js sdk
-  // Client with signer - my private key example
 
   static async associateToken(contract, tokenAddress, contractName) {
     const signers = await ethers.getSigners();
@@ -554,8 +467,9 @@ class Utils {
     const hederaNetwork = {};
 
     const sdkClient = await config.networks[network].sdkClient;
-    hederaNetwork[sdkClient.networkNodeUrl] =
-      AccountId.fromString(sdkClient.nodeId);
+    hederaNetwork[sdkClient.networkNodeUrl] = AccountId.fromString(
+      sdkClient.nodeId
+    );
     const { mirrorNode } = sdkClient;
 
     operatorId = operatorId || sdkClient.operatorId;
@@ -565,14 +479,14 @@ class Utils {
       .setMirrorNetwork(mirrorNode)
       .setOperator(operatorId, operatorKey);
 
-    // Track created clients for teardown to prevent hanging test processes
-    try { __sdkClients.push(client); } catch (_) {}
+    try {
+      __sdkClients.push(client);
+    } catch (_) {}
 
     return client;
   }
 
   static async closeAllSDKClients() {
-    // Close any Hedera SDK clients created during tests
     while (__sdkClients.length) {
       const c = __sdkClients.pop();
       try {
@@ -602,30 +516,13 @@ class Utils {
     return await query.execute(client);
   }
 
-  static async getContractInfo(evmAddress, client) {
-    const query = new ContractInfoQuery().setContractId(
-      ContractId.fromEvmAddress(0, 0, evmAddress)
-    );
-
-    return await query.execute(client);
-  }
-
-  static async deleteAccount(account, signer, accountId) {
-    const accountDeleteTransaction = await new AccountDeleteTransaction()
-      .setAccountId(accountId)
-      .setTransferAccountId(signer.getOperator().accountId)
-      .freezeWith(signer)
-      .sign(PrivateKey.fromStringECDSA(account.signingKey.privateKey));
-
-    await accountDeleteTransaction.execute(signer);
-  }
-
   static async getSignerCompressedPublicKey(
     index = 0,
     asBuffer = true,
     prune0x = true
   ) {
-    const privateKey = config.networks[Utils.getCurrentNetwork()].accounts[index];
+    const privateKey =
+      config.networks[Utils.getCurrentNetwork()].accounts[index];
     const wallet = new ethers.Wallet(privateKey);
     const cpk = prune0x
       ? wallet.signingKey.compressedPublicKey.replace('0x', '')
@@ -758,31 +655,6 @@ class Utils {
     return prepend0x ? '0x' + address : address;
   }
 
-  static async associateWithSigner(privateKey, tokenAddress) {
-    const genesisClient = await this.createSDKClient();
-
-    const wallet = new ethers.Wallet(privateKey);
-    const accountIdAsString = await this.getAccountId(
-      wallet.address,
-      genesisClient
-    );
-    const signerPk = PrivateKey.fromStringECDSA(wallet.signingKey.privateKey);
-
-    const signerClient = await this.createSDKClient(
-      accountIdAsString,
-      signerPk.toString() // DER encoded
-    );
-
-    const transaction = new TokenAssociateTransaction()
-      .setAccountId(AccountId.fromString(accountIdAsString))
-      .setTokenIds([TokenId.fromSolidityAddress(tokenAddress)])
-      .freezeWith(signerClient);
-
-    const signTx = await transaction.sign(signerPk);
-    const txResponse = await signTx.execute(signerClient);
-    await txResponse.getReceipt(signerClient);
-  }
-
   static defaultKeyValues = {
     inheritAccountKey: false,
     contractId: '0x0000000000000000000000000000000000000000',
@@ -847,227 +719,6 @@ class Utils {
       default:
         return;
     }
-  }
-
-  /**
-   * This method fetches the transaction actions from the mirror node corresponding to the current network,
-   * filters the actions to find the one directed to the Hedera Token Service (HTS) system contract,
-   * and extracts the result data from the precompile action. The result data is converted from a BigInt
-   * to a string before being returned.
-   *
-   * @param {string} txHash - The transaction hash to query.
-   * @param {number} timeout - Max. time to wait for transaction.
-   * @returns {string} - The response code as a string.
-   */
-  static async getHTSResponseCode(txHash, timeout = 10000) {
-    const network = Utils.getCurrentNetwork();
-    const mirrorNodeUrl = getMirrorNodeUrl(network);
-    const waitingInterval = 1000;
-    let res;
-    let success = false
-    do {
-      try {
-        res = await axios.get(
-          `${mirrorNodeUrl}/contracts/results/${txHash}/actions`
-        );
-        success = true;
-      } catch (e) {
-        await new Promise((resolve) => setTimeout(resolve, waitingInterval));
-        timeout -= waitingInterval;
-      }
-    } while(!success && timeout > 0);
-
-    const precompileAction = res.data.actions.find(
-      (x) => x.recipient === Constants.HTS_SYSTEM_CONTRACT_ID
-    );
-    return BigInt(precompileAction.result_data).toString();
-  }
-
-  static async getTokenInfoByMN(tokenAddress) {
-    const network = Utils.getCurrentNetwork();
-    const mirrorNodeUrl = getMirrorNodeUrl(network);
-    const res = await axios.get(
-        `${mirrorNodeUrl}/tokens/${tokenAddress}`
-    );
-
-    return res.data;
-  }
-
-  /**
-   * This method fetches the transaction contract results from the mirror node corresponding to the current network. The
-   * response contains extra information that can not be gathered by `eth_getTransactionReceipt` and that might be
-   * needed for test assertions (e.g., revert messages).
-   *
-   * @param txHash - The transaction hash to query.
-   * @returns {Promise<any>} - The response from the MN.
-   */
-  static async getContractResultFromMN(txHash) {
-    const res = await axios.get(
-        `${getMirrorNodeUrl(Utils.getCurrentNetwork())}/contracts/results/${txHash}`
-    );
-
-    return res.data;
-  }
-
-  /**
-   * This method fetches the transaction actions from the mirror node corresponding to the current network,
-   * filters the actions to find the one directed to the Hedera Account Service (HAS) system contract,
-   * and extracts the result data from the precompile action. The result data is converted from a BigInt
-   * to a string before being returned.
-   *
-   * @param {string} txHash - The transaction hash to query.
-   * @param {number} timeout - Max. time to wait for transaction.
-   * @returns {string} - The response code as a string.
-   */
-  static async getHASResponseCode(txHash, timeout = 10000) {
-    const network = Utils.getCurrentNetwork();
-    const mirrorNodeUrl = getMirrorNodeUrl(network);
-    const waitingInterval = 1000;
-    let res;
-    let success = false
-    do {
-      try {
-        res = await axios.get(
-          `${mirrorNodeUrl}/contracts/results/${txHash}/actions`
-        );
-        success = true;
-      } catch (e) {
-        await new Promise((resolve) => setTimeout(resolve, waitingInterval));
-        timeout -= waitingInterval;
-      }
-    } while(!success && timeout > 0);
-    const precompileAction = res.data.actions.find(
-      (x) => x.recipient === Constants.HAS_SYSTEM_CONTRACT_ID
-    );
-    return BigInt(precompileAction.result_data).toString();
-  }
-
-  static async setupNft(tokenCreateContract, owner, contractAddresses) {
-    const nftTokenAddress =
-      await this.createNonFungibleTokenWithSECP256K1AdminKeyWithoutKYC(
-        tokenCreateContract,
-        owner,
-        await this.getSignerCompressedPublicKey()
-      );
-
-    await this.updateTokenKeysViaHapi(
-      nftTokenAddress,
-      contractAddresses,
-      true,
-      true,
-      false,
-      true,
-      true,
-      true,
-      false
-    );
-
-    await this.associateToken(
-      tokenCreateContract,
-      nftTokenAddress,
-      Constants.Contract.TokenCreateContract
-    );
-
-    return nftTokenAddress;
-  }
-
-  static async setupToken(tokenCreateContract, owner, contractAddresses) {
-    const tokenAddress =
-      await this.createFungibleTokenWithSECP256K1AdminKeyWithoutKYC(
-        tokenCreateContract,
-        owner,
-        await this.getSignerCompressedPublicKey()
-      );
-
-    await this.updateTokenKeysViaHapi(
-      tokenAddress,
-      contractAddresses,
-      true,
-      true,
-      false,
-      true,
-      true,
-      true,
-      false
-    );
-
-    await this.associateToken(
-      tokenCreateContract,
-      tokenAddress,
-      Constants.Contract.TokenCreateContract
-    );
-
-    return tokenAddress;
-  }
-
-  /**
-   * Creates multiple pending airdrops for testing purposes
-   * @param {Contract} airdropContract - The airdrop contract instance
-   * @param {string} owner - The owner's address
-   * @param {Contract} tokenCreateContract - The token create contract instance
-   * @param {number} count - Number of pending airdrops to create
-   * @returns {Object} Object containing arrays of senders, receivers, tokens, serials, and amounts
-   */
-  static async createPendingAirdrops(
-    count,
-    tokenCreateContract,
-    owner,
-    airdropContract,
-    receiver
-  ) {
-    const senders = [];
-    const receivers = [];
-    const tokens = [];
-    const serials = [];
-    const amounts = [];
-
-    for (let i = 0; i < count; i++) {
-      const tokenAddress = await this.setupToken(tokenCreateContract, owner, [
-        await airdropContract.getAddress(),
-      ]);
-      const ftAmount = BigInt(i + 1); // Different amount for each airdrop
-
-      const airdropTx = await airdropContract.tokenAirdrop(
-        tokenAddress,
-        owner,
-        receiver,
-        ftAmount,
-        {
-          value: Constants.ONE_HBAR,
-          gasLimit: 2_000_000,
-        }
-      );
-      await airdropTx.wait();
-
-      senders.push(owner);
-      receivers.push(receiver);
-      tokens.push(tokenAddress);
-      serials.push(0); // 0 for fungible tokens
-      amounts.push(ftAmount);
-    }
-
-    return { senders, receivers, tokens, serials, amounts };
-  }
-
-  /**
-   * Retrieves the maximum number of automatic token associations for an account from the mirror node
-   * @param {string} evmAddress - The EVM address of the account to query
-   * @returns {Promise<number>} Returns:
-   *  - -1 if unlimited automatic associations are enabled
-   *  - 0 if automatic associations are disabled
-   *  - positive number for the maximum number of automatic associations allowed
-   * @throws {Error} If there was an error fetching the data from mirror node
-   */
-  static async getMaxAutomaticTokenAssociations(evmAddress) {
-    const network = Utils.getCurrentNetwork();
-    const mirrorNodeUrl = getMirrorNodeUrl(network);
-    const response = await axios.get(`${mirrorNodeUrl}/accounts/${evmAddress}`);
-    return response.data.max_automatic_token_associations;
-  }
-
-  static decimalToAscii(decimalStr) {
-    const hex = BigInt(decimalStr).toString(16);
-    return Buffer.from(hex, 'hex').toString('ascii');
   }
 }
 
