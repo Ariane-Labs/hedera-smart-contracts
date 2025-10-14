@@ -1,13 +1,10 @@
 node_modules
 cache
 .idea
-
 .env
 test-results.*
 contracts-abi/
 artifacts/
-test/state-registry/states.json
-test/state-registry/ercStates.json
 
 # Ignores development broadcast logs
 !/broadcast
