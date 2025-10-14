@@ -1,13 +1,14 @@
 # Solidity Interface Documentation: ICryptoAllowance
 
-Generated on 2025-10-14T10:17:35.606Z
+Generated on 2025-10-14T12:10:36.649Z
 
 Source: contracts/account-service/examples/IHRC-906/cryptoOwner.sol
 
 ## Table of Contents
-- [Functions](#functions)
+- [Solidity Interface Functions](#functions)
+  - [cryptoTransferPublic](#cryptotransferpublic)
 
-## Functions
+## Solidity Interface Functions
 ### cryptoTransferPublic
 
 Signature:
@@ -15,16 +16,3 @@ Signature:
 ```solidity
 function cryptoTransferPublic(IHederaTokenService.TransferList calldata transferList, IHederaTokenService.TokenTransferList[] calldata tokenTransferList) external returns (int responseCode);
 ```
-
-Parameters:
-
-| Name | Type |
-|-----:|:-----|
-| transferList | IHederaTokenService.TransferList calldata |
-| tokenTransferList | IHederaTokenService.TokenTransferList[] calldata |
-
-Returns:
-
-| Name | Type |
-|-----:|:-----|
-| responseCode | int |

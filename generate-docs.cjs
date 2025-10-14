@@ -16,6 +16,21 @@ const path = require('path');
 const ROOT = __dirname;
 const CONTRACTS_DIR = path.join(ROOT, 'contracts');
 const PROTO_BASE = path.join(ROOT, 'node_modules', '@hashgraph', 'proto', 'src', 'proto', 'services');
+const PROTO_PKG_JSON = path.join(ROOT, 'node_modules', '@hashgraph', 'proto', 'package.json');
+
+function getProtoPackageInfo() {
+  try {
+    const raw = fs.readFileSync(PROTO_PKG_JSON, 'utf8');
+    const pkg = JSON.parse(raw);
+    return {
+      name: pkg.name || '',
+      version: pkg.version || '',
+      description: pkg.description || ''
+    };
+  } catch (e) {
+    return null;
+  }
+}
 
 // Manual mapping: Interface name -> array of proto file paths (relative to PROTO_BASE)
 const INTERFACE_PROTO_MAP = {
@@ -251,15 +266,17 @@ function parseSolidityInterfaceBlock(blockSource) {
       let sigBlock = raw + '\n';
       let parenDepth = (raw.match(/\(/g) || []).length - (raw.match(/\)/g) || []).length;
       let j = i + 1;
-      while (j < lines.length) {
-        const l = lines[j];
-        sigBlock += l + '\n';
-        parenDepth += (l.match(/\(/g) || []).length - (l.match(/\)/g) || []).length;
-        if (parenDepth <= 0 && l.trim().endsWith(';')) {
+      if (!(parenDepth <= 0 && raw.trim().endsWith(';'))) {
+        while (j < lines.length) {
+          const l = lines[j];
+          sigBlock += l + '\n';
+          parenDepth += (l.match(/\(/g) || []).length - (l.match(/\)/g) || []).length;
+          if (parenDepth <= 0 && l.trim().endsWith(';')) {
+            j++;
+            break;
+          }
           j++;
-          break;
         }
-        j++;
       }
 
       const sigOneLine = sigBlock.replace(/\s+/g, ' ').trim();
@@ -356,6 +373,15 @@ function mdEscape(str) {
     .replace(/>/g, '&gt;');
 }
 
+function mdSlug(str) {
+  return String(str || '')
+    .trim()
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+}
+
 function generateMarkdownForInterface(opts) {
   const { interfaceName, sourceRelPath, parsedSol, protoData } = opts;
   const now = new Date();
@@ -369,30 +395,68 @@ function generateMarkdownForInterface(opts) {
 
   // Table of Contents
   const toc = [];
-  if (parsedSol.structs && parsedSol.structs.length > 0) toc.push('- [Structs](#structs)');
-  if (parsedSol.functions && parsedSol.functions.length > 0) toc.push('- [Functions](#functions)');
-  if (protoData && protoData.length > 0) toc.push('- [Related Protobuf Files](#related-protobuf-files)');
+  if (protoData && protoData.length > 0) {
+    toc.push('- [Protobuf Definitions](#protobuf-definitions)');
+    for (const proto of protoData) {
+      const fileName = path.basename(proto.relPath || proto.file);
+      toc.push(`  - [${mdEscape(fileName)}](#${mdSlug(fileName)})`);
+    }
+  }
+  if (parsedSol.structs && parsedSol.structs.length > 0) {
+    toc.push('- [Solidity Interface Structs](#structs)');
+    for (const st of parsedSol.structs) {
+      toc.push(`  - [${mdEscape(st.name)}](#${mdSlug(st.name)})`);
+    }
+  }
+  if (parsedSol.functions && parsedSol.functions.length > 0) {
+    toc.push('- [Solidity Interface Functions](#functions)');
+    for (const fn of parsedSol.functions) {
+      toc.push(`  - [${mdEscape(fn.name)}](#${mdSlug(fn.name)})`);
+    }
+  }
   if (toc.length > 0) {
     h.push('## Table of Contents');
     for (const item of toc) h.push(item);
     h.push('');
   }
 
+  // Protobuf Definitions
+  if (protoData && protoData.length > 0) {
+    h.push('## Protobuf Definitions');
+    h.push('');
+    const pkgInfo = getProtoPackageInfo();
+    if (pkgInfo) {
+      h.push(`Using Protobuf package: ${pkgInfo.name} v${pkgInfo.version}`);
+      if (pkgInfo.description) h.push(`${pkgInfo.description}`);
+      h.push('');
+    }
+    const mdDirAbs = path.join(ROOT, path.dirname(sourceRelPath));
+    for (const proto of protoData) {
+      const fileName = path.basename(proto.relPath || proto.file);
+      const relFromMd = path.relative(mdDirAbs, proto.file).replace(/\\/g, '/');
+      h.push(`### ${fileName}`);
+      h.push('');
+      h.push(`Source: [${mdEscape(relFromMd)}](${mdEscape(relFromMd)})`);
+      h.push('');
+      const protoContent = readFileSafe(proto.file) || '';
+      h.push('```proto');
+      h.push(protoContent.trimEnd());
+      h.push('```');
+      h.push('');
+    }
+  }
+
   // Structs
   if (parsedSol.structs && parsedSol.structs.length > 0) {
-    h.push('## Structs');
+    h.push('## Solidity Interface Structs');
     for (const st of parsedSol.structs) {
       h.push(`### ${st.name}`);
-      if (st.description) {
-        h.push('');
-        h.push(mdEscape(st.description));
-      }
       if (st.fields.length) {
         h.push('');
-        h.push('| Field | Type | Description |');
-        h.push('|------:|:-----|:------------|');
+        h.push('| Field | Type |');
+        h.push('|------:|:-----|');
         for (const f of st.fields) {
-          h.push(`| ${mdEscape(f.name)} | ${mdEscape(f.type)} | ${mdEscape(f.description)} |`);
+          h.push(`| ${mdEscape(f.name)} | ${mdEscape(f.type)} |`);
         }
       }
       h.push('');
@@ -401,54 +465,16 @@ function generateMarkdownForInterface(opts) {
 
   // Functions
   if (parsedSol.functions && parsedSol.functions.length > 0) {
-    h.push('## Functions');
+    h.push('## Solidity Interface Functions');
     for (const fn of parsedSol.functions) {
       h.push(`### ${fn.name}`);
-      if (fn.description) {
-        h.push('');
-        h.push(mdEscape(fn.description));
-      }
       h.push('');
       h.push('Signature:');
       h.push('');
       h.push('```solidity');
       h.push(fn.signature);
       h.push('```');
-      if (fn.params.length) {
-        h.push('');
-        h.push('Parameters:');
-        h.push('');
-        h.push('| Name | Type |');
-        h.push('|-----:|:-----|');
-        for (const p of fn.params) {
-          h.push(`| ${mdEscape(p.name)} | ${mdEscape(p.type)} |`);
-        }
-      }
-      if (fn.returns.length) {
-        h.push('');
-        h.push('Returns:');
-        h.push('');
-        h.push('| Name | Type |');
-        h.push('|-----:|:-----|');
-        for (const r of fn.returns) {
-          h.push(`| ${mdEscape(r.name)} | ${mdEscape(r.type)} |`);
-        }
-      }
       h.push('');
-    }
-  }
-
-  // Related Protobuf Files
-  if (protoData && protoData.length > 0) {
-    h.push('## Related Protobuf Files');
-    h.push('');
-    h.push('| Name | Link |');
-    h.push('|-----:|:-----|');
-    const mdDirAbs = path.join(ROOT, path.dirname(sourceRelPath));
-    for (const proto of protoData) {
-      const fileName = path.basename(proto.relPath || proto.file);
-      const relFromMd = path.relative(mdDirAbs, proto.file).replace(/\\/g, '/');
-      h.push(`| ${mdEscape(fileName)} | [${mdEscape(relFromMd)}](${mdEscape(relFromMd)}) |`);
     }
   }
 

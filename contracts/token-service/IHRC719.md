@@ -1,58 +1,216 @@
 # Solidity Interface Documentation: IHRC719
 
-Generated on 2025-10-14T10:17:35.638Z
+Generated on 2025-10-14T12:10:36.682Z
 
 Source: contracts/token-service/IHRC719.sol
 
 ## Table of Contents
-- [Functions](#functions)
-- [Related Protobuf Files](#related-protobuf-files)
+- [Protobuf Definitions](#protobuf-definitions)
+  - [token_associate.proto](#token_associateproto)
+  - [token_dissociate.proto](#token_dissociateproto)
+- [Solidity Interface Functions](#functions)
+  - [associate](#associate)
+  - [dissociate](#dissociate)
+  - [isAssociated](#isassociated)
 
-## Functions
+## Protobuf Definitions
+
+Using Protobuf package: @hashgraph/proto v2.20.0
+Protobufs for the Hiero SDK
+
+### token_associate.proto
+
+Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_associate.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_associate.proto)
+
+```proto
+/**
+ * # Token Associate
+ * Transaction to associate an Hedera Token Service (HTS) token with an
+ * account.<br/>
+ * Accounts cannot transact in a token (send or receive) until the account
+ * and token are associated.
+ *
+ * > Note
+ * >> An "airdrop" transaction MAY initiate sending tokens to an
+ * >> unassociated account, but the transfer remains in a "pending"
+ * >> state until the recipient executes a "claim" transaction
+ * >> that both accepts the tokens and associates that account
+ * >> with the token type.
+ *
+ * ### Keywords
+ * The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+ * "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+ * document are to be interpreted as described in
+ * [RFC2119](https://www.ietf.org/rfc/rfc2119) and clarified in
+ * [RFC8174](https://www.ietf.org/rfc/rfc8174).
+ */
+syntax = "proto3";
+
+package proto;
+
+// SPDX-License-Identifier: Apache-2.0
+option java_package = "com.hederahashgraph.api.proto.java";
+// <<<pbj.java_package = "com.hedera.hapi.node.token">>> This comment is special code for setting PBJ Compiler java package
+option java_multiple_files = true;
+
+import "services/basic_types.proto";
+
+/**
+ * Associate an Hedera Token Service (HTS) token and an account.
+ *
+ * An association MUST exist between an account and a token before that
+ * account may transfer or receive that token.<br/>
+ * If the identified account is not found,
+ * the transaction SHALL return `INVALID_ACCOUNT_ID`.<br/>
+ * If the identified account has been deleted,
+ * the transaction SHALL return `ACCOUNT_DELETED`.<br/>
+ * If any of the identified tokens is not found,
+ * the transaction SHALL return `INVALID_TOKEN_REF`.<br/>
+ * If any of the identified tokens has been deleted,
+ * the transaction SHALL return `TOKEN_WAS_DELETED`.<br/>
+ * If an association already exists for any of the identified tokens,
+ * the transaction SHALL return `TOKEN_ALREADY_ASSOCIATED_TO_ACCOUNT`.<br/>
+ * The identified account MUST sign this transaction.
+ *
+ * ### Block Stream Effects
+ * None
+ */
+message TokenAssociateTransactionBody {
+    /**
+     * An account identifier.
+     * <p>
+     * The identified account SHALL be associated to each of the
+     * tokens identified in the `tokens` field.<br/>
+     * This field is REQUIRED and MUST be a valid account identifier.<br/>
+     * The identified account MUST exist in state.<br/>
+     * The identified account MUST NOT be deleted.<br/>
+     * The identified account MUST NOT be expired.
+     */
+    AccountID account = 1;
+
+    /**
+     * A list of token identifiers.
+     * <p>
+     * Each token identified in this list SHALL be separately associated with
+     * the account identified in the `account` field.<br/>
+     * This list MUST NOT be empty.
+     * Each entry in this list MUST be a valid token identifier.<br/>
+     * Each entry in this list MUST NOT be currently associated to the
+     * account identified in `account`.<br/>
+     * Each entry in this list MUST NOT be expired.<br/>
+     * Each entry in this list MUST NOT be deleted.
+     */
+    repeated TokenID tokens = 2;
+}
+```
+
+### token_dissociate.proto
+
+Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_dissociate.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_dissociate.proto)
+
+```proto
+/**
+ * # Token Dissociate
+ * Remove association between an account and one or more Hedera Token
+ * Service (HTS) tokens.
+ *
+ * ### Keywords
+ * The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+ * "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+ * document are to be interpreted as described in
+ * [RFC2119](https://www.ietf.org/rfc/rfc2119) and clarified in
+ * [RFC8174](https://www.ietf.org/rfc/rfc8174).
+ */
+syntax = "proto3";
+
+package proto;
+
+// SPDX-License-Identifier: Apache-2.0
+option java_package = "com.hederahashgraph.api.proto.java";
+// <<<pbj.java_package = "com.hedera.hapi.node.token">>> This comment is special code for setting PBJ Compiler java package
+option java_multiple_files = true;
+
+import "services/basic_types.proto";
+
+/**
+ * Dissociate an account from one or more HTS tokens.
+ *
+ * If the identified account is not found,
+ * the transaction SHALL return `INVALID_ACCOUNT_ID`.<br/>
+ * If the identified account has been deleted,
+ * the transaction SHALL return `ACCOUNT_DELETED`.<br/>
+ * If any of the identified tokens is not found,
+ * the transaction SHALL return `INVALID_TOKEN_REF`.<br/>
+ * If any of the identified tokens has been deleted,
+ * the transaction SHALL return `TOKEN_WAS_DELETED`.<br/>
+ * If an association does not exist for any of the identified tokens,
+ * the transaction SHALL return `TOKEN_NOT_ASSOCIATED_TO_ACCOUNT`.<br/>
+ * If the identified account has a nonzero balance for any of the identified
+ * tokens, and that token is neither deleted nor expired, the
+ * transaction SHALL return `TRANSACTION_REQUIRES_ZERO_TOKEN_BALANCES`.<br/>
+ * If one of the identified tokens is a fungible/common token that is expired,
+ * the account MAY disassociate from that token, even if that token balance is
+ * not zero for that account.<br/>
+ * If one of the identified tokens is a non-fungible/unique token that is
+ * expired, the account MUST NOT disassociate if that account holds any
+ * individual NFT of that token. In this situation the transaction SHALL
+ * return `TRANSACTION_REQUIRED_ZERO_TOKEN_BALANCES`.<br/>
+ * The identified account MUST sign this transaction.
+ *
+ * ### Block Stream Effects
+ * None
+ */
+message TokenDissociateTransactionBody {
+    /**
+     * An account identifier.
+     * <p>
+     * The identified account SHALL be dissociated from each of the
+     * tokens identified in the `tokens` field.
+     * This field is REQUIRED and MUST be a valid account identifier.<br/>
+     * The identified account MUST exist in state.<br/>
+     * The identified account MUST NOT be deleted.<br/>
+     * The identified account MUST NOT be expired.
+     */
+    AccountID account = 1;
+
+    /**
+     * A list of token identifiers.
+     * <p>
+     * Each token identified in this list SHALL be dissociated from
+     * the account identified in the `account` field.<br/>
+     * This list MUST NOT be empty.
+     * Each entry in this list MUST be a valid token identifier.<br/>
+     * Each entry in this list MUST be currently associated to the
+     * account identified in `account`.<br/>
+     * Entries in this list MAY be expired, if the token type is
+     * fungible/common.<br/>
+     * Each entry in this list MUST NOT be deleted.
+     */
+    repeated TokenID tokens = 2;
+}
+```
+
+## Solidity Interface Functions
 ### associate
-
-@notice Associates the calling account with the token
-@dev This function allows an account to opt-in to receive the token
-@return responseCode The response code indicating the result of the operation
 
 Signature:
 
 ```solidity
 function associate() external returns (uint256 responseCode);
-
-    /// @notice Dissociates the calling account from the token
-    /// @dev This function allows an account to opt-out from receiving the token
-    /// @return responseCode The response code indicating the result of the operation
-    function dissociate() external returns (uint256 responseCode);
 ```
 
-Returns:
+### dissociate
 
-| Name | Type |
-|-----:|:-----|
-| responseCode | uint256 |
+Signature:
+
+```solidity
+function dissociate() external returns (uint256 responseCode);
+```
 
 ### isAssociated
-
-@notice Checks if the calling account is associated with the token
-@dev This function returns the association status of the calling account
-@return associated True if the account is associated, false otherwise
 
 Signature:
 
 ```solidity
 function isAssociated() external view returns (bool associated);
 ```
-
-Returns:
-
-| Name | Type |
-|-----:|:-----|
-| associated | bool |
-
-## Related Protobuf Files
-
-| Name | Link |
-|-----:|:-----|
-| token_associate.proto | [../../node_modules/@hashgraph/proto/src/proto/services/token_associate.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_associate.proto) |
-| token_dissociate.proto | [../../node_modules/@hashgraph/proto/src/proto/services/token_dissociate.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_dissociate.proto) |

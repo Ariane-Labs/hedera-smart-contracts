@@ -1,14 +1,69 @@
 # Solidity Interface Documentation: IPrngSystemContract
 
-Generated on 2025-10-14T10:17:35.621Z
+Generated on 2025-10-14T12:10:36.668Z
 
 Source: contracts/prng/IPrngSystemContract.sol
 
 ## Table of Contents
-- [Functions](#functions)
-- [Related Protobuf Files](#related-protobuf-files)
+- [Protobuf Definitions](#protobuf-definitions)
+  - [util_prng.proto](#util_prngproto)
+- [Solidity Interface Functions](#functions)
+  - [getPseudorandomSeed](#getpseudorandomseed)
 
-## Functions
+## Protobuf Definitions
+
+Using Protobuf package: @hashgraph/proto v2.20.0
+Protobufs for the Hiero SDK
+
+### util_prng.proto
+
+Source: [../../node_modules/@hashgraph/proto/src/proto/services/util_prng.proto](../../node_modules/@hashgraph/proto/src/proto/services/util_prng.proto)
+
+```proto
+/**
+ * # Utility PRNG query
+ * A query to retrieve a deterministic pseudo-random value.
+ *
+ * ### Keywords
+ * The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+ * "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+ * document are to be interpreted as described in
+ * [RFC2119](https://www.ietf.org/rfc/rfc2119) and clarified in
+ * [RFC8174](https://www.ietf.org/rfc/rfc8174).
+ */
+syntax = "proto3";
+
+package proto;
+
+// SPDX-License-Identifier: Apache-2.0
+option java_package = "com.hederahashgraph.api.proto.java";
+// <<<pbj.java_package = "com.hedera.hapi.node.util">>> This comment is special code for setting PBJ Compiler java package
+option java_multiple_files = true;
+
+/**
+ * Request a deterministic pseudo-random number.
+ *
+ * The value returned SHALL be deterministic, but not easily predicted.
+ * The value returned SHALL NOT be suitable for cryptographic use.
+ *
+ * ### Block Stream Effects
+ * The result of this transaction is reported in a `UtilPrngOutput` message.
+ */
+message UtilPrngTransactionBody {
+    /**
+     * A range for the requested value.
+     * <p>
+     * If this is greater than `0`, the service SHALL return a 32-bit
+     * pseudo-random number between 0 and the value provided in the
+     * transaction record.<br/>
+     * If this is unset, zero, or negative; the service SHALL return a
+     * 384-bit unsigned pseudo-random number in the record.
+     */
+    int32 range = 1;
+}
+```
+
+## Solidity Interface Functions
 ### getPseudorandomSeed
 
 Signature:
@@ -16,15 +71,3 @@ Signature:
 ```solidity
 function getPseudorandomSeed() external returns (bytes32);
 ```
-
-Returns:
-
-| Name | Type |
-|-----:|:-----|
-|  | bytes32 |
-
-## Related Protobuf Files
-
-| Name | Link |
-|-----:|:-----|
-| util_prng.proto | [../../node_modules/@hashgraph/proto/src/proto/services/util_prng.proto](../../node_modules/@hashgraph/proto/src/proto/services/util_prng.proto) |

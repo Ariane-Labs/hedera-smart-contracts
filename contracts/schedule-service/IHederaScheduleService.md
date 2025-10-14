@@ -1,115 +1,2981 @@
 # Solidity Interface Documentation: IHederaScheduleService
 
-Generated on 2025-10-14T10:17:35.624Z
+Generated on 2025-10-14T12:10:36.669Z
 
 Source: contracts/schedule-service/IHederaScheduleService.sol
 
 ## Table of Contents
-- [Functions](#functions)
-- [Related Protobuf Files](#related-protobuf-files)
+- [Protobuf Definitions](#protobuf-definitions)
+  - [schedule_create.proto](#schedule_createproto)
+  - [schedule_sign.proto](#schedule_signproto)
+  - [schedule_get_info.proto](#schedule_get_infoproto)
+  - [basic_types.proto](#basic_typesproto)
+- [Solidity Interface Functions](#functions)
+  - [authorizeSchedule](#authorizeschedule)
+  - [signSchedule](#signschedule)
+  - [scheduleNative](#schedulenative)
+  - [getScheduledCreateFungibleTokenInfo](#getscheduledcreatefungibletokeninfo)
+  - [getScheduledCreateNonFungibleTokenInfo](#getscheduledcreatenonfungibletokeninfo)
 
-## Functions
+## Protobuf Definitions
+
+Using Protobuf package: @hashgraph/proto v2.20.0
+Protobufs for the Hiero SDK
+
+### schedule_create.proto
+
+Source: [../../node_modules/@hashgraph/proto/src/proto/services/schedule_create.proto](../../node_modules/@hashgraph/proto/src/proto/services/schedule_create.proto)
+
+```proto
+/**
+ * # Schedule Create
+ * Message to create a schedule, which is an instruction to execute some other
+ * transaction (the scheduled transaction) at a future time, either when
+ * enough signatures are gathered (short term) or when the schedule expires
+ * (long term). In all cases the scheduled transaction is not executed if
+ * signature requirements are not met before the schedule expires.
+ *
+ * ### Keywords
+ * The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+ * "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+ * document are to be interpreted as described in
+ * [RFC2119](https://www.ietf.org/rfc/rfc2119) and clarified in
+ * [RFC8174](https://www.ietf.org/rfc/rfc8174).
+ */
+syntax = "proto3";
+
+package proto;
+
+// SPDX-License-Identifier: Apache-2.0
+option java_package = "com.hederahashgraph.api.proto.java";
+// <<<pbj.java_package = "com.hedera.hapi.node.scheduled">>> This comment is special code for setting PBJ Compiler java package
+option java_multiple_files = true;
+
+import "services/basic_types.proto";
+import "services/timestamp.proto";
+import "services/schedulable_transaction_body.proto";
+
+/**
+ * Create a new Schedule.
+ *
+ * #### Requirements
+ * This transaction SHALL create a new _schedule_ entity in network state.<br/>
+ * The schedule created SHALL contain the `scheduledTransactionBody` to be
+ * executed.<br/>
+ * If successful the receipt SHALL contain a `scheduleID` with the full
+ * identifier of the schedule created.<br/>
+ * When a schedule _executes_ successfully, the receipt SHALL include a
+ * `scheduledTransactionID` with the `TransactionID` of the transaction that
+ * executed.<br/>
+ * When a scheduled transaction is executed the network SHALL charge the
+ * regular _service_ fee for the transaction to the `payerAccountID` for
+ * that schedule, but SHALL NOT charge node or network fees.<br/>
+ * If the `payerAccountID` field is not set, the effective `payerAccountID`
+ * SHALL be the `payer` for this create transaction.<br/>
+ * If an `adminKey` is not specified, or is an empty `KeyList`, the schedule
+ * created SHALL be immutable.<br/>
+ * An immutable schedule MAY be signed, and MAY execute, but SHALL NOT be
+ * deleted.<br/>
+ * If two schedules have the same values for all fields except `payerAccountID`
+ * then those two schedules SHALL be deemed "identical".<br/>
+ * If a `scheduleCreate` requests a new schedule that is identical to an
+ * existing schedule, the transaction SHALL fail and SHALL return a status
+ * code of `IDENTICAL_SCHEDULE_ALREADY_CREATED` in the receipt.<br/>
+ * The receipt for a duplicate schedule SHALL include the `ScheduleID` of the
+ * existing schedule and the `TransactionID` of the earlier `scheduleCreate`
+ * so that the earlier schedule may be queried and/or referred to in a
+ * subsequent `scheduleSign`.
+ *
+ * #### Signature Requirements
+ * A `scheduleSign` transaction SHALL be used to add additional signatures
+ * to an existing schedule.<br/>
+ * Each signature SHALL "activate" the corresponding cryptographic("primitive")
+ * key for that schedule.<br/>
+ * Signature requirements SHALL be met when the set of active keys includes
+ * all keys required by the scheduled transaction.<br/>
+ * A scheduled transaction for a "long term" schedule SHALL NOT execute if
+ * the signature requirements for that transaction are not met when the
+ * network consensus time reaches the schedule `expiration_time`.<br/>
+ * A "short term" schedule SHALL execute immediately once signature
+ * requirements are met. This MAY be immediately when created.
+ *
+ * #### Long Term Schedules
+ * A "short term" schedule SHALL have the flag `wait_for_expiry` _unset_.<br/>
+ * A "long term" schedule SHALL have the flag  `wait_for_expiry` _set_.<br/>
+ * A "long term" schedule SHALL NOT be accepted if the network configuration
+ * `scheduling.longTermEnabled` is not enabled.<br/>
+ * A "long term" schedule SHALL execute when the current consensus time
+ * matches or exceeds the `expiration_time` for that schedule, if the
+ * signature requirements for the scheduled transaction
+ * are met at that instant.<br/>
+ * A "long term" schedule SHALL NOT execute before the current consensus time
+ * matches or exceeds the `expiration_time` for that schedule.<br/>
+ * A "long term" schedule SHALL expire, and be removed from state, after the
+ * network consensus time exceeds the schedule `expiration_time`.<br/>
+ * A short term schedule SHALL expire, and be removed from state,
+ * after the network consensus time exceeds the current network
+ * configuration for `ledger.scheduleTxExpiryTimeSecs`.
+ *
+ * > Note
+ * >> Long term schedules are not (as of release 0.56.0) enabled. Any schedule
+ * >> created currently MUST NOT set the `wait_for_expiry` flag.<br/>
+ * >> When long term schedules are not enabled, schedules SHALL NOT be
+ * >> executed at expiration, and MUST meet signature requirements strictly
+ * >> before expiration to be executed.
+ *
+ * ### Block Stream Effects
+ * If the scheduled transaction is executed immediately, the transaction
+ * record SHALL include a `scheduleRef` with the schedule identifier of the
+ * schedule created.
+ */
+message ScheduleCreateTransactionBody {
+    /**
+     * A scheduled transaction.
+     * <p>
+     * This value is REQUIRED.<br/>
+     * This transaction body MUST be one of the types enabled in the
+     * network configuration value `scheduling.whitelist`.
+     */
+    SchedulableTransactionBody scheduledTransactionBody = 1;
+
+    /**
+     * A short description of the schedule.
+     * <p>
+     * This value, if set, MUST NOT exceed `transaction.maxMemoUtf8Bytes`
+     * (default 100) bytes when encoded as UTF-8.
+     */
+    string memo = 2;
+
+    /**
+     * A `Key` required to delete this schedule.
+     * <p>
+     * If this is not set, or is an empty `KeyList`, this schedule SHALL be
+     * immutable and SHALL NOT be deleted.
+     */
+    Key adminKey = 3;
+
+    /**
+     * An account identifier of a `payer` for the scheduled transaction.
+     * <p>
+     * This value MAY be unset. If unset, the `payer` for this `scheduleCreate`
+     * transaction SHALL be the `payer` for the scheduled transaction.<br/>
+     * If this is set, the identified account SHALL be charged the fees
+     * required for the scheduled transaction when it is executed.<br/>
+     * If the actual `payer` for the _scheduled_ transaction lacks
+     * sufficient HBAR balance to pay service fees for the scheduled
+     * transaction _when it executes_, the scheduled transaction
+     * SHALL fail with `INSUFFICIENT_PAYER_BALANCE`.<br/>
+     */
+    AccountID payerAccountID = 4;
+
+    /**
+     * An expiration time.
+     * <p>
+     * If not set, the expiration SHALL default to the current consensus time
+     * advanced by either the network configuration value
+     * `scheduling.maxExpirationFutureSeconds`, if `wait_for_expiry` is set and
+     * "long term" schedules are enabled, or the network configuration value
+     * `ledger.scheduleTxExpiryTimeSecs` otherwise.
+     */
+    Timestamp expiration_time = 5;
+
+    /**
+     * A flag to delay execution until expiration.
+     * <p>
+     * If this flag is set the scheduled transaction SHALL NOT be evaluated for
+     * execution before the network consensus time matches or exceeds the
+     * `expiration_time`.<br/>
+     * If this flag is not set, the scheduled transaction SHALL be executed
+     * immediately when all required signatures are received, whether in this
+     * `scheduleCreate` transaction or a later `scheduleSign` transaction.<br/>
+     * This value SHALL NOT be used and MUST NOT be set when the network
+     * configuration value `scheduling.longTermEnabled` is not enabled.
+     */
+    bool wait_for_expiry = 13;
+}
+```
+
+### schedule_sign.proto
+
+Source: [../../node_modules/@hashgraph/proto/src/proto/services/schedule_sign.proto](../../node_modules/@hashgraph/proto/src/proto/services/schedule_sign.proto)
+
+```proto
+/**
+ * # Schedule Sign
+ * Transaction body for a `scheduleSign` transaction to add signatures
+ * to an existing scheduled transaction.
+ *
+ * ### Keywords
+ * The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+ * "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+ * document are to be interpreted as described in
+ * [RFC2119](https://www.ietf.org/rfc/rfc2119) and clarified in
+ * [RFC8174](https://www.ietf.org/rfc/rfc8174).
+ */
+syntax = "proto3";
+
+package proto;
+
+// SPDX-License-Identifier: Apache-2.0
+option java_package = "com.hederahashgraph.api.proto.java";
+// <<<pbj.java_package = "com.hedera.hapi.node.scheduled">>> This comment is special code for setting PBJ Compiler java package
+option java_multiple_files = true;
+
+import "services/basic_types.proto";
+
+/**
+ * Add signatures to an existing scheduled transaction.
+ *
+ * When a schedule _executes_ successfully, the receipt SHALL include a
+ * `scheduledTransactionID` with the `TransactionID` of the transaction that
+ * executed.<br/>
+ * When a scheduled transaction is executed the network SHALL charge the
+ * regular _service_ fee for the transaction to the `payerAccountID` for
+ * that schedule, but SHALL NOT charge node or network fees.<br/>
+ * If the `payerAccountID` field is not set, the effective `payerAccountID`
+ * SHALL be the `payer` for this create transaction.<br/>
+ * Each signature on this transaction SHALL "activate" the corresponding
+ * cryptographic("primitive") key for the schedule identified.<br/>
+ * Signature requirements SHALL be met when the set of active keys includes
+ * all keys required by the scheduled transaction.<br/>
+ * A scheduled transaction for a "long term" schedule SHALL NOT execute if
+ * the signature requirements for that transaction are not met when the
+ * network consensus time reaches the schedule `expiration_time`.<br/>
+ * A "short term" schedule SHALL execute immediately once signature
+ * requirements are met. This MAY be immediately when created.<br/>
+ *
+ * ### Block Stream Effects
+ * If the scheduled transaction is executed immediately following this
+ * `scheduleSign` transaction, the transaction record SHALL include a
+ * `scheduleRef` with the schedule identifier `scheduleID`.
+ */
+message ScheduleSignTransactionBody {
+  /**
+   * A schedule identifier.
+   * <p>
+   * This MUST identify the schedule to which signatures SHALL be added.
+   */
+  ScheduleID scheduleID = 1;
+}
+```
+
+### schedule_get_info.proto
+
+Source: [../../node_modules/@hashgraph/proto/src/proto/services/schedule_get_info.proto](../../node_modules/@hashgraph/proto/src/proto/services/schedule_get_info.proto)
+
+```proto
+/**
+ * # Schedule Get Information
+ * Query body and response to retrieve information about a scheduled
+ * transaction.
+ *
+ * ### Keywords
+ * The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+ * "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+ * document are to be interpreted as described in
+ * [RFC2119](https://www.ietf.org/rfc/rfc2119) and clarified in
+ * [RFC8174](https://www.ietf.org/rfc/rfc8174).
+ */
+syntax = "proto3";
+
+package proto;
+
+// SPDX-License-Identifier: Apache-2.0
+option java_package = "com.hederahashgraph.api.proto.java";
+// <<<pbj.java_package = "com.hedera.hapi.node.scheduled">>> This comment is special code for setting PBJ Compiler java package
+option java_multiple_files = true;
+
+import "services/basic_types.proto";
+import "services/timestamp.proto";
+import "services/query_header.proto";
+import "services/response_header.proto";
+import "services/schedulable_transaction_body.proto";
+
+/**
+ * Request for information about a scheduled transaction.
+ *
+ * If the requested schedule does not exist, the network SHALL respond
+ * with `INVALID_SCHEDULE_ID`.
+ */
+message ScheduleGetInfoQuery {
+    /**
+     * Standard information sent with every query operation.<br/>
+     * This includes the signed payment and what kind of response is requested
+     * (cost, state proof, both, or neither).
+     */
+    QueryHeader header = 1;
+
+    /**
+     * A schedule identifier.
+     * <p>
+     * This SHALL identify the schedule to retrieve.<br/>
+     * This field is REQUIRED.
+     */
+    ScheduleID scheduleID = 2;
+}
+
+/**
+ * Information summarizing schedule state
+ */
+message ScheduleInfo {
+    /**
+     * A schedule identifier.
+     * <p>
+     * This SHALL identify the schedule retrieved.
+     */
+    ScheduleID scheduleID = 1;
+
+    oneof data {
+        /**
+         * A deletion timestamp.
+         * <p>
+         * If the schedule was deleted, this SHALL be set to the consensus
+         * timestamp of the `deleteSchedule` transaction.<br/>
+         * If the schedule is _not_ deleted, this field SHALL NOT be set.
+         */
+        Timestamp deletion_time = 2;
+
+        /**
+         * An execution timestamp.
+         * <p>
+         * If the schedule was completed, and the _scheduled_ transaction
+         * executed, this SHALL be set to the consensus timestamp of the
+         * transaction that initiated that execution.<br/>
+         * If the schedule is _not_ complete, this field SHALL NOT be set.
+         */
+        Timestamp execution_time = 3;
+    }
+
+    /**
+     * An expiration timestamp.<br/>
+     * This represents the time at which the schedule will expire. For a
+     * long-term schedule (if enabled) this is when the schedule will be
+     * executed, assuming it meets signature requirements at that time.
+     * For a short-term schedule, this is the deadline to complete the
+     * signature requirements for the scheduled transaction to execute.
+     * Regardless of schedule type, the schedule will be removed from
+     * state when it expires.
+     * <p>
+     * A schedule SHALL be removed from state when it expires.<br/>
+     * A short-term schedule MUST meet signature requirements strictly
+     * before expiration or it SHALL NOT be executed.<br/>
+     * A long-term schedule SHALL be executed if, and only if, all signature
+     * requirements for the scheduled transaction are met at expiration.<br/>
+     * A long-term schedule SHALL NOT be executed if any signature requirement
+     * for the scheduled transaction are not met at expiration.<br/>
+     */
+    Timestamp expirationTime = 4;
+
+    /**
+     * A scheduled transaction.
+     * <p>
+     * This SHALL be a transaction type enabled in the network property
+     * `scheduling.whitelist`, and SHALL NOT be any other
+     * transaction type.<br/>
+     * This transaction SHALL be executed if the schedule meets all signature
+     * and execution time requirements for this transaction.<br/>
+     * The signature requirements for this transaction SHALL be evaluated
+     * at schedule creation, SHALL be reevaluated with each `signSchedule`
+     * transaction, and, for long-term schedules, SHALL be reevaluated when
+     * the schedule expires.<br/>
+     */
+    SchedulableTransactionBody scheduledTransactionBody = 5;
+
+    /**
+     * A short description for this schedule.
+     * <p>
+     * This value, if set, MUST NOT exceed `transaction.maxMemoUtf8Bytes`
+     * (default 100) bytes when encoded as UTF-8.
+     */
+    string memo = 6;
+
+    /**
+     * The key used to delete the schedule from state
+     */
+    Key adminKey = 7;
+
+    /**
+     * A list of "valid" signatures for this schedule.<br/>
+     * This list contains only "primitive" (i.e. cryptographic or contract)
+     * signatures. The full signature requirements for the scheduled
+     * transaction are evaluated as if this list of keys had signed the
+     * scheduled transaction directly.
+     * <p>
+     * This list SHALL contain every "primitive" key that has signed the
+     * original `createSchedule`, or any subsequent
+     * `signSchedule` transaction.<br/>
+     * This list MAY elide any signature not likely to be required by the
+     * scheduled transaction. Such requirement SHOULD be evaluated when the
+     * signature is presented (i.e. during evaluation of a `createSchedule` or
+     * `signSchedule` transaction).
+     */
+    KeyList signers = 8;
+
+    /**
+     * An account identifier.
+     * <p>
+     * This SHALL identify the account that created this schedule.
+     */
+    AccountID creatorAccountID = 9;
+
+    /**
+     * An account identifier.
+     * <p>
+     * The identified account SHALL pay the full transaction fee for the
+     * scheduled transaction _when it executes_.
+     */
+    AccountID payerAccountID = 10;
+
+    /**
+     * A transaction identifier.
+     * <p>
+     * This SHALL be recorded as the transaction identifier for the
+     * _scheduled_ transaction, if (and when) it is executed.
+     */
+    TransactionID scheduledTransactionID = 11;
+
+    /**
+     * The ledger ID of the network that generated this response.
+     * <p>
+     * This value SHALL identify the distributed ledger that responded to
+     * this query.
+     */
+    bytes ledger_id = 12;
+
+    /**
+     * A flag indicating this schedule will execute when it expires.
+     * <p>
+     * If this field is set
+     * <ul>
+     *   <li>This schedule SHALL be considered a "long-term" schedule.</li>
+     *   <li>This schedule SHALL be evaluated when the network consensus time
+     *       reaches the `expirationTime`, and if the signature requirements
+     *       for the scheduled transaction are met at that time, the
+     *       scheduled transaction SHALL be executed.</li>
+     *   <li>This schedule SHALL NOT be executed before the network consensus
+     *       time reaches the `expirationTime`.</li>
+     * </ul>
+     * If this field is not set
+     * <ul>
+     *   <li>This schedule SHALL be considered a "short-term" schedule.</li>
+     *   <li>This schedule SHALL be evaluated when created, and reevaluated
+     *       with each `signSchedule` transaction, and if the signature
+     *       requirements for the scheduled transaction are met at that time,
+     *       the scheduled transaction SHALL be executed immediately.</li>
+     *   <li>This schedule SHALL be executed as soon as the signature
+     *       requirements are met, and MUST be executed before the network
+     *       consensus time reaches the `expirationTime`, if at all.</li>
+     * </ul>
+     */
+    bool wait_for_expiry = 13;
+}
+
+/**
+ * A response message for a `getScheduleInfo` query.
+ */
+message ScheduleGetInfoResponse {
+    /**
+     * The standard response information for queries.<br/>
+     * This includes the values requested in the `QueryHeader`
+     * (cost, state proof, both, or neither).
+     */
+    ResponseHeader header = 1;
+
+    /**
+     * Detail information for a schedule.
+     * <p>
+     * This field SHALL contain all available schedule detail.
+     */
+    ScheduleInfo scheduleInfo = 2;
+}
+```
+
+### basic_types.proto
+
+Source: [../../node_modules/@hashgraph/proto/src/proto/services/basic_types.proto](../../node_modules/@hashgraph/proto/src/proto/services/basic_types.proto)
+
+```proto
+/**
+ * # Basic Types
+ * Fundamental message types used across transactions and state as field types.
+ *
+ * ### Requirements for identifier values
+ * - Most entities in the network SHALL be identified by a multi-part
+ *   identifier. These identifier values SHALL consist of a shard, a realm, and
+ *   an entity identifier.
+ * - Shard, Realm, and Entity Number MUST all be whole numbers.
+ * - A Shard SHALL be globally unique.
+ * - A Realm MAY be reused between shards, but SHALL be unique within a shard.
+ * - An Entity Number MAY be reused between shards and realms, but SHALL be
+ *   unique within each combination of shard and realm.
+ * - Every object (e.g. account, file, token, etc...) SHALL be scoped to exactly
+ *   one realm and shard. Thus a File has a FileID, a numeric triplet, such as
+ *   0.0.2 for shard 0, realm 0, entity 2.
+ * - Identifier values SHOULD use an Entity Number as the third component of the
+ *   identifier. Some, however, MAY use alternative or composite values for the
+ *   Entity portion of the three part identifier. Any such alternative or
+ *   composite value MUST be unique within that shard and realm combination.
+ * - The entity portion of the identifier, regardless of type, MUST be unique
+ *   within that realm and shard combination and MAY be globally unique.
+ * - The triplet of shard.realm.entity MUST be globally unique, even across
+ *   different identifier types.
+ * - Each realm SHALL maintain a single counter for entity numbers, so if there
+ *   is an identifier with value 0.1.2, then there MUST NOT be an identifier
+ *   with value 0.1.2 for any other object.
+ *
+ * ### Keywords
+ * The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
+ * "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
+ * document are to be interpreted as described in
+ * [RFC2119](https://www.ietf.org/rfc/rfc2119) and clarified in
+ * [RFC8174](https://www.ietf.org/rfc/rfc8174).
+ */
+syntax = "proto3";
+
+package proto;
+
+// SPDX-License-Identifier: Apache-2.0
+import "services/timestamp.proto";
+import "google/protobuf/wrappers.proto";
+
+option java_package = "com.hederahashgraph.api.proto.java";
+// <<<pbj.java_package = "com.hedera.hapi.node.base">>> This comment is special code for setting PBJ Compiler java package
+option java_multiple_files = true;
+
+/**
+ * A shard identifier.<br/>
+ * A shard is a partition of nodes running the network that processes
+ * transactions separately from other shards. Each shard is effectively an
+ * independent instance of the overall network that shares the same virtual
+ * distributed ledger, and may gossip cross-shard transactions with other
+ * shards to maintain overall correct processing of the ledger.
+ */
+message ShardID {
+    /**
+     * A whole number shard identifier.
+     */
+    int64 shardNum = 1;
+}
+
+/**
+ * A realm identifier.<br/>
+ * Within a given shard, every realm has a unique numeric identifier.
+ * Each account, file, and contract instance belongs to exactly one realm.
+ */
+message RealmID {
+    /**
+     * A whole number shard identifier.
+     */
+    int64 shardNum = 1;
+
+    /**
+     * A whole number realm identifier.
+     */
+    int64 realmNum = 2;
+}
+
+/**
+ * Unique identifier for a token.<br/>
+ * As with all entity identifiers within the network, a token identifier
+ * consists of a combination of shard number, realm number, and entity number.
+ * Each of these numbers is unique within its scope (shard > realm > entity).
+ */
+message TokenID {
+    /**
+     * A whole number shard identifier.
+     */
+    int64 shardNum = 1;
+
+    /**
+     * A whole number realm identifier.
+     */
+    int64 realmNum = 2;
+
+    /**
+     * A whole number token identifier.
+     */
+    int64 tokenNum = 3;
+}
+
+/**
+ * A specific hash algorithm.
+ *
+ * We did not reuse Record Stream `HashAlgorithm` here because in all cases,
+ * currently, this will be `SHA2_384` and if that is the default value then
+ * we can save space by not serializing it, whereas `HASH_ALGORITHM_UNKNOWN`
+ * is the default for Record Stream `HashAlgorithm`.
+ *
+ * Note that enum values here MUST NOT match the name of any other enum value
+ * in the same `package`, as protobuf follows `C++` scope rules and all enum
+ * _names_ are treated as global constants within the `package`.
+ */
+enum BlockHashAlgorithm {
+    /**
+     * A SHA2 algorithm SHA-384 hash.
+     * <p>
+     * This is the default value, if a field of this enumerated type is
+     * not set, then this is the value that will be decoded when the
+     * serialized message is read.
+     */
+    SHA2_384 = 0;
+}
+
+/**
+ * A unique identifier for an Hedera account.
+ *
+ * An account identifier is of the form `shard.realm.[number|alias]`.<br/>
+ * The identifier MAY use the alias form when transferring HBAR to a public key
+ * before the account for that key is created, when only the alias value is
+ * known, or in some smart contracts that use the EVM address style alias to
+ * refer to Accounts.<br/>
+ * When the account entry is completed, the alias SHALL be stored separately in
+ * the Account record, and the identifier in the Account SHALL use the
+ * `accountNum` form.
+ *
+ * ---
+ * ### Additional Notes
+ *
+ * #### Alias
+ * There is considerable complexity with `alias` (aka `evm_address`) for
+ * Accounts. Much of this comes from the existence of a "hidden" alias for
+ * almost all accounts, and the reuse of the alias field for both EVM reference
+ * and "automatic" account creation.<br/>
+ * For the purposes of this specification, we will use the following terms for
+ * clarity.
+ *   - `key_alias`<br/>
+ *      The account public key as a protobuf serialized message and used for
+ *      auto-creation and subsequent lookup. This is only valid if the account
+ *      key is a single `primitive` key, either Ed25519 or ECDSA_SECP256K1.
+ *   - `evm_address`<br/>
+ *     Exists for every account and is one of
+ *      - `contract_address`<br/>
+ *        The 20 byte EVM address prescribed by `CREATE` or `CREATE2`
+ *      - `evm_key_address`<br/>
+ *        An arbitrary 20 byte EVM address that, for a usable externally owned
+ *        account (EOA) SHALL be the rightmost 20 bytes of the Keccak-256 hash
+ *        of a ECDSA_SECP256K1 key.<br/>
+ *        Such accounts may be created in one of three ways:
+ *        - Sending hbar or fungible tokens to an unused
+ *          ECDSA_SECP256K1 key alias.
+ *        - Sending hbar or fungible tokens to an unassigned 20-byte
+ *          EVM address.
+ *        - Submitting a `CryptoCreate` signed with the corresponding
+ *          private key.
+ *      - `long_zero`<br/>
+ *        A synthetic 20 byte address inferred for "normally" created accounts.
+ *        It is constructed from the "standard" AccountID as follows.
+ *         1. 4 byte big-endian shard number
+ *         1. 8 byte big-endian realm number
+ *         1. 8 byte big-endian entity number<br/>
+ *
+ * The `alias` field in the `Account` message SHALL contain one of four values
+ * for any given account.
+ *   - The `key_alias`, if the account was created by transferring HBAR to the
+ *     `key_alias` public key value.
+ *   - The `evm_key_address` if the account was created from an EVM public key
+ *   - The `contract_address` if the account belongs to an EVM contract
+ *   - Not-Set/null/Bytes.EMPTY (collectively `null`) if the account was
+ *     created normally
+ *
+ * If the `alias` field of an `Account` is any form of `null`, then the account
+ * MAY be referred to by `alias` in an `AccountID` by using the `long_zero`
+ * address for the account.<br/>
+ * This "hidden default" alias SHALL NOT be stored, but is synthesized by the
+ * node software as needed, and may be synthesized by an EVM contract or client
+ * software as well.
+ *
+ * ---
+ *
+ * #### Alias forms
+ * An `AccountID` in a transaction MAY reference an `Account` with
+ * `shard.realm.alias`.<br/>
+ * If the account `alias` field is set for an Account, that value SHALL be the
+ * account alias.<br/>
+ * If the account `alias` field is not set for an Account, the `long_zero` alias
+ * SHALL be the account alias.
+ */
+message AccountID {
+    /**
+     * A whole number shard identifier.
+     */
+    int64 shardNum = 1;
+
+    /**
+     * A whole number realm identifier.
+     */
+    int64 realmNum = 2;
+
+    oneof account {
+        /**
+         * A whole number account number, unique within its realm and shard.
+         * <p>
+         * For any AccountID fields in the query response, transaction records,
+         * transaction receipts, or block stream `accountNum` MUST be used.
+         */
+        int64 accountNum = 3;
+
+        /**
+         * An alias value.<br/>
+         * Alias is a value used in some contexts to refer to an account when
+         * account number is not available, and may be an alias public key, or
+         * an EVM address.
+         */
+        bytes alias = 4;
+    }
+}
+
+/**
+ * An identifier for a unique token (or "NFT"), used by both contract
+ * and token services.
+ */
+message NftID {
+    /**
+     * A token identifier.<br/>
+     * This token represents the collection containing this NFT.
+     */
+    TokenID token_ID = 1;
+
+    /**
+     * A unique serial number.<br/>
+     * This serial number is unique within its token type.
+     */
+    int64 serial_number = 2;
+}
+
+/**
+ * An identifier for a File within the network.
+ */
+message FileID {
+    /**
+     * A whole number shard identifier.
+     */
+    int64 shardNum = 1;
+
+    /**
+     * A whole number realm identifier.
+     */
+    int64 realmNum = 2;
+
+    /**
+     * A whole number file identifier, unique within its realm and shard.
+     */
+    int64 fileNum = 3;
+}
+
+/**
+ * An identifier for a smart contract within the network.
+ */
+message ContractID {
+    /**
+     * A whole number shard identifier.
+     */
+    int64 shardNum = 1;
+
+    /**
+     * A whole number realm identifier.
+     */
+    int64 realmNum = 2;
+
+    oneof contract {
+        /**
+        * A whole number contract identifier, unique within its realm and shard.
+        */
+        int64 contractNum = 3;
+
+        /**
+        * A 20-byte EVM address of the contract to call.
+        * <p>
+        * A contract created via a HAPI `ContractCreate` call SHALL have
+        * an EVM address determined by its `shard.realm.num` identifier.<br/>
+        * This address is as follows
+        * <ol>
+        *     <li>4 byte big-endian shard number</li>
+        *     <li>8 byte big-endian realm number</li>
+        *     <li>8 byte big-endian contract number</li>
+        * </ol>
+        * This address is not stored in state, but is computed when needed.
+        * <p>
+        * Contracts created by any other means, including a HAPI
+        * `EthereumTransaction` whose `to` address is the zero address,
+        * SHALL have the EVM address prescribed by the `CREATE` or
+        * `CREATE2` opcode, as applicable.
+        */
+        bytes evm_address = 4;
+    }
+}
+
+/**
+ * An unique identifier for a topic.<br/>
+ * Topics are part of the consensus service, messages are published to a topic.
+ */
+message TopicID {
+    /**
+     * A whole number shard identifier.
+     */
+    int64 shardNum = 1;
+
+    /**
+     * A whole number realm identifier.
+     */
+    int64 realmNum = 2;
+
+    /**
+     * A whole number topic identifier, unique within its realm and shard.
+     */
+    int64 topicNum = 3;
+}
+
+/**
+ * An unique identifier for a Schedule
+ */
+message ScheduleID {
+    /**
+     * A whole number shard
+     */
+    int64 shardNum = 1;
+
+    /**
+     * A whole number realm
+     */
+    int64 realmNum = 2;
+
+    /**
+     * A whole number schedule, unique within its realm and shard
+     */
+    int64 scheduleNum = 3;
+}
+
+/**
+ * A transaction identifier.<br/>
+ * This is used for retrieving receipts and records for a transaction
+ * and internally by the network for detecting when duplicate transactions are
+ * submitted.
+ *
+ * A transaction may be processed more reliably by submitting it to
+ * several nodes, each with a different node account, but all with the same
+ * TransactionID. Then, the transaction will take effect when the first of all
+ * those nodes submits the transaction and it reaches consensus. The other
+ * transactions SHALL NOT be executed (and SHALL result in a
+ * `DUPLICATE_TRANSACTION` response).<br/>
+ * Multiple submission increase reliability on the assumption that an error in,
+ * for example, network connectivity will not affect all nodes equally. Latency
+ * might be slightly lower, if one node is handling intake significantly slower
+ * than others, for example. The base transaction fee is required for each
+ * submission, however, so the total fees charged are significantly higher when
+ * using this approach.
+ *
+ * ### Requirements
+ * Each transaction identifier MUST be unique.<br/>
+ * Multiple transactions MAY be submitted with the same transaction
+ * identifier, but all except the first SHALL be rejected as duplicate
+ * transactions.<br/>
+ * An identifier MUST specify a `payer` account to be charged all fees
+ * associated with the transaction.<br/>
+ * The `payer` account MUST exist and MUST have sufficient HBAR to pay all
+ * transaction fees.<br/>
+ * An identifier MUST specify a "valid start time".<br/>
+ * The "valid start time" MUST be strictly _earlier_ than the current
+ * network consensus time when submitted.<br/>
+ * The "valid start time" MUST NOT be more than `transaction.maxValidDuration`
+ * seconds before the current network consensus time when submitted.<br/>
+ * A client-submitted transaction MUST NOT set the `scheduled` flag.
+ *
+ * ### Additional Notes
+ *
+ * Additional items applicable to Scheduled Transactions:
+ *
+ *  - The ID of a Scheduled Transaction, once executed, SHALL inherit both
+ *    `transactionValidStart` and `accountID` from the `ScheduleCreate`
+ *    transaction that created the schedule.
+ *  - The `scheduled` property SHALL be set for Scheduled Transactions.
+ */
+message TransactionID {
+    /**
+     * A timestamp for the transaction start time.<br/>
+     * This is the earliest expected start time for this transaction.
+     * <p>
+     * This value MUST be strictly less than `consensusTimestamp` when the
+     * transaction is submitted.
+     */
+    Timestamp transactionValidStart = 1;
+
+    /**
+     * An Account identifier.
+     * <p>
+     * The identified account SHALL pay transaction fees for this transaction.
+     */
+    AccountID accountID = 2;
+
+    /**
+     * A scheduled transaction flag.<br/>
+     * If set, this transaction represents the execution of a Schedule after
+     * all necessary signatures are gathered.
+     * <p>
+     * This flag MUST NOT be set in a user-submitted transaction.
+     */
+    bool scheduled = 3;
+
+    /**
+     * An identifier for an internal transaction.<br/>
+     * An internal transaction is one that was spawned as part of handling a
+     * user transaction. These internal transactions share the
+     * transactionValidStart and accountID of the user transaction, so a nonce
+     * is necessary to give them a unique TransactionID.
+     * <p>
+     * An example is when a "parent" ContractCreate or ContractCall transaction
+     * calls one or more HTS precompiled contracts; each of the "child"
+     * transactions spawned for a precompile has a transaction id with a
+     * different nonce.
+     * <p>
+     * This value MUST be unset for user-submitted transactions.
+     */
+    int32 nonce = 4;
+}
+
+/**
+ * An account, and the amount that it sends or receives during a token transfer.
+ *
+ * This message is only relevant to fungible/common token transfers.
+ * Non-fungible/unique (NFT) token transfers MUST use the NftTransfer message.
+ */
+message AccountAmount {
+    /**
+     * An account identifier that will send or receive token(s).
+     */
+    AccountID accountID = 1;
+
+    /**
+     * An amount to send (negative) or receive (positive).
+     * <p>
+     * This amount MUST be denominated in the smallest unit of the relevant
+     * token.<br/>
+     * For HBAR this SHALL be tinybar (10<sup>-8</sup> HBAR).<br/>
+     * For other fungible/common tokens this SHALL depend on the value of
+     * `decimals` for that token.
+     */
+    sint64 amount = 2;
+
+    /**
+     * An approved allowance flag.<br/>
+     * If true then the transfer is expected to be an approved allowance.
+     * <p>
+     * If set, `accountID` SHALL be the owner that previously approved
+     * the allowance.<br/>
+     * The default value SHALL be false (unset).
+     */
+    bool is_approval = 3;
+}
+
+/**
+ * A list of accounts and amounts to transfer.
+ *
+ * Each `AccountAmount` SHALL specify the account and the amount to
+ * send(negative) or receive(positive).<br/>
+ * Each `TransferList` SHALL be contained in another message that contains
+ * other details required to complete a transfer. This is typically a
+ * `CryptoTransferTransactionBody` or `TransactionRecord`.<br/>
+ * The `TransferList` SHALL only be used for HBAR transfers. Other token types
+ * MUST use the `TokenTransferList` message.
+ */
+message TransferList {
+    /**
+     * A list of AccountAmount pairs.<br/>
+     * Each entry in this list is an account and an amount to transfer
+     * into it (positive) or out of it (negative)
+     */
+    repeated AccountAmount accountAmounts = 1;
+}
+
+/**
+ * A NFT transfer.<br/>
+ * This refers to a sender account, a receiver account, and the serial number
+ * of an NFT to transfer from sender to receiver.
+ *
+ * Each `NftTransfer` SHALL be contained in another message (typically
+ * `TokenTransferList`) that details which `Token` type applies to this NFT
+ * transfer.
+ */
+message NftTransfer {
+    /**
+     * An Account identifier for the sender.
+     */
+    AccountID senderAccountID = 1;
+
+    /**
+     * An Account identifier for the receiver.
+     */
+    AccountID receiverAccountID = 2;
+
+    /**
+     * A serial number for the NFT to transfer.
+     */
+    int64 serialNumber = 3;
+
+    /**
+     * An approved allowance flag.<br/>
+     * If true then the transfer is expected to be an approved allowance.
+     * <p>
+     * If set, `senderAccountID` SHALL be the owner that previously approved
+     * the allowance.<br/>
+     * If set, the `senderAccountID` MUST be the "payer" account for
+     * the transaction <br/>
+     * The default value SHALL be false (unset).
+     */
+    bool is_approval = 4;
+}
+
+/**
+ * A list of transfers for a particular (non-HBAR) token type.
+ *
+ * A `TokenTransferList` applies to a single token type, but may contain many
+ * individual transfers.<br/>
+ * Each transfer of a fungible/common token MUST specify an `accountID` and
+ * `amount`. Amount SHALL be positive when the account receives tokens, and
+ * SHALL be negative when the account sends tokens. The amount SHOULD NOT be
+ * `0`.<br/>
+ * In a transfer list containing fungible/common tokens in the `transfers`
+ * list, the sum of all such transfers MUST be zero (`0`).
+ * Each transfer of a unique token SHALL specify both sender and receiver, as
+ * well as the serial number transferred.<br/>
+ * A single `TokenTransferList` MUST contain `transfers` or `nftTransfers`,
+ * but MUST NOT contain both.
+ */
+message TokenTransferList {
+    /**
+     * A token identifier.<br/>
+     * This is the token to be transferred.
+     */
+    TokenID token = 1;
+
+    /**
+     * A list of account amounts.
+     * <p>
+     * Each entry SHALL have an account and amount.<br/>
+     * These transfers SHALL be "double-entry" style; the credits (positive
+     * amount) and debits (negative amount) MUST sum to 0, unless this
+     * transfer list is part of a `mint` or `burn` operation.<br/>
+     * This SHALL be be set for fungible/common tokens and MUST be
+     * empty otherwise.
+     */
+    repeated AccountAmount transfers = 2;
+
+    /**
+     * A list of NftTransfers.
+     * <p>
+     * Each entry SHALL have a sender and receiver account, and the
+     * serial number of the unique token to transfer.<br/>
+     * This SHALL be be set for non-fungible/unique tokens and SHALL be
+     * empty otherwise.
+     */
+    repeated NftTransfer nftTransfers = 3;
+
+    /**
+     * An expected decimal precision.<br/>
+     * This is the number of decimals a fungible/common token type is
+     * _expected_ to have.
+     * <p>
+     * The transfer SHALL fail with response code `UNEXPECTED_TOKEN_DECIMALS`
+     * if this is set and the actual decimals specified for the `Token` differ
+     * from this value.<br/>
+     * If `nftTransfers` is set, then this value SHOULD NOT be set.
+     */
+    google.protobuf.UInt32Value expected_decimals = 4;
+}
+
+/**
+ * A rational number.<br/>
+ * A common use is to set the amount of a value transfer to collect as a
+ * custom fee.
+ *
+ * It is RECOMMENDED that both numerator and denominator be no larger than
+ * necessary to express the required fraction. A very large numerator, in
+ * particular, may not be reliable.
+ * Both fields are REQUIRED and SHOULD be positive integers.
+ */
+message Fraction {
+    /**
+     * A fractional number's numerator.
+     */
+    int64 numerator = 1;
+
+    /**
+     * A fractional number's denominator.
+     * <p>
+     * A zero value SHALL fail with response code `FRACTION_DIVIDES_BY_ZERO`.
+     */
+    int64 denominator = 2;
+}
+
+/**
+ * Possible Token Types (IWA Compatibility).
+ *
+ * Apart from fungible and non-fungible, Tokens can have either a common or
+ * unique representation. Furthermore, tokens can have intrinsic or referential
+ * value, and can be whole and indivisible or fractional.<br/>
+ * These distinction might seem subtle, but it is important when considering
+ * how tokens can be traced, used, transferred, and if they can have isolated
+ * unique properties.
+ *
+ * A few examples (these may not match enumerations below) using IWA taxonomy.
+ * <dl>
+ *   <dt>fungible, whole, intrinsic, unique</dt>
+ *     <dd>Physical fiat currency</dd>
+ *   <dt>fungible, fractional, intrinsic, common</dt>
+ *     <dd>bank balance fiat currency</dd>
+ *   <dt>non-fungible, fractional, reference, unique</dt>
+ *     <dd>"mutual" collectible/art/property ownership</dd>
+ *   <dt>non-fungible, whole, intrinsic, unique</dt>
+ *     <dd>Physical work of fine art</dd>
+ *   <dt>non-fungible, whole, reference, unique</dt>
+ *     <dd>Registered property title</dd>
+ * </dl>
+ */
+enum TokenType {
+    /**
+     * A fungible/common token.<br/>
+     * Tokens of this type are interchangeable with one another, where any
+     * quantity of tokens has the same value as another equal quantity, if
+     * they are in the same class. Tokens share a single set of properties,
+     * and are not distinct from one another. Ownership is represented as a
+     * balance or quantity associated to a given account. Tokens may be
+     * divided into fractional tokens, within reasonable limits.
+     * <p>
+     * IWA taxonomy _fungible, fractional, intrinsic, common_
+     */
+    FUNGIBLE_COMMON = 0;
+
+    /**
+     * A non-fungible/unique token.<br/>
+     * Tokens of this type are unique, and are not interchangeable with other
+     * tokens of the same type. Each token carries a serial number which is
+     * unique for that token, these tokens may have a different trade value
+     * for each individual token. The tokens are individually accounted and
+     * often carry additional unique properties. Tokens cannot be subdivided,
+     * and value is related to what the individual token represents.
+     * <p>
+     * IWA taxonomy _non-fungible, whole, reference, unique_
+     */
+    NON_FUNGIBLE_UNIQUE = 1;
+}
+
+/**
+ * A transaction sub type.<br/>
+ * This enumeration enables a set of transaction base fees to be broadly
+ * defined for a type of operation and also be modified, when necessary,
+ * based on specifics of the operation.
+ *
+ * ### Explanation
+ * The resource cost for a TokenMint operation is different between minting
+ * fungible/common and non-fungible/unique tokens. This `enum` is used to
+ * "mark" a cost as applying to one or the other.<br/>
+ * Similarly, the resource cost for a basic `tokenCreate` without a custom
+ * fee schedule may yield a _base_ fee of $1. The resource cost for a
+ * `tokenCreate` _with_ a custom fee schedule is different and may yield a
+ * _base_ fee of $2 or more.
+ */
+enum SubType {
+    /**
+     * The resource cost for the transaction type has no additional attributes
+     */
+    DEFAULT = 0;
+
+    /**
+     * The resource cost for the transaction type includes an operation on a
+     * fungible/common token
+     */
+    TOKEN_FUNGIBLE_COMMON = 1;
+
+    /**
+     * The resource cost for the transaction type includes an operation on
+     * a non-fungible/unique token
+     */
+    TOKEN_NON_FUNGIBLE_UNIQUE = 2;
+
+    /**
+     * The resource cost for the transaction type includes an operation on a
+     * fungible/common token with a custom fee schedule
+     */
+    TOKEN_FUNGIBLE_COMMON_WITH_CUSTOM_FEES = 3;
+
+    /**
+     * The resource cost for the transaction type includes an operation on a
+     * non-fungible/unique token with a custom fee schedule
+     */
+    TOKEN_NON_FUNGIBLE_UNIQUE_WITH_CUSTOM_FEES = 4;
+
+    /**
+     * The resource cost for the transaction type includes a ScheduleCreate
+     * containing a ContractCall.
+     */
+    SCHEDULE_CREATE_CONTRACT_CALL = 5;
+
+    /**
+     * The resource cost for the transaction type includes a TopicCreate
+     * with custom fees.
+     */
+    TOPIC_CREATE_WITH_CUSTOM_FEES = 6;
+
+    /**
+     * The resource cost for the transaction type includes a ConsensusSubmitMessage
+     * for a topic with custom fees.
+     */
+    SUBMIT_MESSAGE_WITH_CUSTOM_FEES = 7;
+}
+
+/**
+ * Possible Token Supply Types (IWA Compatibility).
+ *
+ * This `enum` indicates the limit of tokens that can exist during the
+ * lifetime of a token definition. The "infinite" supply is only theoretically
+ * infinite, as it is still limited to the magnitude of a 64-bit signed
+ * integer. A "finite" supply is further limited to a value specified when
+ * the token is created (or updated, if not immutable).
+ */
+enum TokenSupplyType {
+    /**
+     * An unlimited supply.<br/>
+     * This indicates that tokens of this type have an upper bound of
+     * Long.MAX_VALUE.<br/>
+     * The supply is accounted in the smallest units of the token
+     * (i.e. 10<sup>-`decimals`</sup> whole tokens)
+     */
+    INFINITE = 0;
+
+    /**
+     * A limited supply.<br/>
+     * This indicates that tokens of this type have an upper bound of
+     * `maxSupply`.<br/>
+     * The maximum supply SHALL be provided on token creation, but MAY be
+     * changed thereafter if the token has an `admin_key` set.
+     */
+    FINITE = 1;
+}
+
+/**
+ * Types of validation strategies for token keys.
+ */
+enum TokenKeyValidation {
+    /**
+     * Perform all token key validations.<br/>
+     * This is the default value and behavior.
+     */
+    FULL_VALIDATION = 0;
+
+    /**
+     * Perform no validations at all for all passed token keys.
+     */
+    NO_VALIDATION = 1;
+}
+
+/**
+ * Possible token freeze status values.
+ *
+ * This is returned by `TokenGetInfoQuery` or `CryptoGetInfoResponse`
+ * in `TokenRelationship`.
+ */
+enum TokenFreezeStatus {
+    /**
+     * The token does not support freeze or cannot be frozen for the designated
+     * account.<br/>
+     * Typically this indicates that the token does not have a `freeze_key` set.
+     */
+    FreezeNotApplicable = 0;
+
+    /**
+     * The token is currently frozen for the designated account.
+     */
+    Frozen = 1;
+
+    /**
+     * The token is not currently frozen for the designated account.
+     */
+    Unfrozen = 2;
+}
+
+/**
+ * Possible token "KYC" status values.
+ *
+ * This is returned by `TokenGetInfoQuery` or `CryptoGetInfoResponse`
+ * in `TokenRelationship`.
+ */
+enum TokenKycStatus {
+    /**
+     * The token does not support KYC or cannot grant KYC for the
+     * designated account.<br/>
+     * Typically this indicates that the token does not have a `kyc_key` set.
+     */
+    KycNotApplicable = 0;
+
+    /**
+     * The designated account is currently granted KYC status for the
+     * designated token.
+     */
+    Granted = 1;
+
+    /**
+     * The designated account is not currently granted KYC status for the
+     * designated token.
+     */
+    Revoked = 2;
+}
+
+/**
+ * Possible Pause status values.
+ *
+ * This is returned by `TokenGetInfoQuery` in `TokenRelationship`.
+ */
+enum TokenPauseStatus {
+    /**
+     * The token does not support pause or cannot be paused.<br/>
+     * Typically this indicates that the token does not have a `pause_key` set.
+     */
+    PauseNotApplicable = 0;
+
+    /**
+     * The token is currently paused.
+     */
+    Paused = 1;
+
+    /**
+     * The token is not currently paused.
+     */
+    Unpaused = 2;
+}
+
+/**
+ * A Key is an entity representing one or more cryptographic public/private key
+ * pairs and, optionally, the structure for how multiple signatures may be
+ * composed to meet complex multiple-signature authorization requirements.
+ *
+ * A Key can be a public key from either the Ed25519 or ECDSA(secp256k1)
+ * signature schemes. In the ECDSA(secp256k1) case we require the 33-byte
+ * compressed form of the public key. For simplicity, we call these
+ * cryptographic public keys `primitive` keys.<br/>
+ * If an entity has a primitive key associated to it, then the corresponding
+ * private key must sign any transaction to send tokens or perform other
+ * actions requiring authorization.
+ *
+ * A Key can also be the ID of a smart contract, which SHALL authorize that
+ * contract to execute any system contract with signing requirements that are
+ * met by the key.<br/>
+ * > Example
+ * >> If account `0.0.A` has a threshold key whose threshold is satisfied
+ * >> by a contract ID key for contract `0.0.C`, then when `0.0.C` is called,
+ * >> it is authorized to use system contracts to manage any asset owned by
+ * >> `0.0.A`. If the contract ID key is "delegatable", then `0.0.C` can even
+ * >> perform these actions when running code accessed via `DELEGATECALL`.
+ *
+ * A Key can be a "threshold key", which is a list of N keys, any M of which
+ * may sign in order for the signature to be considered valid. The value of
+ * M for a given threshold key MUST be less than or equal to N. A threshold
+ * key is sometimes called a "M-of-N" key.
+ *
+ * A Key can be a "key list" where all keys in the list must sign unless
+ * specified otherwise in the documentation for a specific transaction
+ * type (e.g. FileDeleteTransactionBody).<br/>
+ * This implies that the use of a key list is dependent on context. For
+ * example, an Hedera file that is created with a list of keys, SHALL require
+ * that all of those keys must sign a transaction to create or modify the file,
+ * but only one key from that list MUST sign a transaction to delete the file.
+ * So it is a single list that sometimes acts as a N-of-N threshold key, and
+ * sometimes acts as a 1-of-N threshold key.<br/>
+ * To reduce confusion this may cause, a key list SHALL always be considered
+ * N-of-N, unless specified otherwise in official documentation.<br/>
+ * A key list MAY have repeated primitive public keys, but the signature
+ * requirement for all keys in a repeated set SHALL be satisfied by a single
+ * valid signature. There is no mechanism to require a single key to sign a
+ * single transaction more than once.
+ *
+ * Any list or threshold key MAY have nested key lists or threshold keys.
+ * This allows, for example, the keys within a threshold signature to
+ * themselves be threshold, list, contract, or primitive keys. This nesting
+ * structure enables complex asymmetric multi-party signature requirements to
+ * be met.
+ *
+ * To ensure adequate performance and transaction security, key nesting is
+ * limited to at most fifteen(15) levels.
+ */
+message Key {
+    oneof key {
+        /**
+         * A smart contract instance that is authorized implicitly.
+         * <p>
+         * This key type SHALL require that the code in the active message frame
+         * belong to the contract with the given id.
+         */
+        ContractID contractID = 1;
+
+        /**
+         * An array of Ed25519 public key bytes.
+         */
+        bytes ed25519 = 2;
+
+        /**
+         * This option is not currently supported.<br/>
+         * An array of RSA-3072 public key bytes.
+         */
+        bytes RSA_3072 = 3 [deprecated = true];
+
+        /**
+         * This option is not currently supported.<br/>
+         * An array of ECDSA, using the p-384 curve, public key bytes.
+         */
+        bytes ECDSA_384 = 4 [deprecated = true];
+
+        /**
+         * A threshold, M, combined with a list of N keys, any M of which are
+         * sufficient to form a valid signature.
+         */
+        ThresholdKey thresholdKey = 5;
+
+        /**
+         * A list of keys. This may be treated like a "N-of-N" threshold key,
+         * as a component of another key, or in some other manner as documented.
+         */
+        KeyList keyList = 6;
+
+        /**
+         * A set of compressed ECDSA(secp256k1) public key bytes.<br/>
+         * This is an EVM compatibility format.
+         */
+        bytes ECDSA_secp256k1 = 7;
+
+        /**
+         * A smart contract that, if the recipient of the active message frame,
+         * SHALL be imputed authorization.<br/>
+         * Setting this key type is a more permissive version of setting a
+         * contractID key.
+         * <p>
+         * This key form SHALL NOT strictly require that the code being executed
+         * in the frame belong to the given contract. The code in frame MAY be
+         * running another contract via a `delegatecall`.
+         */
+        ContractID delegatable_contract_id = 8;
+    }
+}
+
+/**
+ * A threshold value and a list of public keys that, together, form a threshold
+ * signature requirement. Any subset of the keys in the list may satisfy the
+ * signature requirements of this type of key, provided the number of keys meets
+ * or exceeds the threshold. For example, if a particular key has a threshold of
+ * three(3) and eight(8) keys in the list, then any three(3) signatures, from
+ * the list of eight(8), is sufficient to authorize that key.
+ *
+ * For threshold purposes, all signatures from a single `primitive` key are
+ * considered a single signature, so that signature(s) from a single key SHALL
+ * NOT _directly_ meet a threshold greater than one(1).
+ *
+ * #### Note
+ * > It is possible to construct a complex key structure that _would_ enable a
+ * > single primitive key to successfully meet a threshold requirement. All
+ * > threshold keys SHOULD be carefully audited to ensure no one `primitive`
+ * > key, or smart contract, has disproportionate capability.
+ */
+message ThresholdKey {
+    /**
+     * A transaction MUST have valid signatures from at least this number of
+     * separate keys, from the `keys` list to be authorized by this key.
+     */
+    uint32 threshold = 1;
+
+    /**
+     * A list of the keys that MAY satisfy signature requirements of this key.
+     */
+    KeyList keys = 2;
+}
+
+/**
+ * A list of keys.<br/>
+ * A `KeyList` requires all keys (N-of-N) to sign, unless otherwise
+ * specified in official documentation. A KeyList may contain repeated keys,
+ * but all such repeated keys are considered a single key when determining
+ * signature authorization.
+ *
+ * ### Additional Notes
+ * 1. An empty key list is the "standard" mechanism to represent an
+ *    unassigned key. For example, if the `admin_key` of a token is set
+ *    to the empty key list, then that token has no admin key, and
+ *    functionality that requires an admin key to sign the
+ *    transaction is disabled.
+ */
+message KeyList {
+    /**
+     * A list of keys. All values in this list SHALL be non-null.
+     * <p>
+     */
+    repeated Key keys = 1;
+}
+
+/**
+ * This message is deprecated and MUST NOT be used to communicate with
+ * network nodes. It is retained here only for historical reasons.
+ *
+ * Client software MUST NOT include this message in any request. <br/>
+ * Compliant nodes SHALL NOT accept any request containing this message.
+ *
+ * Please use the `SignaturePair` and `SignatureMap` messages instead of
+ * this message.
+ */
+message Signature {
+    option deprecated = true;
+
+    oneof signature {
+        /**
+         * Smart contract virtual signature (always length zero).
+         */
+        bytes contract = 1;
+
+        /**
+         * Ed25519 signature bytes.
+         */
+        bytes ed25519 = 2;
+
+        /**
+         * RSA-3072 signature bytes.
+         */
+        bytes RSA_3072 = 3;
+
+        /**
+         * ECDSA p-384 signature bytes.
+         */
+        bytes ECDSA_384 = 4;
+
+        /**
+         * A list of signatures for a single N-of-M threshold Key. This must be
+         * a list of exactly M signatures, at least N of which are non-null.
+         */
+        ThresholdSignature thresholdSignature = 5;
+
+        /**
+         * A list of M signatures, each corresponding to a Key in a KeyList
+         * of the same length.
+         */
+        SignatureList signatureList = 6;
+    }
+}
+
+/**
+ * This message is deprecated and MUST NOT be used to communicate with network
+ * nodes. It is retained here only for historical reasons.
+ *
+ * Client software MUST NOT include this message in any request. <br/>
+ * Compliant nodes SHALL NOT accept any request containing this message.
+ *
+ * Please use the `SignaturePair` and `SignatureMap` messages, in combination
+ * with `ThresholdKey` keys, instead of this message.
+ */
+message ThresholdSignature {
+    option deprecated = true;
+
+    /**
+     * For an N-of-M threshold key, this is a list of M signatures, at least N
+     * of which must be non-null.
+     */
+    SignatureList sigs = 2;
+}
+
+/**
+ * This message is deprecated and MUST NOT be used to communicate with network
+ * nodes. It is retained here only for historical reasons.
+ *
+ * Client software MUST NOT include this message in any request. <br/>
+ * Compliant nodes SHALL NOT accept any request containing this message.
+ *
+ * Please use the `SignaturePair` and `SignatureMap` messages instead of
+ * this message.
+ */
+message SignatureList {
+    option deprecated = true;
+
+    /**
+     * Each signature corresponds to a Key in the KeyList.
+     */
+    repeated Signature sigs = 2;
+}
+
+/**
+ * A public key and signature pair.<br/>
+ * Only Ed25519 and ECDSA(secp256k1) keys and signatures are currently supported
+ * as cryptographic (non-implied) signatures.
+ */
+message SignaturePair {
+    /**
+     * Prefix bytes of the public key.
+     * <p>
+     * The client may use any number of bytes from zero to the whole length of
+     * the public key for pubKeyPrefix. If zero bytes are used, then it MUST be
+     * true that only one cryptographic key is required to sign the associated
+     * transaction.<br/>
+     * If the `pubKeyPrefix` is 0 bytes and more than a single cryptographic
+     * key is required to sign the transaction, the request SHALL resolve to
+     * `INVALID_SIGNATURE`.
+     * <blockquote>Important Note<blockquote>
+     * In the special case that a signature is provided to authorize a
+     * precompiled contract, the `pubKeyPrefix` MUST contain the _entire public
+     * key_.<br/>
+     * That is, if the key is an Ed25519 key, the `pubKeyPrefix` MUST be
+     * 32 bytes long and contain the full public key bytes.<br/>
+     * If the key is an ECDSA(secp256k1) key, the `pubKeyPrefix` MUST be
+     * 33 bytes long and contain the full _compressed_ form of the public key.
+     * </blockquote></blockquote>
+     * <p>
+     * <dl><dt>Purpose</dt>
+     * <dd>The `pubKeyPrefix` exists to save cost. A signed transaction with
+     * shorter prefixes will have fewer bytes, and so will have a lower
+     * transaction fee.
+     * The prefixes, however, MUST be long enough to distinguish between all
+     * of the public keys that might be signing the transaction. Therefore,
+     * software signing a transaction SHOULD evaluate which keys might possibly
+     * be required to sign a transaction, and ensure that the shortest prefix
+     * that is sufficient to unambiguously identify the correct key is used.
+     * </dd></dl>
+     */
+    bytes pubKeyPrefix = 1;
+
+    oneof signature {
+        /**
+         * A smart contract virtual signature.
+         * <p>
+         * This value MUST be length zero, if set.
+         */
+        bytes contract = 2;
+
+        /**
+         * An Ed25519 signature.
+         */
+        bytes ed25519 = 3;
+
+        /**
+         * This option is not supported.<br/>
+         * A RSA-3072 signature.
+         */
+        bytes RSA_3072 = 4 [deprecated = true];
+
+        /**
+         * This option is not supported.<br/>
+         * ECDSA p-384 signature.
+         */
+        bytes ECDSA_384 = 5 [deprecated = true];
+
+        /**
+         * An ECDSA(secp256k1) signature.
+         */
+        bytes ECDSA_secp256k1 = 6;
+    }
+}
+
+/**
+ * A set of signatures corresponding to every unique public key that
+ * signed a given transaction.
+ *
+ * If any public key matches more than one prefix in the signature map,
+ * the transaction containing that map SHALL fail immediately with the
+ * response code `KEY_PREFIX_MISMATCH`.
+ */
+message SignatureMap {
+    /**
+     * A list of signature pairs for a specific transaction.<br/>
+     * Each signature pair represents a single cryptographic (`primitive`)
+     * public key identified by a "prefix" value and the cryptographic
+     * signature produced for that key.
+     */
+    repeated SignaturePair sigPair = 1;
+}
+
+/**
+ * The transactions and queries supported by Hedera Hashgraph.
+ */
+enum HederaFunctionality {
+    // FUTURE - Uncomment when https://github.com/hashgraph/pbj/issues/339 is fixed;
+    // currently the PBJ-generated unit tests fail when using reserved ordinals
+    // reserved 96, 97, 98, 99;
+
+    /**
+     * Unused - The first value is unused because this default value is
+     * ambiguous with an "unset" value and therefore should not be used.
+     */
+    NONE = 0;
+
+    /**
+     * Transfer tokens among accounts.
+     */
+    CryptoTransfer = 1;
+
+    /**
+     * Update an account.
+     */
+    CryptoUpdate = 2;
+
+    /**
+     * Delete an account.
+     */
+    CryptoDelete = 3;
+
+    /**
+     * Add a livehash to an account
+     */
+    CryptoAddLiveHash = 4 [deprecated = true];
+
+    /**
+     * Delete a livehash from an account
+     */
+    CryptoDeleteLiveHash = 5 [deprecated = true];
+
+    /**
+     * Execute a smart contract call.
+     */
+    ContractCall = 6;
+
+    /**
+     * Create a smart contract.
+     */
+    ContractCreate = 7;
+
+    /**
+     * Update a smart contract.
+     */
+    ContractUpdate = 8;
+
+    /**
+     * Create a "file" stored in the ledger.
+     */
+    FileCreate = 9;
+
+    /**
+     * Append data to a "file" stored in the ledger.
+     */
+    FileAppend = 10;
+
+    /**
+     * Update a "file" stored in the ledger.
+     */
+    FileUpdate = 11;
+
+    /**
+     * Delete a "file" stored in the ledger.
+     */
+    FileDelete = 12;
+
+    /**
+     * Get the balance for an account.
+     */
+    CryptoGetAccountBalance = 13;
+
+    /**
+     * Get a full account record.
+     */
+    CryptoGetAccountRecords = 14;
+
+    /**
+     * Get information about a token.
+     */
+    CryptoGetInfo = 15;
+
+    /**
+     * Execute a local smart contract call.<br/>
+     * Used by contracts to call other contracts.
+     */
+    ContractCallLocal = 16;
+
+    /**
+     * Get information about a smart contract.
+     */
+    ContractGetInfo = 17;
+
+    /**
+     * Get the compiled bytecode that implements a smart contract.
+     */
+    ContractGetBytecode = 18;
+
+    /**
+     * Get a smart contract record by reference to the solidity ID.
+     */
+    GetBySolidityID = 19;
+
+    /**
+     * Get a smart contract by reference to the contract key.
+     */
+    GetByKey = 20;
+
+    /**
+     * Get the live hash for an account
+     */
+    CryptoGetLiveHash = 21 [deprecated = true];
+
+    /**
+     * Get the accounts proxy staking to a given account.
+     */
+    CryptoGetStakers = 22 [deprecated = true];
+
+    /**
+     * Get the contents of a "file" stored in the ledger.
+     */
+    FileGetContents = 23;
+
+    /**
+     * Get the metadata for a "file" stored in the ledger.
+     */
+    FileGetInfo = 24;
+
+    /**
+     * Get transaction record(s) for a specified transaction ID.
+     */
+    TransactionGetRecord = 25;
+
+    /**
+     * Get all transaction records for a specified contract ID in
+     * the past 24 hours.<br/>
+     * deprecated since version 0.9.0
+     */
+    ContractGetRecords = 26 [deprecated = true];
+
+    /**
+     * Create a new account
+     */
+    CryptoCreate = 27;
+
+    /**
+     * Delete a "system" "file" stored in the ledger.<br/>
+     * "System" files are files with special purpose and ID values within a
+     * specific range.<br/>
+     * These files require additional controls and can only be deleted when
+     * authorized by accounts with elevated privilege.
+     */
+    SystemDelete = 28;
+
+    /**
+     * Undo the delete of a "system" "file" stored in the ledger.<br/>
+     * "System" files are files with special purpose and ID values within a
+     * specific range.<br/>
+     * These files require additional controls and can only be deleted when
+     * authorized by accounts with elevated privilege. This operation allows
+     * such files to be restored, within a reasonable timeframe, if
+     * deleted improperly.
+     */
+    SystemUndelete = 29;
+
+    /**
+     * Delete a smart contract
+     */
+    ContractDelete = 30;
+
+    /**
+     * Stop all processing and "freeze" the entire network.<br/>
+     * This is generally sent immediately prior to upgrading the network.<br/>
+     * After processing this transactions all nodes enter a quiescent state.
+     */
+    Freeze = 31;
+
+    /**
+     * Create a Transaction Record.<br/>
+     * This appears to be purely internal and unused.
+     */
+    CreateTransactionRecord = 32;
+
+    /**
+     * Auto-renew an account.<br/>
+     * This is used for internal fee calculations.
+     */
+    CryptoAccountAutoRenew = 33;
+
+    /**
+     * Auto-renew a smart contract.<br/>
+     * This is used for internal fee calculations.
+     */
+    ContractAutoRenew = 34;
+
+    /**
+     * Get version information for the ledger.<br/>
+     * This returns a the version of the software currently running the network
+     * for both the protocol buffers and the network services (node).
+     */
+    GetVersionInfo = 35;
+
+    /**
+     * Get a receipt for a specified transaction ID.
+     */
+    TransactionGetReceipt = 36;
+
+    /**
+     * Create a topic for the Hedera Consensus Service (HCS).
+     */
+    ConsensusCreateTopic = 50;
+
+    /**
+     * Update an HCS topic.
+     */
+    ConsensusUpdateTopic = 51;
+
+    /**
+     * Delete an HCS topic.
+     */
+    ConsensusDeleteTopic = 52;
+
+    /**
+     * Get metadata (information) for an HCS topic.
+     */
+    ConsensusGetTopicInfo = 53;
+
+    /**
+     * Publish a message to an HCS topic.
+     */
+    ConsensusSubmitMessage = 54;
+
+    /**
+     * Submit a transaction, bypassing intake checking.
+     * Only enabled in local-mode.
+     */
+    UncheckedSubmit = 55;
+
+    /**
+     * Create a token for the Hedera Token Service (HTS).
+     */
+    TokenCreate = 56;
+
+    /**
+     * Get metadata (information) for an HTS token.
+     */
+    TokenGetInfo = 58;
+
+    /**
+     * Freeze a specific account with respect to a specific HTS token.
+     * <p>
+     * Once this transaction completes that account CANNOT send or receive
+     * the specified token.
+     */
+    TokenFreezeAccount = 59;
+
+    /**
+     * Remove a "freeze" from an account with respect to a specific HTS token.
+     */
+    TokenUnfreezeAccount = 60;
+
+    /**
+     * Grant KYC status to an account for a specific HTS token.
+     */
+    TokenGrantKycToAccount = 61;
+
+    /**
+     * Revoke KYC status from an account for a specific HTS token.
+     */
+    TokenRevokeKycFromAccount = 62;
+
+    /**
+     * Delete a specific HTS token.
+     */
+    TokenDelete = 63;
+
+    /**
+     * Update a specific HTS token.
+     */
+    TokenUpdate = 64;
+
+    /**
+     * Mint HTS token amounts to the treasury account for that token.
+     */
+    TokenMint = 65;
+
+    /**
+     * Burn HTS token amounts from the treasury account for that token.
+     */
+    TokenBurn = 66;
+
+    /**
+     * Wipe all amounts for a specific HTS token from a specified account.
+     */
+    TokenAccountWipe = 67;
+
+    /**
+     * Associate a specific HTS token to an account.
+     */
+    TokenAssociateToAccount = 68;
+
+    /**
+     * Dissociate a specific HTS token from an account.
+     */
+    TokenDissociateFromAccount = 69;
+
+    /**
+     * Create a scheduled transaction
+     */
+    ScheduleCreate = 70;
+
+    /**
+     * Delete a scheduled transaction
+     */
+    ScheduleDelete = 71;
+
+    /**
+     * Sign a scheduled transaction
+     */
+    ScheduleSign = 72;
+
+    /**
+     * Get metadata (information) for a scheduled transaction
+     */
+    ScheduleGetInfo = 73;
+
+    /**
+     * Get NFT metadata (information) for a range of NFTs associated to a
+     * specific non-fungible/unique HTS token and owned by a specific account.
+     */
+    TokenGetAccountNftInfos = 74 [deprecated = true];
+
+    /**
+     * Get metadata (information) for a specific NFT identified by token and
+     * serial number.
+     */
+    TokenGetNftInfo = 75 [deprecated = true];
+
+    /**
+     * Get NFT metadata (information) for a range of NFTs associated to a
+     * specific non-fungible/unique HTS token.
+     */
+    TokenGetNftInfos = 76;
+
+    /**
+     * Update a token's custom fee schedule.
+     * <p>
+     * If a transaction of this type is not signed by the token
+     * `fee_schedule_key` it SHALL fail with INVALID_SIGNATURE, or
+     * TOKEN_HAS_NO_FEE_SCHEDULE_KEY if there is no `fee_schedule_key` set.
+     */
+    TokenFeeScheduleUpdate = 77;
+
+    /**
+     * Get execution time(s) for one or more "recent" TransactionIDs.
+     */
+    NetworkGetExecutionTime = 78 [deprecated = true];
+
+    /**
+     * Pause a specific HTS token
+     */
+    TokenPause = 79;
+
+    /**
+     * Unpause a paused HTS token.
+     */
+    TokenUnpause = 80;
+
+    /**
+     * Approve an allowance for a spender relative to the owner account, which
+     * MUST sign the transaction.
+     */
+    CryptoApproveAllowance = 81;
+
+    /**
+     * Delete (unapprove) an allowance previously approved
+     * for the owner account.
+     */
+    CryptoDeleteAllowance = 82;
+
+    /**
+     * Get all the information about an account, including balance
+     * and allowances.<br/>
+     * This does not get a list of account records.
+     */
+    GetAccountDetails = 83;
+
+    /**
+     * Perform an Ethereum (EVM) transaction.<br/>
+     * CallData may be inline if small, or in a "file" if large.
+     */
+    EthereumTransaction = 84;
+
+    /**
+     * Used to indicate when the network has updated the staking information
+     * at the end of a staking period and to indicate a new staking period
+     * has started.
+     */
+    NodeStakeUpdate = 85;
+
+    /**
+     * Generate and return a pseudorandom number based on network state.
+     */
+    UtilPrng = 86;
+
+    /**
+     * Get a record for a "recent" transaction.
+     */
+    TransactionGetFastRecord = 87 [deprecated = true];
+
+    /**
+     * Update the metadata of one or more NFT's of a specific token type.
+     */
+    TokenUpdateNfts = 88;
+
+    /**
+     * Create a node
+     */
+    NodeCreate = 89;
+
+    /**
+     * Update a node
+     */
+    NodeUpdate = 90;
+
+    /**
+     * Delete a node
+     */
+    NodeDelete = 91;
+
+    /**
+     * Transfer one or more token balances held by the requesting account
+     * to the treasury for each token type.
+     */
+    TokenReject = 92;
+
+    /**
+     * Airdrop one or more tokens to one or more accounts.
+     */
+    TokenAirdrop = 93;
+
+    /**
+    * Remove one or more pending airdrops from state on behalf of
+    * the sender(s) for each airdrop.
+    */
+    TokenCancelAirdrop = 94;
+
+    /**
+     * Claim one or more pending airdrops
+     */
+    TokenClaimAirdrop = 95;
+
+    /**
+     * Submit a signature of a state root hash gossiped to other nodes
+     */
+    StateSignatureTransaction = 100;
+
+    /**
+     * Publish a hinTS key to the network.
+     */
+    HintsKeyPublication = 101;
+
+    /**
+     * Vote for a particular preprocessing output of a hinTS construction.
+     */
+    HintsPreprocessingVote = 102;
+
+    /**
+     * Sign a partial signature for the active hinTS construction.
+     */
+    HintsPartialSignature = 103;
+
+    /**
+     * Sign a particular history assembly.
+     */
+    HistoryAssemblySignature = 104;
+
+    /**
+     * Publish a roster history proof key to the network.
+     */
+    HistoryProofKeyPublication = 105;
+
+    /**
+     * Vote for a particular history proof.
+     */
+    HistoryProofVote = 106;
+
+    /**
+     * Publish a random CRS to the network.
+     */
+    CrsPublication = 107;
+
+    /**
+     * Submit a batch of transactions to run atomically
+     */
+    AtomicBatch = 108;
+}
+
+/**
+ * A set of values the nodes use in determining transaction and query fees, and
+ * constants involved in fee calculations.
+ *
+ * Nodes SHALL multiply the amount of "resources" allocated to a transaction or
+ * query by the corresponding price to calculate the appropriate fee. Units are
+ * one-thousandth of a `tinyCent`. The "resource" allocations SHALL be estimated
+ * based on transaction characteristics and current network state, and MAY be
+ * further adjusted based on network load and congestion.
+ *
+ * This SHALL be used, in different contexts, for the cost _factors_ used to
+ * calculate charged amounts, for the resource accumulation, and for actual
+ * amounts to be charged.<br/>
+ * Amounts recorded here MUST be converted to tinybar according to the
+ * current active `ExchangeRate` for the network.
+ */
+message FeeComponents {
+    /**
+     * Base: "minimum total fee".
+     * <p>
+     * The calculated fee MUST be greater than this value.
+     */
+    int64 min = 1;
+
+    /**
+     * Base: "maximum total fee".
+     * <p>
+     * The calculated fee MUST be less than this value.
+     */
+    int64 max = 2;
+
+    /**
+     * Base: "constant fee".<br/>
+     * A baseline constant contribution to total fee.
+     */
+    int64 constant = 3;
+
+    /**
+     * Bandwidth: "bytes per transaction".<br/>
+     * The fee for bandwidth consumed by a transaction, measured in bytes
+     */
+    int64 bpt = 4;
+
+    /**
+     * Signatures: "validations per transaction".<br/>
+     * The fee for signature verifications required by a transaction
+     */
+    int64 vpt = 5;
+
+    /**
+     * Memory: "RAM byte-hours".<br/>
+     * The fee for RAM required to process a transaction,
+     * measured in byte-hours
+     */
+    int64 rbh = 6;
+
+    /**
+     * Disk: "storage byte-hours".<br/>
+     * The fee for storage required by a transaction, measured in byte-hours
+     */
+    int64 sbh = 7;
+
+    /**
+     * Compute: Ethereum term for a derivative EVM compute resource.<br/>
+     * The fee of computation for a smart contract transaction. The value of
+     * gas is set by a conversion rate, and is regularly updated to reflect
+     * reasonable and customary costs.
+     */
+    int64 gas = 8;
+
+    /**
+     * Ad valorem: "transferred value".<br/>
+     * The fee for HBAR transferred by a transaction.
+     */
+    int64 tv = 9;
+
+    /**
+     * Response memory: "bytes per response".<br/>
+     * The fee for data retrieved from memory to deliver a response,
+     * measured in bytes
+     */
+    int64 bpr = 10;
+
+    /**
+     * Response disk: "storage bytes per response".<br/>
+     * The fee for data retrieved from disk to deliver a response,
+     * measured in bytes
+     */
+    int64 sbpr = 11;
+}
+
+/**
+ * The fee schedule for a specific transaction or query based on the fee data.
+ */
+message TransactionFeeSchedule {
+    /**
+     * An enumeration for a particular transaction or query.<br/>
+     * The functionality type determines the base cost parameters.
+     */
+    HederaFunctionality hederaFunctionality = 1;
+
+    /**
+     * Use `fees` instead of this field.<br/>
+     * Resource price coefficients.
+     */
+    FeeData feeData = 2 [deprecated = true];
+
+    /**
+     * The resource price coefficients for transaction type and any applicable
+     * subtypes.<br/>
+     * The multiple entries enable support for subtype price definitions.
+     */
+    repeated FeeData fees = 3;
+}
+
+/**
+ * A total fee, in component amounts charged for a transaction.
+ *
+ * Total fees are composed of three sets of components.
+ * - Node data, components that compensate the specific node that submitted
+ *   the transaction.
+ * - Network data, components that compensate the Hedera network for gossiping
+ *   the transaction and determining the consensus timestamp.
+ * - Service data, components that compensate the Hedera network for the ongoing
+ *   maintenance and operation of the network, as well as ongoing development
+ *   of network services.
+ *
+ * Fee components are recorded in thousandths of a tiny cent, and the network
+ * exchange rate converts these to tinybar amounts, which are what the network
+ * charges for transactions and what the network reports in the record stream.
+ */
+message FeeData {
+    /**
+     * Fee components to be paid to the submitting node.
+     */
+    FeeComponents nodedata = 1;
+
+    /**
+     * Fee components to be paid to the network for bringing a
+     * transaction to consensus.
+     */
+    FeeComponents networkdata = 2;
+
+    /**
+     * Fee components to be paid to the network for providing the immediate and
+     * ongoing services associated with executing the transaction, maintaining
+     * the network, and developing the network software.
+     */
+    FeeComponents servicedata = 3;
+
+    /**
+     * A sub-type distinguishing between different types of `FeeData` that may
+     * apply to the same base transaction type (associated with
+     * an `HederaFunctionality`).
+     */
+    SubType subType = 4;
+}
+
+/**
+ * A set of fee schedules covering all transaction types and query types, along
+ * with a specific time at which this fee schedule will expire.
+ *
+ * Nodes SHALL use the most recent unexpired fee schedule to determine the fees
+ * for all transactions based on various resource components imputed to each
+ * transaction.
+ */
+message FeeSchedule {
+    /**
+     * Sets of fee coefficients for various transaction or query types.
+     */
+    repeated TransactionFeeSchedule transactionFeeSchedule = 1;
+
+    /**
+     * A time, in seconds since the `epoch`, when this fee schedule
+     * will expire.
+     * <p>
+     * For this purpose, `epoch` SHALL be the UNIX epoch
+     * with 0 at `1970-01-01T00:00:00.000Z`.
+     */
+    TimestampSeconds expiryTime = 2;
+}
+
+/**
+ * The "current" fee schedule and the "next" fee schedule.
+ *
+ * The current fee schedule is the schedule that SHALL apply to the current
+ * transaction.<br/>
+ * The next fee schedule is the schedule that SHALL apply after the current
+ * schedule expires.<br/>
+ * We store both to avoid a condition where transactions are processed very
+ * near the time when a fee schedule expires and it might be indeterminate
+ * which fees to apply. With both current and next fee schedule the network
+ * can deterministically apply the correct fee schedule based on consensus
+ * timestamp for each transaction.
+ */
+message CurrentAndNextFeeSchedule {
+    /**
+     * A current, unexpired, fee schedule.
+     */
+    FeeSchedule currentFeeSchedule = 1;
+
+    /**
+     * A future fee schedule to use when the current schedule expires.
+     */
+    FeeSchedule nextFeeSchedule = 2;
+}
+
+/**
+ * A network node endpoint.<br/>
+ * Each network node in the global address book publishes one or more endpoints
+ * which enable the nodes to communicate both with other nodes, for gossip, and
+ * with clients to receive transaction requests.
+ *
+ * This message supports IPv4 with address and TCP port,
+ * and MAY include a FQDN instead of an IP address.<br/>
+ * IPv6 is not currently supported.
+ *
+ * When the `domain_name` field is set, the `ipAddressV4` field
+ * MUST NOT be set.<br/>
+ * When the `ipAddressV4` field is set, the `domain_name` field
+ * MUST NOT be set.
+ */
+message ServiceEndpoint {
+    /**
+     * A 32-bit IPv4 address.<br/>
+     * This is the address of the endpoint, encoded in pure "big-endian"
+     * (i.e. left to right) order (e.g. `127.0.0.1` has hex bytes in the
+     * order `7F`, `00`, `00`, `01`).
+     */
+    bytes ipAddressV4 = 1;
+
+    /**
+     * A TCP port to use.
+     * <p>
+     * This value MUST be between 0 and 65535, inclusive.
+     */
+    int32 port = 2;
+
+    /**
+     * A node domain name.
+     * <p>
+     * This MUST be the fully qualified domain name of the node.<br/>
+     * This value MUST NOT exceed 253 characters.<br/>
+     * When the `domain_name` field is set, the `ipAddressV4`
+     * field MUST NOT be set.<br/>
+     * When the `ipAddressV4` field is set, the `domain_name`
+     * field MUST NOT be set.
+     */
+    string domain_name = 3;
+}
+
+/**
+ * The data about a node, including its service endpoints and the Hedera account
+ * to be paid for services provided by the node (that is, queries answered and
+ * transactions submitted).
+ *
+ * All active fields are populated in the `0.0.102` address book file.<br/>
+ * Only fields documented with "`0.0.101` field" are populated in the 0.0.101
+ * address book file.
+ *
+ * This message MAY be superseded by messages in state/addressbook/node.proto
+ * and node_get_info.proto.
+ */
+message NodeAddress {
+    /**
+     * ServiceEndpoint is now used to retrieve a node's list of IP
+     * addresses and ports.<br/>
+     * The IP address of the Node, as a string, encoded in UTF-8.<br/>
+     * This value SHALL NOT be populated.
+     */
+    bytes ipAddress = 1 [deprecated = true];
+
+    /**
+     * ServiceEndpoint is now used to retrieve a node's list of IP
+     * addresses and ports.<br/>
+     * The port number of the grpc server for the node.<br/>
+     * This value SHALL NOT be populated.
+     */
+    int32 portno = 2 [deprecated = true];
+
+    /**
+     * Description provides short text functionality.<br/>
+     * A short description of the node.
+     * <p>
+     * This field SHALL NOT be populated.
+     */
+    bytes memo = 3 [deprecated = true];
+
+    /**
+     * A hexadecimal String encoding of an X509 public key.
+     * <p>
+     * This X509 RSA _public_ key SHALL be used to verify record stream files
+     * (e.g., record stream files).<br/>
+     * This field SHALL be a string of hexadecimal characters, encoded UTF-8,
+     * which, translated to binary, form the public key DER encoding.
+     */
+    string RSA_PubKey = 4;
+
+    /**
+     * A numeric identifier for the node.
+     * <p>
+     * This value SHALL NOT be sequential.
+     * <p>
+     * A `0.0.101` field
+     */
+    int64 nodeId = 5;
+
+    /**
+     * An account to be paid the "node" portion of transaction fees.<br/>
+     * The "node" fees are paid to the node that submitted the transaction.
+     * <p>
+     * A `0.0.101` field
+     */
+    AccountID nodeAccountId = 6;
+
+    /**
+     * A hash of the node's TLS certificate.
+     * <p>
+     * This field SHALL be a string of hexadecimal characters, encoded UTF-8,
+     * which, translated to binary, form a SHA-384 hash of the node's TLS
+     * certificate in PEM format.
+     * This TLS certificate MUST be encoded UTF-8 and normalized according to
+     * the NFKD form prior to computing the hash value.<br/>
+     * The value of this field SHALL be used to verify the node TLS
+     * certificate when presented during protocol negotiation.
+     * <p>
+     * A `0.0.101` field
+     */
+    bytes nodeCertHash = 7;
+
+    /**
+     * A node's service IP addresses and TCP ports.<br/>
+     * Nodes require multiple endpoints to ensure that inter-node communication
+     * (e.g. gossip) is properly separated from client communication to
+     * API endpoints.
+     * <p>
+     * A `0.0.101` field
+     */
+    repeated ServiceEndpoint serviceEndpoint = 8;
+
+    /**
+     * A short description of the node.
+     * <p>
+     * This value, if set, MUST NOT exceed `transaction.maxMemoUtf8Bytes`
+     * (default 100) bytes when encoded as UTF-8.
+     */
+    string description = 9;
+
+    /**
+     * This is replaced by per-account stake tracking and dynamic
+     * calculation.<br/>
+     * The amount of tinybar staked to the node.<br/>
+     * This value SHOULD NOT be populated, and SHALL be ignored.
+     */
+    int64 stake = 10 [deprecated = true];
+}
+
+/**
+ * A list of nodes and their metadata that contains details of the nodes
+ * running the network.
+ *
+ * Used to parse the contents of system files `0.0.101` and `0.0.102`.
+ */
+message NodeAddressBook {
+    /**
+     * Published data for all nodes in the network
+     */
+    repeated NodeAddress nodeAddress = 1;
+}
+
+/**
+ * A software version according to "[semantic versioning](https://semver.org/)"
+ * or "date versioning".
+ *
+ * Hedera currently modifies the "typical" semantic versioning somewhat, the
+ * `major` version is always `0`, and each release increments the `minor`
+ * version. The `patch` and `pre` components are used in the typical manner.
+ * The `build` component is not generally used.
+ */
+message SemanticVersion {
+    /**
+     * A major version.<br/>
+     * Hedera does not increment this value and retains a `0` value to
+     * indicate that API may change for any release.
+     * <p>
+     * This value SHALL increment for an incompatible API change.<br/>
+     */
+    int32 major = 1;
+
+    /**
+     * A minor version.<br/>
+     * Hedera increments this value with each release.<br/>
+     * There may be incompatible API changes in any Hedera Services release.
+     * <p>
+     * This value SHALL increment for backwards-compatible new
+     * functionality.
+     */
+    int32 minor = 2;
+
+    /**
+     * A patch version.
+     * <p>
+     * This value SHALL increment for backwards-compatible bug fixes.
+     */
+    int32 patch = 3;
+
+    /**
+     * A pre-release version.
+     * <p>
+     * This MAY be denoted by appending a hyphen and a series of dot separated
+     * identifiers per [Semver Specification](https://semver.org/#spec-item-9);
+     * given a string `0.14.0-alpha.1+21AF26D3`, this field would contain
+     * 'alpha.1'
+     */
+    string pre = 4;
+
+    /**
+     * A build version.
+     * <p>
+     * Build version MAY be denoted by appending a plus sign and a series of
+     * dot separated identifiers immediately following the patch or pre-release
+     * version per [Semver Specification](https://semver.org/#spec-item-10); so
+     * given a string `0.14.0-alpha.1+21AF26D3`, this field
+     * would contain '21AF26D3'
+     */
+    string build = 5;
+}
+
+/**
+ * A single runtime configuration setting.
+ *
+ * Typically a name-value pair, this may also contain a small amount of
+ * associated data.
+ */
+message Setting {
+    /**
+     * A name for this setting property.
+     */
+    string name = 1;
+
+    /**
+     * A value for this setting property.
+     */
+    string value = 2;
+
+    /**
+     * A small quantity of data associated with this setting.
+     * <p>
+     * This SHOULD be less than 100 bytes.<br/>
+     * If the value is a string, it MUST be encoded UTF-8.
+     */
+    bytes data = 3;
+}
+
+/**
+ * Setting values representing a source of runtime configuration information.
+ */
+message ServicesConfigurationList {
+    /**
+     * A List of `Setting` values, typically read from application properties.
+     */
+    repeated Setting nameValue = 1;
+}
+
+/**
+ * An Hedera Token Service token relationship. A token relationship describes
+ * the connection between an Account and a Token type, including the current
+ * account balance in that token.
+ *
+ * A `TokenRelationship` SHALL contain, for the designated token and enclosing
+ * account, The account's current balance, whether the account has KYC granted,
+ * whether the assets are frozen and whether the association was automatic.<br/>
+ * A `TokenRelationship` MAY also contain the `symbol` and `decimals` values
+ * copied from the token.<br/>
+ * `TokenRelationship` entries SHALL be valid only within the context of a
+ * `GetAccountDetails` query response, or other enclosing message, which
+ * specifies the account side of the relationship.
+ */
+message TokenRelationship {
+    /**
+     * A token identifier.
+     * <p>
+     * This MUST match an existing token that is not deleted.
+     */
+    TokenID tokenId = 1;
+
+    /**
+     * A token symbol.
+     * <p>
+     * This MUST match an existing token that is not deleted.<br/>
+     * This MUST match the value for the token identified in `tokenId`.
+     */
+    string symbol = 2;
+
+    /**
+     * An account balance for this token.
+     * <p>
+     * For fungible/common tokens this SHALL be the balance that the
+     * account holds of that token. The value is provided as an integer amount
+     * of the smallest unit of the token (i.e. 10<sup>`-decimals`</sup> whole
+     * tokens).<br/>
+     * For non-fungible/unique tokens this SHALL be the whole number of
+     * unique tokens held by the account for this token type.
+     */
+    uint64 balance = 3;
+
+    /**
+     * A KYC status for the account with respect to this token.
+     * <p>
+     * This may be `KycNotApplicable`, `Granted` or `Revoked` and, if KYC is
+     * not supported for this token (e.g. the `kyc_key` of the token is not
+     * set), this SHALL be `KycNotApplicable`.
+     */
+    TokenKycStatus kycStatus = 4;
+
+    /**
+     * A Freeze status for the account with respect to this token.
+     * <p>
+     * This value SHALL be one of `FreezeNotApplicable`, `Frozen`
+     * or `Unfrozen`.<br/>
+     * If the token cannot freeze account assets (e.g. the `freeze_key` of the
+     * token is not set), this SHALL be `FreezeNotApplicable`.
+     */
+    TokenFreezeStatus freezeStatus = 5;
+
+    /**
+     * A maximum "precision" for this token.
+     * <p>
+     * This value MUST match the `decimals` field of the token identified in
+     * the `tokenId` field.<br/>
+     * A single whole token SHALL be divided into at most
+     * 10<sup>`decimals`</sup> sub-units.
+     */
+    uint32 decimals = 6;
+
+    /**
+     * An automatic association flag.
+     * <p>
+     * This SHALL be set if the relationship was created implicitly
+     * (automatically).<br/>
+     * This SHALL be unset if the relationship was created explicitly
+     * (manually) via a `TokenAssociate` transaction.
+     */
+    bool automatic_association = 7;
+}
+
+/**
+ * A number of _transferable units_ of a specified token.
+ *
+ * The transferable unit of a token is its smallest denomination, as given by
+ * the token's `decimals` property. Each minted token contains
+ * 10<sup>`decimals`</sup> transferable units. For example, we could think of
+ * the cent as the transferable unit of the US dollar (`decimals=2`); and the
+ * tinybar as the transferable unit of HBAR (`decimals=8`).
+ *
+ * Transferable units are not directly comparable across different tokens.
+ */
+message TokenBalance {
+    /**
+     * A token identifier.
+     */
+    TokenID tokenId = 1;
+
+    /**
+     * A number of transferable units of the identified token.
+     * <p>
+     * For fungible/common tokens this SHALL be the balance, in units of
+     * 10<sup>`-decimals`</sup> whole tokens.<br/>
+     * For non-fungible/unique tokens, this SHALL be the number of
+     * individual unique tokens in this balance.
+     */
+    uint64 balance = 2;
+
+    /**
+     * A number of "decimals" precision.
+     * <p>
+     * This MUST match the `decimals` value for the token identified by the
+     * `tokenId` field.
+     */
+    uint32 decimals = 3;
+}
+
+/**
+ * A set of token balance values.
+ *
+ * Each entry describes the balance the enclosing account holds for a specific
+ * token. The balance is an amount for a fungible/common token or a count for
+ * a non-fungible/unique token.
+ */
+message TokenBalances {
+    /**
+     * A list of token balance values.<br/>
+     * Each entry represents a single account balance for a single token.
+     */
+    repeated TokenBalance tokenBalances = 1;
+}
+
+/**
+ * An association between a token and an account.
+ *
+ * An account must be associated with a token before that account can transact
+ * in (send or receive) that token.
+ */
+message TokenAssociation {
+    /**
+     * A token identifier for the associated token.
+     */
+    TokenID token_id = 1;
+
+    /**
+     * An account identifier for the associated account.
+     */
+    AccountID account_id = 2;
+}
+
+/**
+ * Staking information for an account or a contract.
+ *
+ * This is used for responses returned from `CryptoGetInfo` or
+ * `ContractGetInfo` queries.
+ */
+message StakingInfo {
+
+    /**
+     * A flag indicating that the holder of this account has chosen to decline
+     * staking rewards.
+     */
+    bool decline_reward = 1;
+
+    /**
+     * A `Timestamp` of the start time for the latest active staking period.
+     * <p>
+     * This MUST be a period during which either the staking settings for this
+     * account or contract changed or the account or contract received staking
+     * rewards, whichever is later. Examples of a change in staking settings
+     * include starting staking or changing the staked_node_id.<br/>
+     * If this account or contract is not currently staked to a node, then this
+     * field SHALL NOT be set.
+     */
+    Timestamp stake_period_start = 2;
+
+    /**
+     * An amount, in tinybar, to be received in the next reward payout.<br/>
+     * Rewards are not paid out immediately; for efficiency reasons rewards are
+     * only paid out as part of another transaction involving that account.
+     */
+    int64 pending_reward = 3;
+
+    /**
+     * A proxy-staked balance.<br/>
+     * The total HBAR balance of all accounts that delegate staking to this
+     * account or contract.
+     */
+    int64 staked_to_me = 4;
+
+    oneof staked_id {
+        /**
+         * A delegated stake.
+         * <p>
+         * This account delegates to the indicated account for staking purposes.
+         */
+        AccountID staked_account_id = 5;
+
+        /**
+         * A direct stake.
+         * <p>
+         * This accounts stakes its balance to the designated node.
+         */
+        int64 staked_node_id = 6;
+    }
+}
+
+/**
+ * A unique, composite, identifier for a pending airdrop.
+ *
+ * Each pending airdrop SHALL be uniquely identified by
+ * a `PendingAirdropId`.<br/>
+ * A `PendingAirdropId` SHALL be recorded when created and MUST be provided in
+ * any transaction that would modify that pending airdrop
+ * (such as a `claimAirdrop` or `cancelAirdrop`).
+ */
+message PendingAirdropId {
+    /**
+     * A sending account.
+     * <p>
+     * This is the account that initiated, and SHALL fund,
+     * this pending airdrop.<br/>
+     * This field is REQUIRED.
+     */
+    AccountID sender_id = 1;
+
+    /**
+     * A receiving account.
+     * <p>
+     * This is the ID of the account that SHALL receive the airdrop.<br/>
+     * This field is REQUIRED.
+     */
+    AccountID receiver_id = 2;
+
+    oneof token_reference {
+        /**
+         * A token identifier.<br/>
+         * This is the type of token for a fungible/common token airdrop.
+         * <p>
+         * This field is REQUIRED for a fungible/common token and MUST NOT
+         * be used for a non-fungible/unique token.
+         */
+        TokenID fungible_token_type = 3;
+
+        /**
+         * The id of a single NFT<br/>
+         * This is the type of token for a non-fungible/unique token airdrop
+         * and consists of a Token ID and serial number.
+         * <p>
+         * This field is REQUIRED for a non-fungible/unique token and
+         * MUST NOT be used for a fungible/common token.
+         */
+        NftID non_fungible_token = 4;
+    }
+}
+
+/**
+ * A single pending airdrop value.
+ *
+ * This message SHALL record the airdrop amount for a
+ * fungible/common token.<br/>
+ * This message SHOULD be null for a non-fungible/unique token.<br/>
+ * If a non-null `PendingAirdropValue` is set for a non-fungible/unique
+ * token, the amount field MUST be `0`.
+ *
+ * It is RECOMMENDED that implementations store pending airdrop information
+ * as a key-value map from `PendingAirdropId` to `PendingAirdropValue`, with
+ * a `null` value used for non-fungible pending airdrops.
+ */
+message PendingAirdropValue {
+    /**
+     * An amount to transfer for fungible/common tokens.<br/>
+     * This is expressed in the smallest available units for that token
+     * (i.e. 10<sup>-`decimals`</sup> whole tokens).
+     * <p>
+     * This amount SHALL be transferred from the sender to the receiver,
+     * if claimed.<br/>
+     * If the token is a fungible/common token, this value MUST be strictly
+     * greater than `0`.<br/>
+     * If the token is a non-fungible/unique token, this message SHOULD NOT
+     * be set, and if set, this field MUST be `0`.
+     */
+    uint64 amount = 1;
+}
+```
+
+## Solidity Interface Functions
 ### authorizeSchedule
-
-Authorizes the calling contract as a signer to the schedule transaction.
-@param schedule the address of the schedule transaction.
-@return responseCode The response code for the status of the request. SUCCESS is 22.
 
 Signature:
 
 ```solidity
 function authorizeSchedule(address schedule) external returns (int64 responseCode);
-
-    /// Allows for the signing of a schedule transaction given a protobuf encoded signature map
-    /// The message signed by the keys is defined to be the concatenation of the shard, realm, and schedule transaction ID.
-    /// @param schedule the address of the schedule transaction.
-    /// @param signatureMap the protobuf encoded signature map
-    /// @return responseCode The response code for the status of the request. SUCCESS is 22.
-    function signSchedule(address schedule, bytes memory signatureMap) external returns (int64 responseCode);
 ```
 
-Parameters:
+### signSchedule
 
-| Name | Type |
-|-----:|:-----|
-| schedule | address |
+Signature:
 
-Returns:
-
-| Name | Type |
-|-----:|:-----|
-| responseCode | int64 |
+```solidity
+function signSchedule(address schedule, bytes memory signatureMap) external returns (int64 responseCode);
+```
 
 ### scheduleNative
-
-Allows for the creation of a schedule transaction for a given system contract address, abi encoded call data and payer address
-Currently supports the Hedera Token Service System Contract (0x167) with encoded call data for
-createFungibleToken, createNonFungibleToken, createFungibleTokenWithCustomFees, createNonFungibleTokenWithCustomFees
-and updateToken functions
-@param systemContractAddress the address of the system contract from which to create the schedule transaction
-@param callData the abi encoded call data for the system contract function
-@param payer the address of the account that will pay for the schedule transaction
-@return responseCode The response code for the status of the request. SUCCESS is 22.
-@return scheduleAddress The address of the newly created schedule transaction.
 
 Signature:
 
 ```solidity
 function scheduleNative(address systemContractAddress, bytes memory callData, address payer) external returns (int64 responseCode, address scheduleAddress);
-
-    /// Returns the token information for a scheduled fungible token create transaction
-    /// @param scheduleAddress the address of the schedule transaction
-    /// @return responseCode The response code for the status of the request. SUCCESS is 22.
-    /// @return fungibleTokenInfo The token information for the scheduled fungible token create transaction
-    function getScheduledCreateFungibleTokenInfo(address scheduleAddress) external returns (int64 responseCode, IHederaTokenService.FungibleTokenInfo memory fungibleTokenInfo);
 ```
 
-Parameters:
+### getScheduledCreateFungibleTokenInfo
 
-| Name | Type |
-|-----:|:-----|
-| systemContractAddress | address |
-| callData | bytes memory |
-| payer | address |
+Signature:
 
-Returns:
-
-| Name | Type |
-|-----:|:-----|
-| responseCode | int64 |
-| scheduleAddress | address |
+```solidity
+function getScheduledCreateFungibleTokenInfo(address scheduleAddress) external returns (int64 responseCode, IHederaTokenService.FungibleTokenInfo memory fungibleTokenInfo);
+```
 
 ### getScheduledCreateNonFungibleTokenInfo
-
-Returns the token information for a scheduled non fungible token create transaction
-@param scheduleAddress the address of the schedule transaction
-@return responseCode The response code for the status of the request. SUCCESS is 22.
-@return nonFungibleTokenInfo The token information for the scheduled non fungible token create transaction
 
 Signature:
 
 ```solidity
 function getScheduledCreateNonFungibleTokenInfo(address scheduleAddress) external returns (int64 responseCode, IHederaTokenService.NonFungibleTokenInfo memory nonFungibleTokenInfo);
 ```
-
-Parameters:
-
-| Name | Type |
-|-----:|:-----|
-| scheduleAddress | address |
-
-Returns:
-
-| Name | Type |
-|-----:|:-----|
-| responseCode | int64 |
-| nonFungibleTokenInfo | IHederaTokenService.NonFungibleTokenInfo memory |
-
-## Related Protobuf Files
-
-| Name | Link |
-|-----:|:-----|
-| schedule_create.proto | [../../node_modules/@hashgraph/proto/src/proto/services/schedule_create.proto](../../node_modules/@hashgraph/proto/src/proto/services/schedule_create.proto) |
-| schedule_sign.proto | [../../node_modules/@hashgraph/proto/src/proto/services/schedule_sign.proto](../../node_modules/@hashgraph/proto/src/proto/services/schedule_sign.proto) |
-| schedule_get_info.proto | [../../node_modules/@hashgraph/proto/src/proto/services/schedule_get_info.proto](../../node_modules/@hashgraph/proto/src/proto/services/schedule_get_info.proto) |
-| basic_types.proto | [../../node_modules/@hashgraph/proto/src/proto/services/basic_types.proto](../../node_modules/@hashgraph/proto/src/proto/services/basic_types.proto) |
