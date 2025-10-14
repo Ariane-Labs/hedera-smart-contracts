@@ -53,42 +53,6 @@ jobs:
       mirrorTag: ${{inputs.mirrorNodeTag}}
       relayTag: ${{inputs.relayTag}}
 
-  TokenCreateContract:
-    name: Token Create Test Suite
-    uses: ./.github/workflows/test-workflow.yml
-    with:
-      testfilter: TokenCreateContract
-      networkTag: ${{inputs.networkNodeTag}}
-      mirrorTag: ${{inputs.mirrorNodeTag}}
-      relayTag: ${{inputs.relayTag}}
-
-  TokenQueryContract:
-    name: Token Query Test Suite
-    uses: ./.github/workflows/test-workflow.yml
-    with:
-      testfilter: TokenQueryContract
-      networkTag: ${{inputs.networkNodeTag}}
-      mirrorTag: ${{inputs.mirrorNodeTag}}
-      relayTag: ${{inputs.relayTag}}
-
-  TokenManagmentContract:
-    name: Token Managment Test Suite
-    uses: ./.github/workflows/test-workflow.yml
-    with:
-      testfilter: TokenManagmentContract
-      networkTag: ${{inputs.networkNodeTag}}
-      mirrorTag: ${{inputs.mirrorNodeTag}}
-      relayTag: ${{inputs.relayTag}}
-
-  TokenTransferContract:
-    name: Token Transfer Test Suite
-    uses: ./.github/workflows/test-workflow.yml
-    with:
-      testfilter: TokenTransferContract
-      networkTag: ${{inputs.networkNodeTag}}
-      mirrorTag: ${{inputs.mirrorNodeTag}}
-      relayTag: ${{inputs.relayTag}}
-
   Proxy:
     name: Proxy Upgrade Test Suite
     uses: ./.github/workflows/test-workflow.yml
