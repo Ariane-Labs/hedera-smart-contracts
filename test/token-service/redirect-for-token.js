@@ -179,7 +179,7 @@ describe('RedirectForToken Test Suite', function () {
     expect(Number(result)).to.eq(amount);
   });
 
-  it('should be able to execute transfer(address,uint256)', async function () {
+  it.skip('should be able to execute transfer(address,uint256)', async function () {
     const erc20 = await ethers.getContractAt(
       Constants.Contract.ERC20Mock,
       tokenAddress

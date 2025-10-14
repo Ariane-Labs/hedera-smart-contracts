@@ -189,11 +189,7 @@ const Contract = {
   CancunOpcodes: 'CancunOpcodes',
   KZGPointEvaluation: 'KZGPointEvaluation',
   StateRegistry: 'StateRegistry',
-  Airdrop: 'Airdrop',
-  ClaimAirdrop: 'ClaimAirdrop',
-  TokenReject: 'TokenReject',
   AliasAccountUtility: 'AliasAccountUtility',
-  CancelAirdrop: 'CancelAirdrop',
 };
 
 const CALL_EXCEPTION = 'CALL_EXCEPTION';

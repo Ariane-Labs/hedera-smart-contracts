@@ -476,10 +476,10 @@ describe('TokenTransferContract Test Suite', function () {
     expect(signers0BeforeHbarBalance > signers0AfterHbarBalance).to.equal(true);
     expect(signers1AfterHbarBalance > signers1BeforeHbarBalance).to.equal(true);
     expect(signers0BeforeTokenBalance - amount).to.equal(
-      BigInt(signers0AfterTokenBalance)
+      Number(signers0AfterTokenBalance)
     );
     expect(signers1BeforeTokenBalance + amount).to.equal(
-      signers1AfterTokenBalance
+      Number(signers1AfterTokenBalance)
     );
     expect(nftOwnerBefore).to.equal(signers[0].address);
     expect(nftOwnerAfter).to.equal(signers[1].address);
