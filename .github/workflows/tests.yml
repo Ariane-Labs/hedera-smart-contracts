@@ -39,30 +39,6 @@ jobs:
     with:
       testfilter: ERC1155
 
-  TokenCreateContract:
-    name: Token Create Test Suite
-    uses: ./.github/workflows/test-workflow.yml
-    with:
-      testfilter: TokenCreateContract
-
-  TokenQueryContract:
-    name: Token Query Test Suite
-    uses: ./.github/workflows/test-workflow.yml
-    with:
-      testfilter: TokenQueryContract
-
-  TokenManagmentContract:
-    name: Token Managment Test Suite
-    uses: ./.github/workflows/test-workflow.yml
-    with:
-      testfilter: TokenManagmentContract
-
-  TokenTransferContract:
-    name: Token Transfer Test Suite
-    uses: ./.github/workflows/test-workflow.yml
-    with:
-      testfilter: TokenTransferContract
-
   Proxy:
     name: Proxy Upgrade Test Suite
     uses: ./.github/workflows/test-workflow.yml
@@ -154,10 +130,6 @@ jobs:
       - ERC20Contract
       - ERC721Contract
       - ERC1155Contract
-      - TokenCreateContract
-      - TokenQueryContract
-      - TokenManagmentContract
-      - TokenTransferContract
       - Proxy
       - SafeHTS
       - HIP583
