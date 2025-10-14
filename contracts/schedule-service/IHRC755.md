@@ -5,6 +5,7 @@ Generated on 2025-10-14T12:10:36.670Z
 Source: contracts/schedule-service/IHRC755.sol
 
 ## Table of Contents
+
 - [Protobuf Definitions](#protobuf-definitions)
   - [schedule_sign.proto](#schedule_signproto)
 - [Solidity Interface Functions](#functions)
@@ -81,6 +82,7 @@ message ScheduleSignTransactionBody {
 ```
 
 ## Solidity Interface Functions
+
 ### authorizeSchedule
 
 Signature:

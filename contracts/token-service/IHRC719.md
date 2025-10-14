@@ -5,6 +5,7 @@ Generated on 2025-10-14T12:10:36.682Z
 Source: contracts/token-service/IHRC719.sol
 
 ## Table of Contents
+
 - [Protobuf Definitions](#protobuf-definitions)
   - [token_associate.proto](#token_associateproto)
   - [token_dissociate.proto](#token_dissociateproto)
@@ -191,6 +192,7 @@ message TokenDissociateTransactionBody {
 ```
 
 ## Solidity Interface Functions
+
 ### associate
 
 Signature:

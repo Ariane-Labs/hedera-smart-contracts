@@ -5,6 +5,7 @@ Generated on 2025-10-14T12:10:36.660Z
 Source: contracts/account-service/IHRC632.sol
 
 ## Table of Contents
+
 - [Protobuf Definitions](#protobuf-definitions)
   - [crypto_get_info.proto](#crypto_get_infoproto)
   - [get_account_details.proto](#get_account_detailsproto)
@@ -3175,6 +3176,7 @@ message PendingAirdropValue {
 ```
 
 ## Solidity Interface Functions
+
 ### getEvmAddressAlias
 
 Signature:

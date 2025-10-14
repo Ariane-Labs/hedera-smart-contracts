@@ -5,6 +5,7 @@ Generated on 2025-10-14T12:10:36.668Z
 Source: contracts/prng/IPrngSystemContract.sol
 
 ## Table of Contents
+
 - [Protobuf Definitions](#protobuf-definitions)
   - [util_prng.proto](#util_prngproto)
 - [Solidity Interface Functions](#functions)
@@ -64,6 +65,7 @@ message UtilPrngTransactionBody {
 ```
 
 ## Solidity Interface Functions
+
 ### getPseudorandomSeed
 
 Signature:

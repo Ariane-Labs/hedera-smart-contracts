@@ -5,6 +5,7 @@ Generated on 2025-10-14T12:10:36.683Z
 Source: contracts/token-service/IHRC904TokenFacade.sol
 
 ## Table of Contents
+
 - [Protobuf Definitions](#protobuf-definitions)
   - [token_cancel_airdrop.proto](#token_cancel_airdropproto)
   - [token_claim_airdrop.proto](#token_claim_airdropproto)
@@ -234,6 +235,7 @@ message TokenReference {
 ```
 
 ## Solidity Interface Functions
+
 ### cancelAirdropFT
 
 Signature:

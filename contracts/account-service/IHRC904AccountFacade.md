@@ -5,6 +5,7 @@ Generated on 2025-10-14T12:10:36.661Z
 Source: contracts/account-service/IHRC904AccountFacade.sol
 
 ## Table of Contents
+
 - [Protobuf Definitions](#protobuf-definitions)
   - [crypto_update.proto](#crypto_updateproto)
   - [basic_types.proto](#basic_typesproto)
@@ -2692,6 +2693,7 @@ message PendingAirdropValue {
 ```
 
 ## Solidity Interface Functions
+
 ### setUnlimitedAutomaticAssociations
 
 Signature:

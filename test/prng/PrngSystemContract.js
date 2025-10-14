@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
-import { network } from "hardhat";
+import { network } from 'hardhat';
 const { ethers } = await network.connect();
-import { expect } from "chai";
+import { expect } from 'chai';
 
 describe('PrngSystemContract Test Suite', function () {
   let prngSystemContract;
@@ -17,7 +17,9 @@ describe('PrngSystemContract Test Suite', function () {
     const tx = await prngSystemContract.getPseudorandomSeed();
     const txReceipt = await tx.wait();
 
-    const result = txReceipt.logs.filter((e) => e.fragment.name === 'PseudoRandomSeed')[0].args[0];
+    const result = txReceipt.logs.filter(
+      (e) => e.fragment.name === 'PseudoRandomSeed'
+    )[0].args[0];
 
     expect(result).to.exist;
     expect(result).to.not.equal(ethers.ZeroHash);

@@ -15,8 +15,22 @@ const path = require('path');
 
 const ROOT = __dirname;
 const CONTRACTS_DIR = path.join(ROOT, 'contracts');
-const PROTO_BASE = path.join(ROOT, 'node_modules', '@hashgraph', 'proto', 'src', 'proto', 'services');
-const PROTO_PKG_JSON = path.join(ROOT, 'node_modules', '@hashgraph', 'proto', 'package.json');
+const PROTO_BASE = path.join(
+  ROOT,
+  'node_modules',
+  '@hashgraph',
+  'proto',
+  'src',
+  'proto',
+  'services'
+);
+const PROTO_PKG_JSON = path.join(
+  ROOT,
+  'node_modules',
+  '@hashgraph',
+  'proto',
+  'package.json'
+);
 
 function getProtoPackageInfo() {
   try {
@@ -25,7 +39,7 @@ function getProtoPackageInfo() {
     return {
       name: pkg.name || '',
       version: pkg.version || '',
-      description: pkg.description || ''
+      description: pkg.description || '',
     };
   } catch (e) {
     return null;
@@ -34,41 +48,32 @@ function getProtoPackageInfo() {
 
 // Manual mapping: Interface name -> array of proto file paths (relative to PROTO_BASE)
 const INTERFACE_PROTO_MAP = {
-  'IHederaAccountService': [
+  IHederaAccountService: [
     'crypto_approve_allowance.proto',
     'crypto_get_info.proto',
-    'basic_types.proto'
+    'basic_types.proto',
   ],
-  'IHRC632': [
+  IHRC632: [
     'crypto_get_info.proto',
     'get_account_details.proto',
-    'basic_types.proto'
+    'basic_types.proto',
   ],
-  'IHRC906': [
-    'crypto_approve_allowance.proto',
-    'basic_types.proto'
-  ],
-  'IHRC904': [
+  IHRC906: ['crypto_approve_allowance.proto', 'basic_types.proto'],
+  IHRC904: [
     'token_airdrop.proto',
     'token_cancel_airdrop.proto',
     'token_claim_airdrop.proto',
     'token_reject.proto',
-    'basic_types.proto'
+    'basic_types.proto',
   ],
-  'IHRC904AccountFacade': [
-    'crypto_update.proto',
-    'basic_types.proto'
-  ],
-  'IHRC906AccountFacade': [
-    'crypto_approve_allowance.proto',
-    'basic_types.proto'
-  ],
-  'IHRC904TokenFacade': [
+  IHRC904AccountFacade: ['crypto_update.proto', 'basic_types.proto'],
+  IHRC906AccountFacade: ['crypto_approve_allowance.proto', 'basic_types.proto'],
+  IHRC904TokenFacade: [
     'token_cancel_airdrop.proto',
     'token_claim_airdrop.proto',
-    'token_reject.proto'
+    'token_reject.proto',
   ],
-  'IHederaTokenService': [
+  IHederaTokenService: [
     'token_create.proto',
     'token_freeze_account.proto',
     'token_unfreeze_account.proto',
@@ -93,31 +98,19 @@ const INTERFACE_PROTO_MAP = {
     'token_get_nft_info.proto',
     'token_get_nft_infos.proto',
     'token_get_account_nft_infos.proto',
-    'basic_types.proto'
+    'basic_types.proto',
   ],
-  'IHRC719': [
-    'token_associate.proto',
-    'token_dissociate.proto'
-  ],
-  'IHederaScheduleService': [
+  IHRC719: ['token_associate.proto', 'token_dissociate.proto'],
+  IHederaScheduleService: [
     'schedule_create.proto',
     'schedule_sign.proto',
     'schedule_get_info.proto',
-    'basic_types.proto'
+    'basic_types.proto',
   ],
-  'IHRC755': [
-    'schedule_sign.proto'
-  ],
-  'IHRC756': [
-    'schedule_create.proto',
-    'schedule_get_info.proto'
-  ],
-  'IHRC755ScheduleFacade': [
-    'schedule_sign.proto'
-  ],
-  'IPrngSystemContract': [
-    'util_prng.proto'
-  ]
+  IHRC755: ['schedule_sign.proto'],
+  IHRC756: ['schedule_create.proto', 'schedule_get_info.proto'],
+  IHRC755ScheduleFacade: ['schedule_sign.proto'],
+  IPrngSystemContract: ['util_prng.proto'],
 };
 
 function readFileSafe(file) {
@@ -235,7 +228,11 @@ function parseSolidityInterfaceBlock(blockSource) {
         if (fieldLine.includes('}')) {
           depth--;
           if (depth === 0) {
-            structs.push({ name: structName, description, fields: structFields });
+            structs.push({
+              name: structName,
+              description,
+              fields: structFields,
+            });
             structName = '';
             structFields = [];
             lastLineComment = [];
@@ -264,13 +261,15 @@ function parseSolidityInterfaceBlock(blockSource) {
 
       // aggregate signature until terminating ';'
       let sigBlock = raw + '\n';
-      let parenDepth = (raw.match(/\(/g) || []).length - (raw.match(/\)/g) || []).length;
+      let parenDepth =
+        (raw.match(/\(/g) || []).length - (raw.match(/\)/g) || []).length;
       let j = i + 1;
       if (!(parenDepth <= 0 && raw.trim().endsWith(';'))) {
         while (j < lines.length) {
           const l = lines[j];
           sigBlock += l + '\n';
-          parenDepth += (l.match(/\(/g) || []).length - (l.match(/\)/g) || []).length;
+          parenDepth +=
+            (l.match(/\(/g) || []).length - (l.match(/\)/g) || []).length;
           if (parenDepth <= 0 && l.trim().endsWith(';')) {
             j++;
             break;
@@ -280,7 +279,9 @@ function parseSolidityInterfaceBlock(blockSource) {
       }
 
       const sigOneLine = sigBlock.replace(/\s+/g, ' ').trim();
-      const paramsSectionMatch = sigOneLine.match(/function\s+\w+\s*\((.*?)\)\s*(external|public|internal|private)?/);
+      const paramsSectionMatch = sigOneLine.match(
+        /function\s+\w+\s*\((.*?)\)\s*(external|public|internal|private)?/
+      );
       const paramsSection = paramsSectionMatch ? paramsSectionMatch[1] : '';
 
       const params = [];
@@ -314,7 +315,13 @@ function parseSolidityInterfaceBlock(blockSource) {
         }
       }
 
-      functions.push({ name, description, signature: sigBlock.trim(), params, returns });
+      functions.push({
+        name,
+        description,
+        signature: sigBlock.trim(),
+        params,
+        returns,
+      });
       i = j;
       continue;
     }
@@ -506,7 +513,7 @@ async function main() {
         interfaceName: itf.name,
         sourceRelPath: relSol,
         parsedSol: parsed,
-        protoData
+        protoData,
       });
 
       const outDir = path.dirname(solPath);
@@ -521,7 +528,9 @@ async function main() {
   if (generatedCount === 0) {
     console.log('No interfaces found.');
   } else {
-    console.log(`Done. ${generatedCount} interface documentation file(s) generated.`);
+    console.log(
+      `Done. ${generatedCount} interface documentation file(s) generated.`
+    );
   }
 }
 

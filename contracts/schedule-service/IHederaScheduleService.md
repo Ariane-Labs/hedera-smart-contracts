@@ -5,6 +5,7 @@ Generated on 2025-10-14T12:10:36.669Z
 Source: contracts/schedule-service/IHederaScheduleService.sol
 
 ## Table of Contents
+
 - [Protobuf Definitions](#protobuf-definitions)
   - [schedule_create.proto](#schedule_createproto)
   - [schedule_sign.proto](#schedule_signproto)
@@ -2940,6 +2941,7 @@ message PendingAirdropValue {
 ```
 
 ## Solidity Interface Functions
+
 ### authorizeSchedule
 
 Signature:

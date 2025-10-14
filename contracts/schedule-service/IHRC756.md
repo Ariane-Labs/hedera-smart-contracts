@@ -5,6 +5,7 @@ Generated on 2025-10-14T12:10:36.672Z
 Source: contracts/schedule-service/IHRC756.sol
 
 ## Table of Contents
+
 - [Protobuf Definitions](#protobuf-definitions)
   - [schedule_create.proto](#schedule_createproto)
   - [schedule_get_info.proto](#schedule_get_infoproto)
@@ -423,6 +424,7 @@ message ScheduleGetInfoResponse {
 ```
 
 ## Solidity Interface Functions
+
 ### scheduleNative
 
 Signature:

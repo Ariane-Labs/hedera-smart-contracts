@@ -5,6 +5,7 @@ Generated on 2025-10-14T12:10:36.665Z
 Source: contracts/account-service/IHRC906AccountFacade.sol
 
 ## Table of Contents
+
 - [Protobuf Definitions](#protobuf-definitions)
   - [crypto_approve_allowance.proto](#crypto_approve_allowanceproto)
   - [basic_types.proto](#basic_typesproto)
@@ -2717,6 +2718,7 @@ message PendingAirdropValue {
 ```
 
 ## Solidity Interface Functions
+
 ### hbarAllowance
 
 Signature:

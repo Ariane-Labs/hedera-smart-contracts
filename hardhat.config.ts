@@ -1,8 +1,8 @@
 import type { HardhatUserConfig } from 'hardhat/types/config';
 import hardhatMocha from '@nomicfoundation/hardhat-mocha';
 import hardhatAbiExporter from '@solidstate/hardhat-abi-exporter';
-import hardhatEthers from "@nomicfoundation/hardhat-ethers";
-import dotenv from "dotenv";
+import hardhatEthers from '@nomicfoundation/hardhat-ethers';
+import dotenv from 'dotenv';
 dotenv.config();
 
 /**  @type string */
@@ -12,9 +12,9 @@ const OPERATOR_KEY_A: string =
   process.env.OPERATOR_KEY_A ??
   '0x0000000000000000000000000000000000000000000000000000000000000000';
 
-const PRIVATE_KEYS: string[] = (process.env.PRIVATE_KEYS ?? "")
-  .split(",")
-  .map(k => k.trim())
+const PRIVATE_KEYS: string[] = (process.env.PRIVATE_KEYS ?? '')
+  .split(',')
+  .map((k) => k.trim())
   .filter(Boolean);
 
 const NETWORKS = {

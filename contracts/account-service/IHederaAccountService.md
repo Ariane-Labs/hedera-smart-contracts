@@ -5,6 +5,7 @@ Generated on 2025-10-14T12:10:36.658Z
 Source: contracts/account-service/IHederaAccountService.sol
 
 ## Table of Contents
+
 - [Protobuf Definitions](#protobuf-definitions)
   - [crypto_approve_allowance.proto](#crypto_approve_allowanceproto)
   - [crypto_get_info.proto](#crypto_get_infoproto)
@@ -3010,6 +3011,7 @@ message PendingAirdropValue {
 ```
 
 ## Solidity Interface Functions
+
 ### hbarAllowance
 
 Signature:

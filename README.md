@@ -1,4 +1,4 @@
-:warning: :bangbang: ***All examples and contracts in this repository are exploration code and have NOT been audited. Use them at your own risk!*** :bangbang: :warning:
+:warning: :bangbang: **_All examples and contracts in this repository are exploration code and have NOT been audited. Use them at your own risk!_** :bangbang: :warning:
 
 # Hedera Smart Contracts
 
