@@ -1,11 +1,10 @@
 # Solidity Interface Documentation: IHRC904TokenFacade
 
-Generated on 2025-10-14T12:10:36.683Z
+Generated on 2025-10-15T09:18:32.163Z
 
-Source: contracts/token-service/IHRC904TokenFacade.sol
+Source: contracts/token-service/v1/IHRC904TokenFacade.sol
 
 ## Table of Contents
-
 - [Protobuf Definitions](#protobuf-definitions)
   - [token_cancel_airdrop.proto](#token_cancel_airdropproto)
   - [token_claim_airdrop.proto](#token_claim_airdropproto)
@@ -25,7 +24,7 @@ Protobufs for the Hiero SDK
 
 ### token_cancel_airdrop.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_cancel_airdrop.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_cancel_airdrop.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_cancel_airdrop.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_cancel_airdrop.proto)
 
 ```proto
 /**
@@ -82,7 +81,7 @@ message TokenCancelAirdropTransactionBody {
 
 ### token_claim_airdrop.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_claim_airdrop.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_claim_airdrop.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_claim_airdrop.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_claim_airdrop.proto)
 
 ```proto
 /**
@@ -139,7 +138,7 @@ message TokenClaimAirdropTransactionBody {
 
 ### token_reject.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_reject.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_reject.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_reject.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_reject.proto)
 
 ```proto
 /**
@@ -235,7 +234,6 @@ message TokenReference {
 ```
 
 ## Solidity Interface Functions
-
 ### cancelAirdropFT
 
 Signature:

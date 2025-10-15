@@ -1,11 +1,10 @@
 # Solidity Interface Documentation: IHederaTokenService
 
-Generated on 2025-10-14T12:10:36.687Z
+Generated on 2025-10-15T09:18:32.140Z
 
-Source: contracts/token-service-v2/IHederaTokenService.sol
+Source: contracts/token-service/v1/IHederaTokenService.sol
 
 ## Table of Contents
-
 - [Protobuf Definitions](#protobuf-definitions)
   - [token_create.proto](#token_createproto)
   - [token_freeze_account.proto](#token_freeze_accountproto)
@@ -104,7 +103,6 @@ Source: contracts/token-service-v2/IHederaTokenService.sol
   - [cancelAirdrops](#cancelairdrops)
   - [claimAirdrops](#claimairdrops)
   - [rejectTokens](#rejecttokens)
-  - [updateNFTsMetadata](#updatenftsmetadata)
 
 ## Protobuf Definitions
 
@@ -113,7 +111,7 @@ Protobufs for the Hiero SDK
 
 ### token_create.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_create.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_create.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_create.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_create.proto)
 
 ```proto
 /**
@@ -462,7 +460,7 @@ message TokenCreateTransactionBody {
 
 ### token_freeze_account.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_freeze_account.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_freeze_account.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_freeze_account.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_freeze_account.proto)
 
 ```proto
 /**
@@ -533,7 +531,7 @@ message TokenFreezeAccountTransactionBody {
 
 ### token_unfreeze_account.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_unfreeze_account.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_unfreeze_account.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_unfreeze_account.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_unfreeze_account.proto)
 
 ```proto
 /**
@@ -604,7 +602,7 @@ message TokenUnfreezeAccountTransactionBody {
 
 ### token_grant_kyc.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_grant_kyc.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_grant_kyc.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_grant_kyc.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_grant_kyc.proto)
 
 ```proto
 /**
@@ -678,7 +676,7 @@ message TokenGrantKycTransactionBody {
 
 ### token_revoke_kyc.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_revoke_kyc.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_revoke_kyc.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_revoke_kyc.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_revoke_kyc.proto)
 
 ```proto
 /**
@@ -752,7 +750,7 @@ message TokenRevokeKycTransactionBody {
 
 ### token_delete.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_delete.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_delete.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_delete.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_delete.proto)
 
 ```proto
 /**
@@ -817,7 +815,7 @@ message TokenDeleteTransactionBody {
 
 ### token_update.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_update.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_update.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_update.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_update.proto)
 
 ```proto
 /**
@@ -1127,7 +1125,7 @@ message TokenUpdateTransactionBody {
 
 ### token_mint.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_mint.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_mint.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_mint.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_mint.proto)
 
 ```proto
 /**
@@ -1217,7 +1215,7 @@ message TokenMintTransactionBody {
 
 ### token_burn.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_burn.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_burn.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_burn.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_burn.proto)
 
 ```proto
 /**
@@ -1303,7 +1301,7 @@ message TokenBurnTransactionBody {
 
 ### token_wipe_account.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_wipe_account.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_wipe_account.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_wipe_account.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_wipe_account.proto)
 
 ```proto
 /**
@@ -1419,7 +1417,7 @@ message TokenWipeAccountTransactionBody {
 
 ### token_associate.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_associate.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_associate.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_associate.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_associate.proto)
 
 ```proto
 /**
@@ -1505,7 +1503,7 @@ message TokenAssociateTransactionBody {
 
 ### token_dissociate.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_dissociate.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_dissociate.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_dissociate.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_dissociate.proto)
 
 ```proto
 /**
@@ -1591,7 +1589,7 @@ message TokenDissociateTransactionBody {
 
 ### token_fee_schedule_update.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_fee_schedule_update.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_fee_schedule_update.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_fee_schedule_update.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_fee_schedule_update.proto)
 
 ```proto
 /**
@@ -1660,7 +1658,7 @@ message TokenFeeScheduleUpdateTransactionBody {
 
 ### token_pause.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_pause.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_pause.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_pause.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_pause.proto)
 
 ```proto
 /**
@@ -1715,7 +1713,7 @@ message TokenPauseTransactionBody {
 
 ### token_unpause.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_unpause.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_unpause.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_unpause.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_unpause.proto)
 
 ```proto
 /**
@@ -1770,7 +1768,7 @@ message TokenUnpauseTransactionBody {
 
 ### token_update_nfts.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_update_nfts.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_update_nfts.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_update_nfts.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_update_nfts.proto)
 
 ```proto
 /**
@@ -1844,7 +1842,7 @@ message TokenUpdateNftsTransactionBody {
 
 ### token_airdrop.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_airdrop.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_airdrop.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_airdrop.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_airdrop.proto)
 
 ```proto
 /**
@@ -1953,7 +1951,7 @@ message TokenAirdropTransactionBody {
 
 ### token_cancel_airdrop.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_cancel_airdrop.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_cancel_airdrop.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_cancel_airdrop.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_cancel_airdrop.proto)
 
 ```proto
 /**
@@ -2010,7 +2008,7 @@ message TokenCancelAirdropTransactionBody {
 
 ### token_claim_airdrop.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_claim_airdrop.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_claim_airdrop.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_claim_airdrop.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_claim_airdrop.proto)
 
 ```proto
 /**
@@ -2067,7 +2065,7 @@ message TokenClaimAirdropTransactionBody {
 
 ### token_reject.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_reject.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_reject.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_reject.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_reject.proto)
 
 ```proto
 /**
@@ -2164,7 +2162,7 @@ message TokenReference {
 
 ### token_get_info.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_get_info.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_get_info.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_get_info.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_get_info.proto)
 
 ```proto
 /**
@@ -2563,7 +2561,7 @@ message TokenGetInfoResponse {
 
 ### token_get_nft_info.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_get_nft_info.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_get_nft_info.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_get_nft_info.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_get_nft_info.proto)
 
 ```proto
 /**
@@ -2672,7 +2670,7 @@ message TokenGetNftInfoResponse {
 
 ### token_get_nft_infos.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_get_nft_infos.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_get_nft_infos.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_get_nft_infos.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_get_nft_infos.proto)
 
 ```proto
 /**
@@ -2765,7 +2763,7 @@ message TokenGetNftInfosResponse {
 
 ### token_get_account_nft_infos.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/token_get_account_nft_infos.proto](../../node_modules/@hashgraph/proto/src/proto/services/token_get_account_nft_infos.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/token_get_account_nft_infos.proto](../../../node_modules/@hashgraph/proto/src/proto/services/token_get_account_nft_infos.proto)
 
 ```proto
 /**
@@ -2845,7 +2843,7 @@ message TokenGetAccountNftInfosResponse {
 
 ### basic_types.proto
 
-Source: [../../node_modules/@hashgraph/proto/src/proto/services/basic_types.proto](../../node_modules/@hashgraph/proto/src/proto/services/basic_types.proto)
+Source: [../../../node_modules/@hashgraph/proto/src/proto/services/basic_types.proto](../../../node_modules/@hashgraph/proto/src/proto/services/basic_types.proto)
 
 ```proto
 /**
@@ -5293,168 +5291,165 @@ message PendingAirdropValue {
 ```
 
 ## Solidity Interface Structs
-
 ### AccountAmount
 
-|      Field | Type    |
-| ---------: | :------ |
-|  accountID | address |
-|     amount | int64   |
-| isApproval | bool    |
+| Field | Type |
+|------:|:-----|
+| accountID | address |
+| amount | int64 |
+| isApproval | bool |
 
 ### NftTransfer
 
-|             Field | Type    |
-| ----------------: | :------ |
-|   senderAccountID | address |
+| Field | Type |
+|------:|:-----|
+| senderAccountID | address |
 | receiverAccountID | address |
-|      serialNumber | int64   |
-|        isApproval | bool    |
+| serialNumber | int64 |
+| isApproval | bool |
 
 ### TokenTransferList
 
-|        Field | Type            |
-| -----------: | :-------------- |
-|        token | address         |
-|    transfers | AccountAmount[] |
-| nftTransfers | NftTransfer[]   |
+| Field | Type |
+|------:|:-----|
+| token | address |
+| transfers | AccountAmount[] |
+| nftTransfers | NftTransfer[] |
 
 ### TransferList
 
-|     Field | Type            |
-| --------: | :-------------- |
+| Field | Type |
+|------:|:-----|
 | transfers | AccountAmount[] |
 
 ### Expiry
 
-|            Field | Type    |
-| ---------------: | :------ |
-|           second | int64   |
+| Field | Type |
+|------:|:-----|
+| second | int64 |
 | autoRenewAccount | address |
-|  autoRenewPeriod | int64   |
+| autoRenewPeriod | int64 |
 
 ### KeyValue
 
-|                 Field | Type    |
-| --------------------: | :------ |
-|     inheritAccountKey | bool    |
-|            contractId | address |
-|               ed25519 | bytes   |
-|       ECDSA_secp256k1 | bytes   |
+| Field | Type |
+|------:|:-----|
+| inheritAccountKey | bool |
+| contractId | address |
+| ed25519 | bytes |
+| ECDSA_secp256k1 | bytes |
 | delegatableContractId | address |
 
 ### TokenKey
 
-|   Field | Type     |
-| ------: | :------- |
-| keyType | uint     |
-|     key | KeyValue |
+| Field | Type |
+|------:|:-----|
+| keyType | uint |
+| key | KeyValue |
 
 ### HederaToken
 
-|           Field | Type       |
-| --------------: | :--------- |
-|            name | string     |
-|          symbol | string     |
-|        treasury | address    |
-|            memo | string     |
-| tokenSupplyType | bool       |
-|       maxSupply | int64      |
-|   freezeDefault | bool       |
-|       tokenKeys | TokenKey[] |
-|          expiry | Expiry     |
-|        metadata | bytes      |
+| Field | Type |
+|------:|:-----|
+| name | string |
+| symbol | string |
+| treasury | address |
+| memo | string |
+| tokenSupplyType | bool |
+| maxSupply | int64 |
+| freezeDefault | bool |
+| tokenKeys | TokenKey[] |
+| expiry | Expiry |
 
 ### TokenInfo
 
-|            Field | Type            |
-| ---------------: | :-------------- |
-|            token | HederaToken     |
-|      totalSupply | int64           |
-|          deleted | bool            |
-| defaultKycStatus | bool            |
-|      pauseStatus | bool            |
-|        fixedFees | FixedFee[]      |
-|   fractionalFees | FractionalFee[] |
-|      royaltyFees | RoyaltyFee[]    |
-|         ledgerId | string          |
+| Field | Type |
+|------:|:-----|
+| token | HederaToken |
+| totalSupply | int64 |
+| deleted | bool |
+| defaultKycStatus | bool |
+| pauseStatus | bool |
+| fixedFees | FixedFee[] |
+| fractionalFees | FractionalFee[] |
+| royaltyFees | RoyaltyFee[] |
+| ledgerId | string |
 
 ### FungibleTokenInfo
 
-|     Field | Type      |
-| --------: | :-------- |
+| Field | Type |
+|------:|:-----|
 | tokenInfo | TokenInfo |
-|  decimals | int32     |
+| decimals | int32 |
 
 ### NonFungibleTokenInfo
 
-|        Field | Type      |
-| -----------: | :-------- |
-|    tokenInfo | TokenInfo |
-| serialNumber | int64     |
-|      ownerId | address   |
-| creationTime | int64     |
-|     metadata | bytes     |
-|    spenderId | address   |
+| Field | Type |
+|------:|:-----|
+| tokenInfo | TokenInfo |
+| serialNumber | int64 |
+| ownerId | address |
+| creationTime | int64 |
+| metadata | bytes |
+| spenderId | address |
 
 ### FixedFee
 
-|                     Field | Type    |
-| ------------------------: | :------ |
-|                    amount | int64   |
-|                   tokenId | address |
-|        useHbarsForPayment | bool    |
-| useCurrentTokenForPayment | bool    |
-|              feeCollector | address |
+| Field | Type |
+|------:|:-----|
+| amount | int64 |
+| tokenId | address |
+| useHbarsForPayment | bool |
+| useCurrentTokenForPayment | bool |
+| feeCollector | address |
 
 ### FractionalFee
 
-|          Field | Type    |
-| -------------: | :------ |
-|      numerator | int64   |
-|    denominator | int64   |
-|  minimumAmount | int64   |
-|  maximumAmount | int64   |
-| netOfTransfers | bool    |
-|   feeCollector | address |
+| Field | Type |
+|------:|:-----|
+| numerator | int64 |
+| denominator | int64 |
+| minimumAmount | int64 |
+| maximumAmount | int64 |
+| netOfTransfers | bool |
+| feeCollector | address |
 
 ### RoyaltyFee
 
-|              Field | Type    |
-| -----------------: | :------ |
-|          numerator | int64   |
-|        denominator | int64   |
-|             amount | int64   |
-|            tokenId | address |
-| useHbarsForPayment | bool    |
-|       feeCollector | address |
+| Field | Type |
+|------:|:-----|
+| numerator | int64 |
+| denominator | int64 |
+| amount | int64 |
+| tokenId | address |
+| useHbarsForPayment | bool |
+| feeCollector | address |
 
 ### PendingAirdrop
 
-|    Field | Type    |
-| -------: | :------ |
-|   sender | address |
+| Field | Type |
+|------:|:-----|
+| sender | address |
 | receiver | address |
-|    token | address |
-|   serial | int64   |
+| token | address |
+| serial | int64 |
 
 ### NftID
 
-|  Field | Type    |
-| -----: | :------ |
-|    nft | address |
-| serial | int64   |
+| Field | Type |
+|------:|:-----|
+| nft | address |
+| serial | int64 |
 
 ## Solidity Interface Functions
-
 ### cryptoTransfer
 
 Signature:
 
 ```solidity
 function cryptoTransfer(TransferList memory transferList, TokenTransferList[] memory tokenTransfers)
-    external
-    returns (int64 responseCode);
+        external
+        returns (int64 responseCode);
 ```
 
 ### mintToken
@@ -5467,12 +5462,12 @@ function mintToken(
         int64 amount,
         bytes[] memory metadata
     )
-    external
-    returns (
-        int64 responseCode,
-        int64 newTotalSupply,
-        int64[] memory serialNumbers
-    );
+        external
+        returns (
+            int64 responseCode,
+            int64 newTotalSupply,
+            int64[] memory serialNumbers
+        );
 ```
 
 ### burnToken
@@ -5493,8 +5488,8 @@ Signature:
 
 ```solidity
 function associateTokens(address account, address[] memory tokens)
-    external
-    returns (int64 responseCode);
+        external
+        returns (int64 responseCode);
 ```
 
 ### associateToken
@@ -5503,8 +5498,8 @@ Signature:
 
 ```solidity
 function associateToken(address account, address token)
-    external
-    returns (int64 responseCode);
+        external
+        returns (int64 responseCode);
 ```
 
 ### dissociateTokens
@@ -5513,8 +5508,8 @@ Signature:
 
 ```solidity
 function dissociateTokens(address account, address[] memory tokens)
-    external
-    returns (int64 responseCode);
+        external
+        returns (int64 responseCode);
 ```
 
 ### dissociateToken
@@ -5523,8 +5518,8 @@ Signature:
 
 ```solidity
 function dissociateToken(address account, address token)
-    external
-    returns (int64 responseCode);
+        external
+        returns (int64 responseCode);
 ```
 
 ### createFungibleToken
@@ -5559,9 +5554,9 @@ Signature:
 
 ```solidity
 function createNonFungibleToken(HederaToken memory token)
-    external
-    payable
-    returns (int64 responseCode, address tokenAddress);
+        external
+        payable
+        returns (int64 responseCode, address tokenAddress);
 ```
 
 ### createNonFungibleTokenWithCustomFees
@@ -5685,8 +5680,8 @@ Signature:
 
 ```solidity
 function getApproved(address token, uint256 serialNumber)
-    external
-    returns (int64 responseCode, address approved);
+        external
+        returns (int64 responseCode, address approved);
 ```
 
 ### setApprovalForAll
@@ -5719,8 +5714,8 @@ Signature:
 
 ```solidity
 function isFrozen(address token, address account)
-    external
-    returns (int64 responseCode, bool frozen);
+        external
+        returns (int64 responseCode, bool frozen);
 ```
 
 ### isKyc
@@ -5729,8 +5724,8 @@ Signature:
 
 ```solidity
 function isKyc(address token, address account)
-    external
-    returns (int64 responseCode, bool kycGranted);
+        external
+        returns (int64 responseCode, bool kycGranted);
 ```
 
 ### deleteToken
@@ -5747,8 +5742,8 @@ Signature:
 
 ```solidity
 function getTokenCustomFees(address token)
-    external
-    returns (int64 responseCode, FixedFee[] memory fixedFees, FractionalFee[] memory fractionalFees, RoyaltyFee[] memory royaltyFees);
+        external
+        returns (int64 responseCode, FixedFee[] memory fixedFees, FractionalFee[] memory fractionalFees, RoyaltyFee[] memory royaltyFees);
 ```
 
 ### getTokenDefaultFreezeStatus
@@ -5757,8 +5752,8 @@ Signature:
 
 ```solidity
 function getTokenDefaultFreezeStatus(address token)
-    external
-    returns (int64 responseCode, bool defaultFreezeStatus);
+        external
+        returns (int64 responseCode, bool defaultFreezeStatus);
 ```
 
 ### getTokenDefaultKycStatus
@@ -5767,8 +5762,8 @@ Signature:
 
 ```solidity
 function getTokenDefaultKycStatus(address token)
-    external
-    returns (int64 responseCode, bool defaultKycStatus);
+        external
+        returns (int64 responseCode, bool defaultKycStatus);
 ```
 
 ### getTokenExpiryInfo
@@ -5777,8 +5772,8 @@ Signature:
 
 ```solidity
 function getTokenExpiryInfo(address token)
-    external
-    returns (int64 responseCode, Expiry memory expiry);
+        external
+        returns (int64 responseCode, Expiry memory expiry);
 ```
 
 ### getFungibleTokenInfo
@@ -5787,8 +5782,8 @@ Signature:
 
 ```solidity
 function getFungibleTokenInfo(address token)
-    external
-    returns (int64 responseCode, FungibleTokenInfo memory fungibleTokenInfo);
+        external
+        returns (int64 responseCode, FungibleTokenInfo memory fungibleTokenInfo);
 ```
 
 ### getTokenInfo
@@ -5797,8 +5792,8 @@ Signature:
 
 ```solidity
 function getTokenInfo(address token)
-    external
-    returns (int64 responseCode, TokenInfo memory tokenInfo);
+        external
+        returns (int64 responseCode, TokenInfo memory tokenInfo);
 ```
 
 ### getTokenKey
@@ -5807,8 +5802,8 @@ Signature:
 
 ```solidity
 function getTokenKey(address token, uint keyType)
-    external
-    returns (int64 responseCode, KeyValue memory key);
+        external
+        returns (int64 responseCode, KeyValue memory key);
 ```
 
 ### getNonFungibleTokenInfo
@@ -5817,8 +5812,8 @@ Signature:
 
 ```solidity
 function getNonFungibleTokenInfo(address token, int64 serialNumber)
-    external
-    returns (int64 responseCode, NonFungibleTokenInfo memory nonFungibleTokenInfo);
+        external
+        returns (int64 responseCode, NonFungibleTokenInfo memory nonFungibleTokenInfo);
 ```
 
 ### freezeToken
@@ -5827,8 +5822,8 @@ Signature:
 
 ```solidity
 function freezeToken(address token, address account)
-    external
-    returns (int64 responseCode);
+        external
+        returns (int64 responseCode);
 ```
 
 ### unfreezeToken
@@ -5837,8 +5832,8 @@ Signature:
 
 ```solidity
 function unfreezeToken(address token, address account)
-    external
-    returns (int64 responseCode);
+        external
+        returns (int64 responseCode);
 ```
 
 ### grantTokenKyc
@@ -5847,8 +5842,8 @@ Signature:
 
 ```solidity
 function grantTokenKyc(address token, address account)
-    external
-    returns (int64 responseCode);
+        external
+        returns (int64 responseCode);
 ```
 
 ### revokeTokenKyc
@@ -5857,8 +5852,8 @@ Signature:
 
 ```solidity
 function revokeTokenKyc(address token, address account)
-    external
-    returns (int64 responseCode);
+        external
+        returns (int64 responseCode);
 ```
 
 ### pauseToken
@@ -5907,8 +5902,8 @@ Signature:
 
 ```solidity
 function updateTokenInfo(address token, HederaToken memory tokenInfo)
-    external
-    returns (int64 responseCode);
+        external
+        returns (int64 responseCode);
 ```
 
 ### updateTokenExpiryInfo
@@ -5917,8 +5912,8 @@ Signature:
 
 ```solidity
 function updateTokenExpiryInfo(address token, Expiry memory expiryInfo)
-    external
-    returns (int64 responseCode);
+        external
+        returns (int64 responseCode);
 ```
 
 ### updateTokenKeys
@@ -5927,8 +5922,8 @@ Signature:
 
 ```solidity
 function updateTokenKeys(address token, TokenKey[] memory keys)
-    external
-    returns (int64 responseCode);
+        external
+        returns (int64 responseCode);
 ```
 
 ### isToken
@@ -5937,8 +5932,8 @@ Signature:
 
 ```solidity
 function isToken(address token)
-    external returns
-    (int64 responseCode, bool isToken);
+        external returns
+        (int64 responseCode, bool isToken);
 ```
 
 ### getTokenType
@@ -5947,8 +5942,8 @@ Signature:
 
 ```solidity
 function getTokenType(address token)
-    external returns
-    (int64 responseCode, int32 tokenType);
+        external returns
+        (int64 responseCode, int32 tokenType);
 ```
 
 ### redirectForToken
@@ -6005,12 +6000,4 @@ Signature:
 
 ```solidity
 function rejectTokens(address rejectingAddress, address[] memory ftAddresses, NftID[] memory nftIDs) external returns (int64 responseCode);
-```
-
-### updateNFTsMetadata
-
-Signature:
-
-```solidity
-function updateNFTsMetadata(address nftToken, int64[] memory serialNumbers, bytes memory metadata) external returns (int responseCode);
 ```

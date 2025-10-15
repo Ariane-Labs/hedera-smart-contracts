@@ -30,10 +30,10 @@ This repository defines the canonical Solidity interfaces for those system contr
 
 ## Repository Structure
 - contracts/
-  - token-service/ — HTS Solidity interfaces, structs, helpers, and examples.
-  - token-service-v2/ — Evolution of the HTS interface (v2) for newer HIPs.
+  - token-service/v1/ — HTS Solidity interfaces, structs, helpers, and examples.
+  - token-service/v2/ — Evolution of the HTS interface (v2) for newer HIPs.
   - account-service/ — HAS Solidity interfaces and example callers.
-  - schedule-service/ — HSS interfaces,.
+  - schedule-service/ — HSS interfaces.
   - prng/ — PRNG system contract interface and sample usage.
 - test/ — Hardhat tests. See also the dedicated testing docs linked below.
 - hardhat.config.ts — Hardhat configuration (Solidity 0.8.24, Cancun EVM, ABI export on compile, preconfigured networks).
@@ -43,7 +43,7 @@ This repository defines the canonical Solidity interfaces for those system contr
 ## System Contracts and Features
 
 ### Hedera Token Service (HTS)
-- Interface: [IHederaTokenService.sol](contracts/token-service/IHederaTokenService.sol)
+- Interface: [IHederaTokenService.sol](contracts/token-service/v1/IHederaTokenService.solsol)
 - Precompile address: `0x167`
 - HIPs: [HIP-206](https://hips.hedera.com/hip/hip-206), [HIP-376](https://hips.hedera.com/hip/hip-376), [HIP-514](https://hips.hedera.com/hip/hip-514)
 - Reference and examples: [contracts/token-service](contracts/token-service)
@@ -55,7 +55,7 @@ This repository defines the canonical Solidity interfaces for those system contr
   - Query token metadata, fees, types, and balances
   - Redirect ERC calls to HTS and airdrop/reject tokens
 
-For detailed selectors and availability, see [HTS System Contract Methods](contracts/token-service/README.md).
+For detailed selectors and availability, see [HTS System Contract Methods](contracts/token-service/v1/README.md.md).
 
 ### Hedera Account Service (HAS)
 - Interface: [IHederaAccountService.sol](contracts/account-service/IHederaAccountService.sol)
@@ -159,7 +159,7 @@ contract UsesPrng {
 ```solidity
 // SPDX-License-Identifier: Apache-2.0
 pragma solidity ^0.8.24;
-import { HederaTokenService } from "contracts/token-service/HederaTokenService.sol";
+import { HederaTokenService } from "contracts/token-service/v1/HederaTokenService.sol";
 
 contract SimpleHTS is HederaTokenService {
     function associate(address token) external returns (int64) {

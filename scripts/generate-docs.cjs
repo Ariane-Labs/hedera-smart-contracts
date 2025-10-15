@@ -7,16 +7,16 @@
  - Outputs a <InterfaceName>.md file next to the .sol file that defines that interface.
 
  Usage:
-   node generate-docs.cjs
+   node scripts/generate-docs.cjs
 */
 
 const fs = require('fs');
 const path = require('path');
 
-const ROOT = __dirname;
-const CONTRACTS_DIR = path.join(ROOT, 'contracts');
+const PROJECT_ROOT = path.resolve(__dirname, '..');
+const CONTRACTS_DIR = path.join(PROJECT_ROOT, 'contracts');
 const PROTO_BASE = path.join(
-  ROOT,
+  PROJECT_ROOT,
   'node_modules',
   '@hashgraph',
   'proto',
@@ -25,7 +25,7 @@ const PROTO_BASE = path.join(
   'services'
 );
 const PROTO_PKG_JSON = path.join(
-  ROOT,
+  PROJECT_ROOT,
   'node_modules',
   '@hashgraph',
   'proto',
@@ -437,7 +437,7 @@ function generateMarkdownForInterface(opts) {
       if (pkgInfo.description) h.push(`${pkgInfo.description}`);
       h.push('');
     }
-    const mdDirAbs = path.join(ROOT, path.dirname(sourceRelPath));
+    const mdDirAbs = path.join(PROJECT_ROOT, path.dirname(sourceRelPath));
     for (const proto of protoData) {
       const fileName = path.basename(proto.relPath || proto.file);
       const relFromMd = path.relative(mdDirAbs, proto.file).replace(/\\/g, '/');
@@ -504,7 +504,7 @@ async function main() {
 
     for (const itf of interfaces) {
       const parsed = parseSolidityInterfaceBlock(itf.block);
-      const relSol = path.relative(ROOT, solPath).replace(/\\/g, '/');
+      const relSol = path.relative(PROJECT_ROOT, solPath).replace(/\\/g, '/');
 
       // Load proto files for this interface (if mapped)
       const protoData = loadProtoFilesForInterface(itf.name);
@@ -521,7 +521,7 @@ async function main() {
       const outFile = path.join(outDir, `${itf.name}.md`);
       fs.writeFileSync(outFile, md, 'utf8');
       generatedCount++;
-      console.log(`Generated: ${path.relative(ROOT, outFile)}`);
+      console.log(`Generated: ${path.relative(PROJECT_ROOT, outFile)}`);
     }
   }
 

@@ -2,7 +2,7 @@
 pragma solidity >=0.4.9 <0.9.0;
 pragma experimental ABIEncoderV2;
 
-import "../token-service/IHederaTokenService.sol";
+import "../token-service/v1/IHederaTokenService.sol";
 interface IHederaScheduleService {
 
     /// Authorizes the calling contract as a signer to the schedule transaction.
